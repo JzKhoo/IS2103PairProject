@@ -8,6 +8,8 @@ package carmsreservationclient;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import entity.Customer;
 import java.util.Scanner;
+import util.exception.CustomerExistException;
+import util.exception.GeneralException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -19,6 +21,8 @@ public class MainApp
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     
     private Customer currentCustomer;
+    
+    
     
     public MainApp() 
     {
@@ -32,6 +36,8 @@ public class MainApp
         this.customerSessionBeanRemote = customerSessionBeanRemote;
     }
     
+    
+    
     public void runApp() 
     {
         Scanner scanner = new Scanner(System.in);
@@ -41,15 +47,8 @@ public class MainApp
         {
             System.out.println("*** Welcome to CaRMS Reservation System ***\n");
             
-            if(currentCustomer != null) 
-            {
-                System.out.print("You are login as " + currentCustomer.getName() + "\n");
-            }
-            else 
-            {
-                System.out.println("1: Login");
-            }
-            
+
+            System.out.println("1: Login");          
             System.out.println("2: Register as Customer");
             System.out.println("3: Exit\n");
             response = 0;
@@ -67,7 +66,8 @@ public class MainApp
                         try
                         {
                             doLogin();
-                            System.out.println("Login soccessful as " + currentCustomer.getName() + "\n");
+                            System.out.println("Login successful as " + currentCustomer.getName() + "\n");
+                            menuMain();
                         }
                         catch(InvalidLoginCredentialException ex) 
                         {
@@ -81,7 +81,7 @@ public class MainApp
                 }
                 else if (response == 2)
                 {
-                    break;
+                    doCreateCustomer();
                 }
                 else if (response == 3)
                 {
@@ -119,6 +119,74 @@ public class MainApp
         else 
         {
             throw new InvalidLoginCredentialException("Missing login credential!");
+        }
+    }
+    
+    private void menuMain() 
+    {
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 0;
+        
+        while(true) 
+        {
+            System.out.println("*** CaRMS Reservation System ***\n");
+            System.out.println("You are login\n");
+            System.out.println("1: Search Car");
+            System.out.println("2: Reserve Car");
+            System.out.println("3: View Reservation Details");
+            System.out.println("4: View All My Reservations");
+            System.out.println("5: Logout\n");
+            response = 0;
+            
+            while(response < 1 || response > 5) 
+            {
+                System.out.print("> ");
+                
+                response = scanner.nextInt();
+                
+                if (response == 5)
+                {
+                    currentCustomer = null;
+                    break;
+                }
+                else 
+                {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+            
+            if(response == 5) 
+            {
+                break;
+            }
+        }
+    }
+    
+    private void doCreateCustomer() 
+    {
+        try 
+        {
+            Scanner scanner = new Scanner(System.in);
+            Customer newCustomer = new Customer();
+            
+            System.out.println("*** CaRMS Reservation System :: Register As Customer ***\n\n");
+            System.out.print("Enter Email> ");
+            newCustomer.setEmail(scanner.nextLine().trim());
+            System.out.print("Enter Phone Number> ");
+            newCustomer.setPhoneNumber(scanner.nextLine().trim());
+            System.out.print("Enter Passport Number> ");
+            newCustomer.setPassportNumber(scanner.nextLine().trim());
+            System.out.print("Enter Name> ");
+            newCustomer.setName(scanner.nextLine().trim());
+            System.out.print("Enter Password> ");
+            newCustomer.setPassword(scanner.nextLine().trim());
+            
+            Long newCustomerId = customerSessionBeanRemote.createNewCustomer(newCustomer);
+            System.out.println("Registration successful!: " + newCustomerId + "\n");
+        }
+        catch(CustomerExistException | GeneralException ex)
+        {
+            System.out.println("An error has occurred while creating the new customer: " + ex.getMessage() + "!\n");
         }
     }
 }

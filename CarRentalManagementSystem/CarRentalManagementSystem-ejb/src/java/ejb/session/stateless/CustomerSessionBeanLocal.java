@@ -7,7 +7,9 @@ package ejb.session.stateless;
 
 import entity.Customer;
 import javax.ejb.Local;
+import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
+import util.exception.GeneralException;
 
 /**
  *
@@ -18,6 +20,6 @@ public interface CustomerSessionBeanLocal {
 
     public Customer retrieveCustomerById(Long customerId) throws CustomerNotFoundException;
 
-    public Long createNewCustomer(Customer customer);
+    public Long createNewCustomer(Customer customer) throws CustomerExistException, GeneralException;
     
 }

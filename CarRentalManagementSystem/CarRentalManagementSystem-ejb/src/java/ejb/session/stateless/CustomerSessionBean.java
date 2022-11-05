@@ -10,8 +10,11 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
+import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
+import util.exception.GeneralException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -71,11 +74,27 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public Long createNewCustomer(Customer customer) 
+    public Long createNewCustomer(Customer customer) throws CustomerExistException, GeneralException
     {
-        em.persist(customer);
-        em.flush();
-        
-        return customer.getCustomerId();
+        try
+        {
+            em.persist(customer);
+            em.flush();
+
+            return customer.getCustomerId();
+        }
+        catch(PersistenceException ex)
+        {
+            if(ex.getCause() != null && 
+                    ex.getCause().getCause() != null &&
+                    ex.getCause().getCause().getClass().getSimpleName().equals("SQLIntegrityConstraintViolationException"))
+            {
+                throw new CustomerExistException("Customer with same email already exist");
+            }
+            else
+            {
+                throw new GeneralException("An unexpected error has occurred: " + ex.getMessage());
+            }
+        }
     }
 }
