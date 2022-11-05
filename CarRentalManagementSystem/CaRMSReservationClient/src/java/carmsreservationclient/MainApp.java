@@ -181,8 +181,8 @@ public class MainApp
             System.out.print("Enter Password> ");
             newCustomer.setPassword(scanner.nextLine().trim());
             
-            Long newCustomerId = customerSessionBeanRemote.createNewCustomer(newCustomer);
-            System.out.println("Registration successful!: " + newCustomerId + "\n");
+            newCustomer = customerSessionBeanRemote.createNewCustomer(newCustomer);
+            System.out.println("Registration successful! Customer ID = " + newCustomer.getCustomerId() + "\n");
         }
         catch(CustomerExistException | GeneralException ex)
         {

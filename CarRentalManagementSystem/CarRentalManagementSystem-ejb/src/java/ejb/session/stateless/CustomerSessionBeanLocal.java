@@ -20,6 +20,6 @@ public interface CustomerSessionBeanLocal {
 
     public Customer retrieveCustomerById(Long customerId) throws CustomerNotFoundException;
 
-    public Long createNewCustomer(Customer customer) throws CustomerExistException, GeneralException;
+    public Customer createNewCustomer(Customer customer) throws CustomerExistException, GeneralException;
     
 }

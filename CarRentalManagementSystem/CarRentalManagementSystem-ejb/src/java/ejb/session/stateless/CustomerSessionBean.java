@@ -74,14 +74,14 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
     
     @Override
-    public Long createNewCustomer(Customer customer) throws CustomerExistException, GeneralException
+    public Customer createNewCustomer(Customer customer) throws CustomerExistException, GeneralException
     {
         try
         {
             em.persist(customer);
             em.flush();
 
-            return customer.getCustomerId();
+            return customer;
         }
         catch(PersistenceException ex)
         {

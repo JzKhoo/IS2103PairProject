@@ -20,5 +20,5 @@ public interface CustomerSessionBeanRemote {
     
     public Customer login(String email, String password) throws InvalidLoginCredentialException;
     
-    public Long createNewCustomer(Customer customer) throws CustomerExistException, GeneralException;
+    public Customer createNewCustomer(Customer customer) throws CustomerExistException, GeneralException;
 }
