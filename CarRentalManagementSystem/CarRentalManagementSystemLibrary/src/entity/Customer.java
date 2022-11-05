@@ -28,13 +28,13 @@ public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
     private String phoneNumber;
     @Column(nullable = false)
     private String passportNumber;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String password;

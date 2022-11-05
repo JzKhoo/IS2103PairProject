@@ -31,7 +31,6 @@ public class CreditCard implements Serializable {
     @Column(nullable = false)
     private BigDecimal balance;
     
-    @OneToOne(mappedBy = "creditCard")
     @JoinColumn(nullable = false)
     private Customer customer;
 
