@@ -12,5 +12,6 @@ package util.enumeration;
 public enum Role {
     SALES_MANAGER,
     OPERATIONS_MANAGER,
+    CUSTOMER_SERVICE_EXECUTIVE,
     ADMIN;
 }

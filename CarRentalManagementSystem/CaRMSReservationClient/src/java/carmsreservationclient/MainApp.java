@@ -26,13 +26,10 @@ public class MainApp
     
     public MainApp() 
     {
-        currentCustomer = null;
     }
     
     public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote)
-    {
-        this();
-        
+    {   
         this.customerSessionBeanRemote = customerSessionBeanRemote;
     }
     
@@ -61,22 +58,15 @@ public class MainApp
                 
                 if(response == 1)
                 {
-                    if(currentCustomer == null) 
+                    try
                     {
-                        try
-                        {
-                            doLogin();
-                            System.out.println("Login successful as " + currentCustomer.getName() + "\n");
-                            menuMain();
-                        }
-                        catch(InvalidLoginCredentialException ex) 
-                        {
-                            System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
-                        }
+                        doLogin();
+                        System.out.println("Login successful!\n");
+                        menuMain();
                     }
-                    else
+                    catch(InvalidLoginCredentialException ex) 
                     {
-                        System.out.println("You are already login as " + currentCustomer.getName() + "\n");
+                        System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                     }
                 }
                 else if (response == 2)
