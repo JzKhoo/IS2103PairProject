@@ -6,11 +6,13 @@
 package ejb.session.stateless;
 
 import entity.Model;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -39,6 +41,8 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
+    
+    
     
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException
     {
@@ -69,6 +73,15 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         {
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
+    }
+    
+    
+    @Override
+    public List<Model> retrieveAllModels()
+    {
+        Query query = em.createQuery("SELECT m FROM Model m ORDER BY m.category, m.make, m.model ASC");
+        
+        return query.getResultList();
     }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Model>>constraintViolations)

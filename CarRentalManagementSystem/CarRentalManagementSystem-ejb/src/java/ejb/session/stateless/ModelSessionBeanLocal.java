@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Model;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
@@ -18,5 +19,7 @@ import util.exception.UnknownPersistenceException;
 public interface ModelSessionBeanLocal {
 
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException;
+
+    public List<Model> retrieveAllModels();
     
 }

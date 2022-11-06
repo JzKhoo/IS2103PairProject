@@ -10,6 +10,8 @@ import ejb.session.stateless.ModelSessionBeanRemote;
 import entity.Category;
 import entity.Employee;
 import entity.Model;
+import java.text.NumberFormat;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
@@ -97,7 +99,7 @@ public class OperationsManagerModule {
                 }
                 else if(response == 2)
                 {
-                    break;
+                    doViewAllModels();
                 }
                 else if(response == 3)
                 {
@@ -201,6 +203,25 @@ public class OperationsManagerModule {
         {
             showInputDataValidationErrorsForModel(constraintViolations);
         }
+    }
+    
+    
+    private void doViewAllModels()
+    {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View All Models ***\n");
+        
+        List<Model> models = modelSessionBeanRemote.retrieveAllModels();
+        System.out.printf("%20s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "Model Id", "isDisabled");
+
+        for(Model model:models)
+        {
+            System.out.printf("%20s%20s%20s%20s%20s\n", model.getCategory().getType(), model.getMake(), model.getModel(), model.getModelId(), model.isIsDisabled());
+        }
+        
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
     }
     
     
