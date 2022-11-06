@@ -7,10 +7,8 @@ package carmsmanagementclient;
 
 import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
-import entity.Category;
 import entity.Employee;
 import entity.Model;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -22,7 +20,9 @@ import util.enumeration.Role;
 import util.exception.CategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
+import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateModelException;
 
 /**
  *
@@ -103,7 +103,14 @@ public class OperationsManagerModule {
                 }
                 else if(response == 3)
                 {
-                    break;
+                    try
+                    {
+                        doUpdateModel();
+                    }
+                    catch(ModelNotFoundException ex)
+                    {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
                 else if(response == 4)
                 {
@@ -222,6 +229,68 @@ public class OperationsManagerModule {
         
         System.out.print("Press any key to continue...> ");
         scanner.nextLine();
+    }
+    
+    
+    private void doUpdateModel() throws ModelNotFoundException
+    {
+        Scanner scanner = new Scanner(System.in); 
+        String input;
+        Model model = null;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Update Model ***\n");
+        
+        // Retrieve model object by ID
+        System.out.print("Enter Id of Model to Update> ");
+        Long modelId = new Long(scanner.nextInt());
+        
+        scanner.nextLine();
+        
+        try
+        {
+            model = modelSessionBeanRemote.retrieveModelByModelId(modelId);
+        }
+        catch(ModelNotFoundException ex)
+        {
+            throw new ModelNotFoundException("An error has occurred while retrieving model: " + ex.getMessage() + "\n");
+        }
+        
+        System.out.print("Enter Make (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            model.setMake(input);
+        }
+        
+        System.out.print("Enter Model (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            model.setModel(input);
+        }
+        
+        Set<ConstraintViolation<Model>>constraintViolations = validator.validate(model);
+        
+        if(constraintViolations.isEmpty())
+        {
+            try
+            {
+                modelSessionBeanRemote.updateModel(model);
+                System.out.println("Model updated successfully!\n");
+            }
+            catch (ModelNotFoundException | UpdateModelException ex) 
+            {
+                System.out.println("An error has occurred while updating model: " + ex.getMessage() + "\n");
+            }
+            catch(InputDataValidationException ex)
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            showInputDataValidationErrorsForModel(constraintViolations);
+        }
     }
     
     

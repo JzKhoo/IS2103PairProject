@@ -18,7 +18,9 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
+import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateModelException;
 
 /**
  *
@@ -82,6 +84,59 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         Query query = em.createQuery("SELECT m FROM Model m ORDER BY m.category, m.make, m.model ASC");
         
         return query.getResultList();
+    }
+    
+    
+    @Override
+    public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException
+    {
+        Model model = em.find(Model.class, modelId);
+        
+        if(model != null)
+        {
+            model.getCars().size();
+            return model;
+        }
+        else
+        {
+            throw new ModelNotFoundException("Model ID " + modelId + " does not exist!");
+        }
+    }
+    
+    
+    @Override
+    public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException 
+    {
+        if(model != null && model.getModelId()!= null)
+        {
+            Set<ConstraintViolation<Model>>constraintViolations = validator.validate(model);
+        
+            if(constraintViolations.isEmpty())
+            {
+                Model modelToUpdate = retrieveModelByModelId(model.getModelId());
+
+                if(modelToUpdate.getModelId().equals(model.getModelId()))
+                {
+                    modelToUpdate.setMake(model.getMake());
+                    modelToUpdate.setModel(model.getModel());
+                    modelToUpdate.setIsDisabled(model.isIsDisabled());
+                    modelToUpdate.setCars(model.getCars());
+                    modelToUpdate.setCategory(model.getCategory());
+                }
+                else
+                {
+                    throw new UpdateModelException("Model ID of model record to be updated does not match the existing record");
+                }
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        }
+        else
+        {
+            throw new ModelNotFoundException("Model ID not provided for model to be updated");
+        }
     }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Model>>constraintViolations)

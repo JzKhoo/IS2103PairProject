@@ -9,7 +9,9 @@ import entity.Model;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.InputDataValidationException;
+import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateModelException;
 
 /**
  *
@@ -21,5 +23,9 @@ public interface ModelSessionBeanLocal {
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException;
 
     public List<Model> retrieveAllModels();
+
+    public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException;
+
+    public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;
     
 }
