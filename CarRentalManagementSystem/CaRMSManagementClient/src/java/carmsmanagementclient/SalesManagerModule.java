@@ -29,7 +29,7 @@ public class SalesManagerModule {
     
     public void menuSalesManager() throws InvalidAccessRightException
     {
-        if(currentEmployee.getUserRole() != Role.SALES_MANAGER)
+        if(currentEmployee.getUserRole() != Role.SALES_MANAGER && currentEmployee.getUserRole() != Role.SYSTEM_ADMINISTRATOR)
         {
             throw new InvalidAccessRightException("You don't have Sales Manager rights to access the sales manager module.");
         }

@@ -14,7 +14,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import util.enumeration.CategoryType;
 
 /**
  *
@@ -28,12 +27,10 @@ public class Category implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
     @Column(nullable = false)
-    private CategoryType categoryType;
+    private String type;
     
     @OneToMany(mappedBy = "category")
     private List<Car> cars;
-    @OneToMany(mappedBy = "category")
-    private List<Model> models;
     @OneToMany(mappedBy = "category")
     private List<RentalRateRecord> rentalRateRecords;
 
@@ -47,14 +44,12 @@ public class Category implements Serializable {
 
     public Category() {
         this.cars = new ArrayList<Car>();
-        this.models = new ArrayList<Model>();
         this.rentalRateRecords = new ArrayList<RentalRateRecord>();
     }
 
-    public Category(CategoryType categoryType) {
-        this.categoryType = categoryType;
+    public Category(String type) {
+        this.type = type;
         this.cars = new ArrayList<Car>();
-        this.models = new ArrayList<Model>();
         this.rentalRateRecords = new ArrayList<RentalRateRecord>();
     }
     
@@ -85,14 +80,6 @@ public class Category implements Serializable {
         return "entity.Category[ id=" + categoryId + " ]";
     }
 
-    public CategoryType getCategoryType() {
-        return categoryType;
-    }
-
-    public void setCategoryType(CategoryType categoryType) {
-        this.categoryType = categoryType;
-    }
-
     public List<Car> getCars() {
         return cars;
     }
@@ -101,20 +88,20 @@ public class Category implements Serializable {
         this.cars = cars;
     }
 
-    public List<Model> getModels() {
-        return models;
-    }
-
-    public void setModels(List<Model> models) {
-        this.models = models;
-    }
-
     public List<RentalRateRecord> getRentalRateRecords() {
         return rentalRateRecords;
     }
 
     public void setRentalRateRecords(List<RentalRateRecord> rentalRateRecords) {
         this.rentalRateRecords = rentalRateRecords;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
     
 }

@@ -40,14 +40,17 @@ public class Car implements Serializable {
     @Column(nullable = false)
     private boolean isDisabled;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
     @OneToMany(mappedBy = "car")
     private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Category category;
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Model model;
     @OneToMany(mappedBy = "car")
     private List<CarRentalReservationRecord> carRentalReservationRecords;
     
@@ -65,7 +68,7 @@ public class Car implements Serializable {
         this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
     }
 
-    public Car(String licensePlateNumber, String colour, CarStatus status, String location, boolean isDisabled, Outlet outlet, Category category) {
+    public Car(String licensePlateNumber, String colour, CarStatus status, String location, boolean isDisabled, Outlet outlet, Category category, Model model) {
         this.licensePlateNumber = licensePlateNumber;
         this.colour = colour;
         this.status = status;
@@ -73,6 +76,7 @@ public class Car implements Serializable {
         this.isDisabled = isDisabled;
         this.outlet = outlet;
         this.category = category;
+        this.model = model;
         this.transitDriverDispatchRecords = new ArrayList<TransitDriverDispatchRecord>();
         this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
     }
@@ -174,6 +178,14 @@ public class Car implements Serializable {
 
     public void setCarRentalReservationRecords(List<CarRentalReservationRecord> carRentalReservationRecords) {
         this.carRentalReservationRecords = carRentalReservationRecords;
+    }
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
     }
     
 }

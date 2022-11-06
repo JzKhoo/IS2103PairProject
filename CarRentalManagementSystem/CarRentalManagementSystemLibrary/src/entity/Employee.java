@@ -36,7 +36,7 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     private String password;
     
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
     @OneToMany(mappedBy = "employee")

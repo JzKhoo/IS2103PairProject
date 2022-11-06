@@ -33,7 +33,7 @@ public class TransitDriverDispatchRecord implements Serializable {
     
     @ManyToOne
     private Employee employee;
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Car car;
     

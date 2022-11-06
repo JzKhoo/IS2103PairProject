@@ -52,6 +52,7 @@ public class DataInitializationSessionBean {
             employeeSessionBeanLocal.createNewEmployee(new Employee(Role.CUSTOMER_SERVICE_EXECUTIVE, "User1", "Password", defaultOutlet));
             employeeSessionBeanLocal.createNewEmployee(new Employee(Role.OPERATIONS_MANAGER, "User2", "Password", defaultOutlet));
             employeeSessionBeanLocal.createNewEmployee(new Employee(Role.SALES_MANAGER, "User3", "Password", defaultOutlet));
+            employeeSessionBeanLocal.createNewEmployee(new Employee(Role.SYSTEM_ADMINISTRATOR, "User4", "Password", defaultOutlet));
         }
         
     }

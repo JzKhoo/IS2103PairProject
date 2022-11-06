@@ -29,9 +29,9 @@ public class CustomerServiceExecutiveModule {
     
     public void menuCustomerServiceExecutive() throws InvalidAccessRightException
     {
-        if(currentEmployee.getUserRole() != Role.CUSTOMER_SERVICE_EXECUTIVE)
+        if(currentEmployee.getUserRole() != Role.CUSTOMER_SERVICE_EXECUTIVE && currentEmployee.getUserRole() != Role.SYSTEM_ADMINISTRATOR)
         {
-            throw new InvalidAccessRightException("You don't have CustomerServiceExecutive rights to access the customer service executive module.");
+            throw new InvalidAccessRightException("You don't have Customer Service Executive rights to access the customer service executive module.");
         }
         
         Scanner scanner = new Scanner(System.in);

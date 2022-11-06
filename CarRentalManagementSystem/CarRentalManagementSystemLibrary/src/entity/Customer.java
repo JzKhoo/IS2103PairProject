@@ -38,13 +38,13 @@ public class Customer implements Serializable {
     private String name;
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false, unique = true)
+    private String cardNumber;
+    @Column(nullable = false)
+    private double balance = 0.0;
     
     @OneToMany(mappedBy = "customer")
     private List<CarRentalReservationRecord> carRentalReservationRecords;
-    @OneToOne(mappedBy = "customer")
-    @JoinColumn(nullable = false)
-    private CreditCard creditCard;
-    
 
     public Long getCustomerId() {
         return customerId;
@@ -58,16 +58,16 @@ public class Customer implements Serializable {
         this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
     }
 
-    public Customer(String email, String phoneNumber, String passportNumber, String name, String password, CreditCard creditCard) {
+    public Customer(String email, String phoneNumber, String passportNumber, String name, String password, String cardNumber) {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.passportNumber = passportNumber;
         this.name = name;
         this.password = password;
-        this.creditCard = creditCard;
+        this.cardNumber = cardNumber;
         this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
     }
-    
+
     
 
     @Override
@@ -143,12 +143,22 @@ public class Customer implements Serializable {
         this.carRentalReservationRecords = carRentalReservationRecords;
     }
 
-    public CreditCard getCreditCard() {
-        return creditCard;
+    public String getCardNumber() {
+        return cardNumber;
     }
 
-    public void setCreditCard(CreditCard creditCard) {
-        this.creditCard = creditCard;
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    
     
 }

@@ -29,7 +29,7 @@ public class OperationsManagerModule {
     
     public void menuOperationsManager() throws InvalidAccessRightException
     {
-        if(currentEmployee.getUserRole() != Role.OPERATIONS_MANAGER)
+        if(currentEmployee.getUserRole() != Role.OPERATIONS_MANAGER && currentEmployee.getUserRole() != Role.SYSTEM_ADMINISTRATOR)
         {
             throw new InvalidAccessRightException("You don't have Operations Manager rights to access the operations manager module.");
         }

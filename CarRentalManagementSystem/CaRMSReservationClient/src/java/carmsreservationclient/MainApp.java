@@ -136,7 +136,6 @@ public class MainApp
                 
                 if (response == 5)
                 {
-                    currentCustomer = null;
                     break;
                 }
                 else 
@@ -170,6 +169,8 @@ public class MainApp
             newCustomer.setName(scanner.nextLine().trim());
             System.out.print("Enter Password> ");
             newCustomer.setPassword(scanner.nextLine().trim());
+            System.out.print("Enter Card Number> ");
+            newCustomer.setCardNumber(scanner.nextLine().trim());
             
             newCustomer = customerSessionBeanRemote.createNewCustomer(newCustomer);
             System.out.println("Registration successful! Customer ID = " + newCustomer.getCustomerId() + "\n");

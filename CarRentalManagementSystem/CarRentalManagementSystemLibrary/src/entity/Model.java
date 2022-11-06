@@ -6,13 +6,14 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -32,9 +33,8 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private boolean isDisabled;
     
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Category category;
+    @OneToMany(mappedBy = "model")
+    private List<Car> cars;
 
     public Long getModelId() {
         return modelId;
@@ -45,14 +45,16 @@ public class Model implements Serializable {
     }
 
     public Model() {
+        this.cars = new ArrayList<Car>();
     }
 
-    public Model(String make, String model, boolean isDisabled, Category category) {
+    public Model(String make, String model, boolean isDisabled) {
         this.make = make;
         this.model = model;
         this.isDisabled = isDisabled;
-        this.category = category;
+        this.cars = new ArrayList<Car>();
     }
+
     
     
 
@@ -105,12 +107,13 @@ public class Model implements Serializable {
         this.isDisabled = isDisabled;
     }
 
-    public Category getCategory() {
-        return category;
+    public List<Car> getCars() {
+        return cars;
     }
 
-    public void setCategory(Category category) {
-        this.category = category;
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
     }
+
     
 }
