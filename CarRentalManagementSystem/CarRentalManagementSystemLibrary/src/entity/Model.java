@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 /**
@@ -31,10 +32,12 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private String model;
     @Column(nullable = false)
-    private boolean isDisabled;
+    private boolean isDisabled = false;
     
     @OneToMany(mappedBy = "model")
     private List<Car> cars;
+    @ManyToOne(optional = false)
+    private Category category;
 
     public Long getModelId() {
         return modelId;
@@ -48,10 +51,10 @@ public class Model implements Serializable {
         this.cars = new ArrayList<Car>();
     }
 
-    public Model(String make, String model, boolean isDisabled) {
+    public Model(String make, String model, Category category) {
         this.make = make;
         this.model = model;
-        this.isDisabled = isDisabled;
+        this.category = category;
         this.cars = new ArrayList<Car>();
     }
 
@@ -113,6 +116,14 @@ public class Model implements Serializable {
 
     public void setCars(List<Car> cars) {
         this.cars = cars;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
     

@@ -5,19 +5,18 @@
  */
 package ejb.session.stateless;
 
-import entity.Category;
+import entity.Model;
 import javax.ejb.Local;
-import util.exception.CategoryNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
  * @author khoojingzhi
  */
 @Local
-public interface CategorySessionBeanLocal {
+public interface ModelSessionBeanLocal {
 
-    public Category retrieveCategoryByType(String type) throws CategoryNotFoundException;
-
-    public Category createNewCategory(Category category);
+    public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException;
     
 }

@@ -5,7 +5,9 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.ModelSessionBeanRemote;
 import entity.Employee;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
@@ -17,6 +19,8 @@ import util.exception.InvalidLoginCredentialException;
  */
 public class MainApp {
     
+    private CategorySessionBeanRemote categorySessionBeanRemote;
+    private ModelSessionBeanRemote modelSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
@@ -29,9 +33,13 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    public MainApp(CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+        this.categorySessionBeanRemote = categorySessionBeanRemote;
+        this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
     }
+
+    
     
     
     public void runApp()
@@ -60,7 +68,7 @@ public class MainApp {
                         System.out.println("Login successful!\n");
                         
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(currentEmployee);
-                        operationsManagerModule = new OperationsManagerModule(currentEmployee);
+                        operationsManagerModule = new OperationsManagerModule(currentEmployee, categorySessionBeanRemote, modelSessionBeanRemote);
                         salesManagerModule = new SalesManagerModule(currentEmployee);
 
                         menuMain();

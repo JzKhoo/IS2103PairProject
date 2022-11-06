@@ -33,6 +33,8 @@ public class Category implements Serializable {
     private List<Car> cars;
     @OneToMany(mappedBy = "category")
     private List<RentalRateRecord> rentalRateRecords;
+    @OneToMany(mappedBy = "category")
+    private List<Model> models;
 
     public Long getCategoryId() {
         return categoryId;
@@ -45,12 +47,14 @@ public class Category implements Serializable {
     public Category() {
         this.cars = new ArrayList<Car>();
         this.rentalRateRecords = new ArrayList<RentalRateRecord>();
+        this.models = new ArrayList<Model>();
     }
 
     public Category(String type) {
         this.type = type;
         this.cars = new ArrayList<Car>();
         this.rentalRateRecords = new ArrayList<RentalRateRecord>();
+        this.models = new ArrayList<Model>();
     }
     
     
@@ -102,6 +106,14 @@ public class Category implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public List<Model> getModels() {
+        return models;
+    }
+
+    public void setModels(List<Model> models) {
+        this.models = models;
     }
     
 }

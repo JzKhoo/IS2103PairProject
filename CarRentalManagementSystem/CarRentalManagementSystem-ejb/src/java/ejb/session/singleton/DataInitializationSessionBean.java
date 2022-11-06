@@ -5,8 +5,10 @@
  */
 package ejb.session.singleton;
 
+import ejb.session.stateless.CategorySessionBeanLocal;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import ejb.session.stateless.OutletSessionBean;
+import entity.Category;
 import entity.Employee;
 import entity.Outlet;
 import java.sql.Time;
@@ -28,8 +30,9 @@ import util.exception.EmployeeNotFoundException;
 public class DataInitializationSessionBean {
 
     @EJB
+    private CategorySessionBeanLocal categorySessionBeanLocal;
+    @EJB
     private EmployeeSessionBeanLocal employeeSessionBeanLocal;
-    
     @EJB
     private OutletSessionBean outletSessionBean;
    
@@ -53,6 +56,11 @@ public class DataInitializationSessionBean {
             employeeSessionBeanLocal.createNewEmployee(new Employee(Role.OPERATIONS_MANAGER, "User2", "Password", defaultOutlet));
             employeeSessionBeanLocal.createNewEmployee(new Employee(Role.SALES_MANAGER, "User3", "Password", defaultOutlet));
             employeeSessionBeanLocal.createNewEmployee(new Employee(Role.SYSTEM_ADMINISTRATOR, "User4", "Password", defaultOutlet));
+            
+            categorySessionBeanLocal.createNewCategory(new Category("Standard Sedan"));
+            categorySessionBeanLocal.createNewCategory(new Category("Family Sedan"));
+            categorySessionBeanLocal.createNewCategory(new Category("Luxury Sedan"));
+            categorySessionBeanLocal.createNewCategory(new Category("SUV"));
         }
         
     }

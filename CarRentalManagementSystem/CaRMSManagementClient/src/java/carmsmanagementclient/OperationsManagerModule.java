@@ -5,10 +5,22 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CategorySessionBeanRemote;
+import ejb.session.stateless.ModelSessionBeanRemote;
+import entity.Category;
 import entity.Employee;
+import entity.Model;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.enumeration.Role;
+import util.exception.CategoryNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -16,13 +28,24 @@ import util.exception.InvalidAccessRightException;
  */
 public class OperationsManagerModule {
     
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+    
+    private CategorySessionBeanRemote categorySessionBeanRemote;
+    private ModelSessionBeanRemote modelSessionBeanRemote;
+    
     private Employee currentEmployee;
 
     public OperationsManagerModule() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(Employee currentEmployee) {
+    public OperationsManagerModule(Employee currentEmployee, CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
+        this();
         this.currentEmployee = currentEmployee;
+        this.categorySessionBeanRemote = categorySessionBeanRemote;
+        this.modelSessionBeanRemote = modelSessionBeanRemote;
     }
     
     
@@ -63,7 +86,14 @@ public class OperationsManagerModule {
 
                 if(response == 1)
                 {
-                    break;
+                    try
+                    {
+                        doCreateNewModel();
+                    }
+                    catch(CategoryNotFoundException ex)
+                    {
+                        System.out.println("Create new model unsuccessful!: " + ex.getMessage() + "\n");
+                    }
                 }
                 else if(response == 2)
                 {
@@ -126,4 +156,63 @@ public class OperationsManagerModule {
         }
     }
     
+    
+    private void doCreateNewModel() throws CategoryNotFoundException
+    {
+        Scanner scanner = new Scanner(System.in);
+        Model newModel = new Model();
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Create New Model ***\n");
+        System.out.print("Enter Make> ");
+        newModel.setMake(scanner.nextLine().trim());
+        System.out.print("Enter Model> ");
+        newModel.setModel(scanner.nextLine().trim());
+        
+        try
+        {
+            System.out.print("Enter Category> ");
+            newModel.setCategory(categorySessionBeanRemote.retrieveCategoryByType(scanner.nextLine().trim()));
+        }
+        catch(CategoryNotFoundException ex)
+        {
+            throw new CategoryNotFoundException(ex.getMessage());
+        }
+        
+        Set<ConstraintViolation<Model>>constraintViolations = validator.validate(newModel);
+        
+        if(constraintViolations.isEmpty())
+        {        
+            try
+            {
+                newModel = modelSessionBeanRemote.createNewModel(newModel);
+
+                System.out.println("New model created successfully!: " + newModel.getModelId()+ "\n");
+            }
+            catch(UnknownPersistenceException ex)
+            {
+                System.out.println("An unknown error has occurred while creating the new model!: " + ex.getMessage() + "\n");
+            }
+            catch(InputDataValidationException ex)
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            showInputDataValidationErrorsForModel(constraintViolations);
+        }
+    }
+    
+    
+    private void showInputDataValidationErrorsForModel(Set<ConstraintViolation<Model>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
 }
