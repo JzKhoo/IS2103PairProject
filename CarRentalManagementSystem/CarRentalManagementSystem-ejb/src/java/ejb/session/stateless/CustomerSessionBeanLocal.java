@@ -9,7 +9,8 @@ import entity.Customer;
 import javax.ejb.Local;
 import util.exception.CustomerExistException;
 import util.exception.CustomerNotFoundException;
-import util.exception.GeneralException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -20,6 +21,6 @@ public interface CustomerSessionBeanLocal {
 
     public Customer retrieveCustomerById(Long customerId) throws CustomerNotFoundException;
 
-    public Customer createNewCustomer(Customer customer) throws CustomerExistException, GeneralException;
+    public Long createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException, InputDataValidationException;
     
 }

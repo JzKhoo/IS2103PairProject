@@ -8,9 +8,15 @@ package carmsreservationclient;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import entity.Customer;
 import java.util.Scanner;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.CustomerExistException;
-import util.exception.GeneralException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -18,6 +24,9 @@ import util.exception.InvalidLoginCredentialException;
  */
 public class MainApp 
 {
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+    
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     
     private Customer currentCustomer;
@@ -26,10 +35,13 @@ public class MainApp
     
     public MainApp() 
     {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
     }
     
     public MainApp(CustomerSessionBeanRemote customerSessionBeanRemote)
     {   
+        this();
         this.customerSessionBeanRemote = customerSessionBeanRemote;
     }
     
@@ -43,8 +55,6 @@ public class MainApp
         while(true)
         {
             System.out.println("*** Welcome to CaRMS Reservation System ***\n");
-            
-
             System.out.println("1: Login");          
             System.out.println("2: Register as Customer");
             System.out.println("3: Exit\n");
@@ -120,7 +130,7 @@ public class MainApp
         while(true) 
         {
             System.out.println("*** CaRMS Reservation System ***\n");
-            System.out.println("You are login\n");
+            System.out.println("You are login as " + currentCustomer.getName() + "\n");
             System.out.println("1: Search Car");
             System.out.println("2: Reserve Car");
             System.out.println("3: View Reservation Details");
@@ -153,31 +163,63 @@ public class MainApp
     
     private void doCreateCustomer() 
     {
-        try 
+        Scanner scanner = new Scanner(System.in);
+        Customer newCustomer = new Customer();
+
+        System.out.println("*** CaRMS Reservation System :: Register As Customer ***\n\n");
+        System.out.print("Enter Email> ");
+        newCustomer.setEmail(scanner.nextLine().trim());
+        System.out.print("Enter Phone Number> ");
+        newCustomer.setPhoneNumber(scanner.nextLine().trim());
+        System.out.print("Enter Passport Number> ");
+        newCustomer.setPassportNumber(scanner.nextLine().trim());
+        System.out.print("Enter Name> ");
+        newCustomer.setName(scanner.nextLine().trim());
+        System.out.print("Enter Password> ");
+        newCustomer.setPassword(scanner.nextLine().trim());
+        System.out.print("Enter Card Number> ");
+        newCustomer.setCardNumber(scanner.nextLine().trim());
+
+        Set<ConstraintViolation<Customer>>constraintViolations = validator.validate(newCustomer);
+
+        if(constraintViolations.isEmpty())
         {
-            Scanner scanner = new Scanner(System.in);
-            Customer newCustomer = new Customer();
-            
-            System.out.println("*** CaRMS Reservation System :: Register As Customer ***\n\n");
-            System.out.print("Enter Email> ");
-            newCustomer.setEmail(scanner.nextLine().trim());
-            System.out.print("Enter Phone Number> ");
-            newCustomer.setPhoneNumber(scanner.nextLine().trim());
-            System.out.print("Enter Passport Number> ");
-            newCustomer.setPassportNumber(scanner.nextLine().trim());
-            System.out.print("Enter Name> ");
-            newCustomer.setName(scanner.nextLine().trim());
-            System.out.print("Enter Password> ");
-            newCustomer.setPassword(scanner.nextLine().trim());
-            System.out.print("Enter Card Number> ");
-            newCustomer.setCardNumber(scanner.nextLine().trim());
-            
-            newCustomer = customerSessionBeanRemote.createNewCustomer(newCustomer);
-            System.out.println("Registration successful! Customer ID = " + newCustomer.getCustomerId() + "\n");
+            try
+            {
+                Long newCustomerId = customerSessionBeanRemote.createNewCustomer(newCustomer);
+                System.out.println("New customer registered successfully!: " + newCustomerId + "\n");
+            }
+            catch(CustomerExistException ex)
+            {
+                System.out.println("An error has occurred while registering!: The email already exist\n");
+            }
+            catch(UnknownPersistenceException ex)
+            {
+                System.out.println("An unknown error has occurred while creating the new staff!: " + ex.getMessage() + "\n");
+            }
+            catch(InputDataValidationException ex)
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
         }
-        catch(CustomerExistException | GeneralException ex)
+        else
         {
-            System.out.println("An error has occurred while creating the new customer: " + ex.getMessage() + "!\n");
+            showInputDataValidationErrorsForCustomerEntity(constraintViolations);
         }
+        
+        
+
+    }
+    
+    private void showInputDataValidationErrorsForCustomerEntity(Set<ConstraintViolation<Customer>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
     }
 }
