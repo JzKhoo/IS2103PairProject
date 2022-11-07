@@ -20,12 +20,14 @@ import util.exception.UpdateModelException;
 @Local
 public interface ModelSessionBeanLocal {
 
+    // Create
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException;
 
+    // Retrieve
     public List<Model> retrieveAllModels();
-
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException;
+    public Model retrieveModelByMakeAndModel(String make, String model) throws ModelNotFoundException;
 
-    public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;
-    
+    // Update
+    public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;    
 }

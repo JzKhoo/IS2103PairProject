@@ -4,15 +4,15 @@
     <jta-data-source>jdbc/carRentalManagementSystem</jta-data-source>
     <class>entity.Car</class>
     <class>entity.CarRentalReservationRecord</class>
-    <class>entity.Category</class>
     <class>entity.CreditCard</class>
     <class>entity.Customer</class>
     <class>entity.Employee</class>
     <class>entity.Model</class>
     <class>entity.Outlet</class>
-    <class>entity.RentalRateRecord</class>
     <class>entity.TransitDriverDispatchRecord</class>
     <class>entity.Partner</class>
+    <class>entity.CarCategory</class>
+    <class>entity.RentalRate</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

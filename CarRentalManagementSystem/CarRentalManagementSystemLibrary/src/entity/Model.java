@@ -34,11 +34,12 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private boolean isDisabled = false;
     
+    @ManyToOne(optional = false)
+    private CarCategory carCategory;
+    
     @OneToMany(mappedBy = "model")
     private List<Car> cars;
-    @ManyToOne(optional = false)
-    private Category category;
-
+    
     public Long getModelId() {
         return modelId;
     }
@@ -48,18 +49,16 @@ public class Model implements Serializable {
     }
 
     public Model() {
-        this.cars = new ArrayList<Car>();
+        this.cars = new ArrayList<>();
     }
 
-    public Model(String make, String model, Category category) {
+    public Model(String make, String model, CarCategory carCategory) {
+        this();
+        
         this.make = make;
         this.model = model;
-        this.category = category;
-        this.cars = new ArrayList<Car>();
+        this.carCategory = carCategory;
     }
-
-    
-    
 
     @Override
     public int hashCode() {
@@ -109,6 +108,14 @@ public class Model implements Serializable {
     public void setIsDisabled(boolean isDisabled) {
         this.isDisabled = isDisabled;
     }
+    
+    public CarCategory getCarCategory() {
+        return carCategory;
+    }
+
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
+    }
 
     public List<Car> getCars() {
         return cars;
@@ -118,13 +125,4 @@ public class Model implements Serializable {
         this.cars = cars;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    
 }

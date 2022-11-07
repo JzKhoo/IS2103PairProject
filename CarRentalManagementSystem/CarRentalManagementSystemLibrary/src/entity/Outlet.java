@@ -27,12 +27,10 @@ public class Outlet implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
-    @Column(nullable = false)
-    private String address;
-    @Column(nullable = false)
-    private Time startTime;
-    @Column(nullable = false)
-    private Time endTime;
+    @Column(nullable = false, unique = true)
+    private String name;
+    private Time openingHour;
+    private Time closingHour;
     
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
@@ -48,16 +46,16 @@ public class Outlet implements Serializable {
     }
 
     public Outlet() {
-        this.cars = new ArrayList<Car>();
-        this.employees = new ArrayList<Employee>();
+        this.cars = new ArrayList<>();
+        this.employees = new ArrayList<>();
     }
 
-    public Outlet(String address, Time startTime, Time endTime) {
-        this.address = address;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.cars = new ArrayList<Car>();
-        this.employees = new ArrayList<Employee>();
+    public Outlet(String name, Time openingHour, Time closingHour) {
+        this();
+        
+        this.name = name;
+        this.openingHour = openingHour;
+        this.closingHour = closingHour;
     }
 
     @Override
@@ -85,28 +83,28 @@ public class Outlet implements Serializable {
         return "entity.Outlet[ id=" + outletId + " ]";
     }
 
-    public String getAddress() {
-        return address;
+    public String getName() {
+        return name;
     }
 
-    public void setAddress(String address) {
-        this.address = address;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Time getStartTime() {
-        return startTime;
+    public Time getOpeningHour() {
+        return openingHour;
     }
 
-    public void setStartTime(Time startTime) {
-        this.startTime = startTime;
+    public void setOpeningHour(Time openingHour) {
+        this.openingHour = openingHour;
     }
 
-    public Time getEndTime() {
-        return endTime;
+    public Time getClosingHour() {
+        return closingHour;
     }
 
-    public void setEndTime(Time endTime) {
-        this.endTime = endTime;
+    public void setClosingHour(Time closingHour) {
+        this.closingHour = closingHour;
     }
 
     public List<Car> getCars() {

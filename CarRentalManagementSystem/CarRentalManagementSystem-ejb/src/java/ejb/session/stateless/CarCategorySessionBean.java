@@ -5,48 +5,50 @@
  */
 package ejb.session.stateless;
 
-import entity.Category;
+import entity.CarCategory;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import util.exception.CategoryNotFoundException;
+import util.exception.CarCategoryNotFoundException;
 
 /**
  *
  * @author khoojingzhi
  */
 @Stateless
-public class CategorySessionBean implements CategorySessionBeanRemote, CategorySessionBeanLocal {
+public class CarCategorySessionBean implements CarCategorySessionBeanRemote, CarCategorySessionBeanLocal {
 
     @PersistenceContext
     private EntityManager em;
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    
+    
+    // Create
     @Override
-    public Category createNewCategory(Category category) 
+    public CarCategory createNewCategory(CarCategory carCategory) 
     {
-        em.persist(category);
+        em.persist(carCategory);
         em.flush();
         
-        return category;
+        return carCategory;
     }
     
+    // Retrieve
     @Override
-    public Category retrieveCategoryByType(String type) throws CategoryNotFoundException
+    public CarCategory retrieveCategoryByName(String name) throws CarCategoryNotFoundException
     {
-        Query query = em.createQuery("SELECT c FROM Category c WHERE c.type = :inType");
-        query.setParameter("inType", type);
+        Query query = em.createQuery("SELECT c FROM CarCategory c WHERE c.name = :inName");
+        query.setParameter("inName", name);
         
         try
         {
-            return (Category)query.getSingleResult();
+            return (CarCategory)query.getSingleResult();
         }
         catch(NoResultException | NonUniqueResultException ex)
         {
-            throw new CategoryNotFoundException("Category " + type + " does not exist!");
+            throw new CarCategoryNotFoundException("Category " + name + " does not exist!");
         }
     }
 }

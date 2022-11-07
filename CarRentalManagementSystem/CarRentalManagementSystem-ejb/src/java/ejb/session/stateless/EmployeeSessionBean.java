@@ -30,6 +30,19 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     public EmployeeSessionBean() {
     }
     
+    
+    // Create
+    @Override
+    public Employee createNewEmployee(Employee employee)
+    {
+        em.persist(employee);
+        em.flush();
+
+        return employee;
+    }
+    
+    
+    // Retrieve
     @Override
     public Employee retrieveEmployeeById(Long employeeId) throws EmployeeNotFoundException
     {
@@ -45,13 +58,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         }
     }
     
+    // Login via CaRMSManagamentClient
     @Override
-    public Employee login(String userName, String password) throws InvalidLoginCredentialException
+    public Employee login(String name, String password) throws InvalidLoginCredentialException
     {
         try 
         {
-            Query query = em.createQuery("SELECT e FROM Employee e WHERE e.userName = :inuserName");
-            query.setParameter("inuserName", userName);
+            Query query = em.createQuery("SELECT e FROM Employee e WHERE e.name = :inName");
+            query.setParameter("inName", name);
             Employee employee = (Employee)query.getSingleResult();
             
             if(employee.getPassword().equals(password))
@@ -69,12 +83,4 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         }
     }
     
-    @Override
-    public Employee createNewEmployee(Employee employee)
-    {
-        em.persist(employee);
-        em.flush();
-
-        return employee;
-    }
 }

@@ -22,6 +22,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
 
     // Add business logic below. (Right-click in editor and choose
     // "Insert Code > Add Business Method")
+    @Override
     public Partner createNewPartner(Partner partner) 
     {
         em.persist(partner);

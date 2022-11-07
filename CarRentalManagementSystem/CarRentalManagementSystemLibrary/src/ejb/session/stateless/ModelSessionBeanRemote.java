@@ -20,11 +20,14 @@ import util.exception.UpdateModelException;
 @Remote
 public interface ModelSessionBeanRemote {
     
+    // Create
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException;
     
+    // Retrieve
     public List<Model> retrieveAllModels();
-    
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException;
+    public Model retrieveModelByMakeAndModel(String make, String model) throws ModelNotFoundException;
     
+    // Update
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;
 }

@@ -5,13 +5,13 @@
  */
 package carmsmanagementclient;
 
-import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import entity.Employee;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 
 /**
  *
@@ -19,7 +19,7 @@ import util.exception.InvalidLoginCredentialException;
  */
 public class MainApp {
     
-    private CategorySessionBeanRemote categorySessionBeanRemote;
+    private CarCategorySessionBeanRemote categorySessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     
@@ -33,7 +33,7 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    public MainApp(CarCategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
         this.categorySessionBeanRemote = categorySessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
@@ -125,7 +125,7 @@ public class MainApp {
         while(true)
         {
             System.out.println("*** CaRMS Management System ***\n");
-            System.out.println("You are login as " + currentEmployee.getUserName() + " with " + currentEmployee.getUserRole() + " rights\n");
+            System.out.println("You are login as " + currentEmployee.getName() + " with " + currentEmployee.getRole() + " rights\n");
             System.out.println("1: Customer Service Executive Operation");
             System.out.println("2: Operations Manager");
             System.out.println("3: Sales Manager");

@@ -16,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import util.enumeration.Role;
 
 /**
  *
@@ -29,16 +28,17 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
-    @Column(nullable = false)
-    private Role userRole;
     @Column(nullable = false, unique = true)
-    private String userName;
+    private String name;
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
+    private String role;
     
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
+    
     @OneToMany(mappedBy = "employee")
     private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
     
@@ -52,19 +52,19 @@ public class Employee implements Serializable {
     }
 
     public Employee() {
-        this.transitDriverDispatchRecords = new ArrayList<TransitDriverDispatchRecord>();
+        this.transitDriverDispatchRecords = new ArrayList<>();
     }
 
-    public Employee(Role userRole, String userName, String password, Outlet outlet) {
-        this.userRole = userRole;
-        this.userName = userName;
+    public Employee(String name, String password, String role, Outlet outlet) {
+        this();
+        
+        this.name = name;
         this.password = password;
+        this.role = role;
         this.outlet = outlet;
-        this.transitDriverDispatchRecords = new ArrayList<TransitDriverDispatchRecord>();
     }
     
     
-
     @Override
     public int hashCode() {
         int hash = 0;
@@ -89,29 +89,29 @@ public class Employee implements Serializable {
     public String toString() {
         return "entity.Employee[ id=" + employeeId + " ]";
     }
-
-    public Role getUserRole() {
-        return userRole;
+    
+    public String getName() {
+        return name;
     }
 
-    public void setUserRole(Role userRole) {
-        this.userRole = userRole;
+    public void setName(String name) {
+        this.name = name;
     }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
+    
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 
     public Outlet getOutlet() {

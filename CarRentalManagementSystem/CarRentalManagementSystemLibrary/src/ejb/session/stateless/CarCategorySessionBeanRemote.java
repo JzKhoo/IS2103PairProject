@@ -5,16 +5,17 @@
  */
 package ejb.session.stateless;
 
-import entity.Category;
+import entity.CarCategory;
 import javax.ejb.Remote;
-import util.exception.CategoryNotFoundException;
+import util.exception.CarCategoryNotFoundException;
 
 /**
  *
  * @author khoojingzhi
  */
 @Remote
-public interface CategorySessionBeanRemote {
+public interface CarCategorySessionBeanRemote {
     
-    public Category retrieveCategoryByType(String type) throws CategoryNotFoundException;
+    // Retrieve
+    public CarCategory retrieveCategoryByName(String type) throws CarCategoryNotFoundException;
 }

@@ -5,18 +5,18 @@
  */
 package ejb.session.stateless;
 
-import entity.Employee;
+import entity.Car;
 import javax.ejb.Remote;
-import util.exception.InvalidLoginCredentialException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
  * @author khoojingzhi
  */
 @Remote
-public interface EmployeeSessionBeanRemote {
-
-    // Login via CaRMSManagamentClient
-    public Employee login(String userName, String password) throws InvalidLoginCredentialException;
+public interface CarSessionBeanRemote {
     
+    // Create
+    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException;
 }

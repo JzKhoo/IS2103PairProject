@@ -7,7 +7,6 @@ package carmsmanagementclient;
 
 import entity.Employee;
 import java.util.Scanner;
-import util.enumeration.Role;
 import util.exception.InvalidAccessRightException;
 
 /**
@@ -29,7 +28,7 @@ public class SalesManagerModule {
     
     public void menuSalesManager() throws InvalidAccessRightException
     {
-        if(currentEmployee.getUserRole() != Role.SALES_MANAGER && currentEmployee.getUserRole() != Role.SYSTEM_ADMINISTRATOR)
+        if(currentEmployee.getRole() != "Sales Manager")
         {
             throw new InvalidAccessRightException("You don't have Sales Manager rights to access the sales manager module.");
         }

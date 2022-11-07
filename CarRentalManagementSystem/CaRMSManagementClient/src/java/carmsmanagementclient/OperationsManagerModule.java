@@ -5,7 +5,6 @@
  */
 package carmsmanagementclient;
 
-import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import entity.Employee;
 import entity.Model;
@@ -16,13 +15,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.enumeration.Role;
-import util.exception.CategoryNotFoundException;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateModelException;
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 
 /**
  *
@@ -33,7 +32,7 @@ public class OperationsManagerModule {
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     
-    private CategorySessionBeanRemote categorySessionBeanRemote;
+    private CarCategorySessionBeanRemote categorySessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
     
     private Employee currentEmployee;
@@ -43,7 +42,7 @@ public class OperationsManagerModule {
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(Employee currentEmployee, CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
+    public OperationsManagerModule(Employee currentEmployee, CarCategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
         this();
         this.currentEmployee = currentEmployee;
         this.categorySessionBeanRemote = categorySessionBeanRemote;
@@ -54,7 +53,7 @@ public class OperationsManagerModule {
     
     public void menuOperationsManager() throws InvalidAccessRightException
     {
-        if(currentEmployee.getUserRole() != Role.OPERATIONS_MANAGER && currentEmployee.getUserRole() != Role.SYSTEM_ADMINISTRATOR)
+        if(currentEmployee.getRole() != "Operations Manager")
         {
             throw new InvalidAccessRightException("You don't have Operations Manager rights to access the operations manager module.");
         }
@@ -92,7 +91,7 @@ public class OperationsManagerModule {
                     {
                         doCreateNewModel();
                     }
-                    catch(CategoryNotFoundException ex)
+                    catch(CarCategoryNotFoundException ex)
                     {
                         System.out.println("Create new model unsuccessful!: " + ex.getMessage() + "\n");
                     }
@@ -166,7 +165,7 @@ public class OperationsManagerModule {
     }
     
     
-    private void doCreateNewModel() throws CategoryNotFoundException
+    private void doCreateNewModel() throws CarCategoryNotFoundException
     {
         Scanner scanner = new Scanner(System.in);
         Model newModel = new Model();
@@ -180,11 +179,11 @@ public class OperationsManagerModule {
         try
         {
             System.out.print("Enter Category> ");
-            newModel.setCategory(categorySessionBeanRemote.retrieveCategoryByType(scanner.nextLine().trim()));
+            newModel.setCarCategory(categorySessionBeanRemote.retrieveCategoryByName(scanner.nextLine().trim()));
         }
-        catch(CategoryNotFoundException ex)
+        catch(CarCategoryNotFoundException ex)
         {
-            throw new CategoryNotFoundException(ex.getMessage());
+            throw new CarCategoryNotFoundException(ex.getMessage());
         }
         
         Set<ConstraintViolation<Model>>constraintViolations = validator.validate(newModel);
@@ -224,7 +223,7 @@ public class OperationsManagerModule {
 
         for(Model model:models)
         {
-            System.out.printf("%20s%20s%20s%20s%20s\n", model.getCategory().getType(), model.getMake(), model.getModel(), model.getModelId(), model.isIsDisabled());
+            System.out.printf("%20s%20s%20s%20s%20s\n", model.getCarCategory().getName(), model.getMake(), model.getModel(), model.getModelId(), model.isIsDisabled());
         }
         
         System.out.print("Press any key to continue...> ");
