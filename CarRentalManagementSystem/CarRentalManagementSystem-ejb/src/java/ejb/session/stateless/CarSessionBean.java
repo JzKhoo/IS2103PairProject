@@ -71,6 +71,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
     }
     
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>>constraintViolations)
     {
         String msg = "Input data validation error!:";

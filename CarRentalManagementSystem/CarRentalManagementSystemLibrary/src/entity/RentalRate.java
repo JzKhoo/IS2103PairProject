@@ -22,6 +22,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class RentalRate implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +32,12 @@ public class RentalRate implements Serializable {
     @Column(nullable = false)
     private int ratePerDay;
     private Timestamp startDateTime;
-    private Timestamp startEndTime;
+    private Timestamp endDateTime;
     @Column(nullable = false)
     private boolean isDisabled = false;
     
-    @ManyToOne
+    // Relationships
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
 
@@ -50,15 +52,13 @@ public class RentalRate implements Serializable {
     public RentalRate() {
     }
 
-    public RentalRate(String name, CarCategory carCategory, int ratePerDay, Timestamp startDateTime, Timestamp startEndTime) {
+    public RentalRate(String name, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime, CarCategory carCategory) {
         this.name = name;
-        this.carCategory = carCategory;
         this.ratePerDay = ratePerDay;
         this.startDateTime = startDateTime;
-        this.startEndTime = startEndTime;
-    }
-    
-    
+        this.endDateTime = endDateTime;
+        this.carCategory = carCategory;
+    } 
 
     @Override
     public int hashCode() {
@@ -109,12 +109,12 @@ public class RentalRate implements Serializable {
         this.startDateTime = startDateTime;
     }
 
-    public Timestamp getStartEndTime() {
-        return startEndTime;
+    public Timestamp getEndDateTime() {
+        return endDateTime;
     }
 
-    public void setStartEndTime(Timestamp startEndTime) {
-        this.startEndTime = startEndTime;
+    public void setEndDateTime(Timestamp endDateTime) {
+        this.endDateTime = endDateTime;
     }
 
     public boolean isIsDisabled() {

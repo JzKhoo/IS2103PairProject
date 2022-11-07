@@ -56,9 +56,6 @@ public class DataInitializationSessionBean {
     @EJB
     private PartnerSessionBeanLocal partnerSessionBeanLocal;
 
-   
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
 
     public DataInitializationSessionBean() {
     }
@@ -103,12 +100,12 @@ public class DataInitializationSessionBean {
         categorySessionBeanLocal.createNewCategory(new CarCategory("Luxury Sedan"));
         categorySessionBeanLocal.createNewCategory(new CarCategory("SUV and Minivan"));
         
-        modelSessionBeanLocal.createNewModel(new Model("Toyota", "Corolla", categorySessionBeanLocal.retrieveCategoryByName("Standard Sedan")));
-        modelSessionBeanLocal.createNewModel(new Model("Honda", "Civic", categorySessionBeanLocal.retrieveCategoryByName("Standard Sedan")));
-        modelSessionBeanLocal.createNewModel(new Model("Nissan", "Sunny", categorySessionBeanLocal.retrieveCategoryByName("Standard Sedan")));
-        modelSessionBeanLocal.createNewModel(new Model("Mercedes", "E Class", categorySessionBeanLocal.retrieveCategoryByName("Luxury Sedan")));
-        modelSessionBeanLocal.createNewModel(new Model("BMW", "5 Series", categorySessionBeanLocal.retrieveCategoryByName("Luxury Sedan")));
-        modelSessionBeanLocal.createNewModel(new Model("Audi", "A6", categorySessionBeanLocal.retrieveCategoryByName("Luxury Sedan")));
+        modelSessionBeanLocal.createNewModel(new Model("Toyota", "Corolla", categorySessionBeanLocal.retrieveCarCategoryByName("Standard Sedan")));
+        modelSessionBeanLocal.createNewModel(new Model("Honda", "Civic", categorySessionBeanLocal.retrieveCarCategoryByName("Standard Sedan")));
+        modelSessionBeanLocal.createNewModel(new Model("Nissan", "Sunny", categorySessionBeanLocal.retrieveCarCategoryByName("Standard Sedan")));
+        modelSessionBeanLocal.createNewModel(new Model("Mercedes", "E Class", categorySessionBeanLocal.retrieveCarCategoryByName("Luxury Sedan")));
+        modelSessionBeanLocal.createNewModel(new Model("BMW", "5 Series", categorySessionBeanLocal.retrieveCarCategoryByName("Luxury Sedan")));
+        modelSessionBeanLocal.createNewModel(new Model("Audi", "A6", categorySessionBeanLocal.retrieveCarCategoryByName("Luxury Sedan")));
         
         carSessionBeanLocal.createNewCar(new Car("SS00A1TC", "Available", outletSessionBean.retrieveOutletByName("Outlet A"), modelSessionBeanLocal.retrieveModelByMakeAndModel("Toyota", "Corolla")));
         carSessionBeanLocal.createNewCar(new Car("SS00A2TC", "Available", outletSessionBean.retrieveOutletByName("Outlet A"), modelSessionBeanLocal.retrieveModelByMakeAndModel("Toyota", "Corolla")));
@@ -123,15 +120,15 @@ public class DataInitializationSessionBean {
         carSessionBeanLocal.createNewCar(new Car("LS00B4B5", "Available", outletSessionBean.retrieveOutletByName("Outlet B"), modelSessionBeanLocal.retrieveModelByMakeAndModel("BMW", "5 Series")));
         carSessionBeanLocal.createNewCar(new Car("LS00C4A6", "Available", outletSessionBean.retrieveOutletByName("Outlet C"), modelSessionBeanLocal.retrieveModelByMakeAndModel("Audi", "A6")));
         
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", categorySessionBeanLocal.retrieveCategoryByName("Standard Sedan"), 100, null, null));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Promotion", categorySessionBeanLocal.retrieveCategoryByName("Standard Sedan"), 80, Timestamp.valueOf("2022-12-09 12:00:00"), Timestamp.valueOf("2022-12-11 00:00:00")));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", categorySessionBeanLocal.retrieveCategoryByName("Family Sedan"), 200, null, null));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", categorySessionBeanLocal.retrieveCategoryByName("Family Sedan"), 300, null, null));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Peak", categorySessionBeanLocal.retrieveCategoryByName("Luxury Sedan"), 310, Timestamp.valueOf("2022-12-05 00:00:00"), Timestamp.valueOf("2022-12-05 23:59:59")));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Peak", categorySessionBeanLocal.retrieveCategoryByName("Luxury Sedan"), 320, Timestamp.valueOf("2022-12-06 00:00:00"), Timestamp.valueOf("2022-12-06 23:59:59")));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Peak", categorySessionBeanLocal.retrieveCategoryByName("Luxury Sedan"), 330, Timestamp.valueOf("2022-12-07 00:00:00"), Timestamp.valueOf("2022-12-07 23:59:59")));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Promotion", categorySessionBeanLocal.retrieveCategoryByName("Luxury Sedan"), 250, Timestamp.valueOf("2022-12-07 12:00:00"), Timestamp.valueOf("2022-12-08 12:00:00")));
-        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", categorySessionBeanLocal.retrieveCategoryByName("SUV and Minivan"), 400, null, null));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", 100, null, null, categorySessionBeanLocal.retrieveCarCategoryByName("Standard Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Promotion", 80, Timestamp.valueOf("2022-12-09 12:00:00"), Timestamp.valueOf("2022-12-11 00:00:00"), categorySessionBeanLocal.retrieveCarCategoryByName("Standard Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", 200, null, null, categorySessionBeanLocal.retrieveCarCategoryByName("Family Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", 300, null, null, categorySessionBeanLocal.retrieveCarCategoryByName("Family Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Peak", 310, Timestamp.valueOf("2022-12-05 00:00:00"), Timestamp.valueOf("2022-12-05 23:59:59"), categorySessionBeanLocal.retrieveCarCategoryByName("Luxury Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Peak", 320, Timestamp.valueOf("2022-12-06 00:00:00"), Timestamp.valueOf("2022-12-06 23:59:59"), categorySessionBeanLocal.retrieveCarCategoryByName("Luxury Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Peak", 330, Timestamp.valueOf("2022-12-07 00:00:00"), Timestamp.valueOf("2022-12-07 23:59:59"), categorySessionBeanLocal.retrieveCarCategoryByName("Luxury Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Promotion", 250, Timestamp.valueOf("2022-12-07 12:00:00"), Timestamp.valueOf("2022-12-08 12:00:00"), categorySessionBeanLocal.retrieveCarCategoryByName("Luxury Sedan")));
+        rentalRateSessionBeanLocal.createNewRentalrate(new RentalRate("Default", 400, null, null, categorySessionBeanLocal.retrieveCarCategoryByName("SUV and Minivan")));
         
         partnerSessionBeanLocal.createNewPartner(new Partner("Holiday.com", "Password"));
         }

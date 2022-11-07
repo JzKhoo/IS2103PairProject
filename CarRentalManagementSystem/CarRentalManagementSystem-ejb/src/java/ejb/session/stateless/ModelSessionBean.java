@@ -81,11 +81,10 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     @Override
     public List<Model> retrieveAllModels()
     {
-        Query query = em.createQuery("SELECT m FROM Model m ORDER BY m.category, m.make, m.model ASC");
+        Query query = em.createQuery("SELECT m FROM Model m ORDER BY m.carCategory, m.make, m.model ASC");
         
         return query.getResultList();
     }
-    
     
     @Override
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException
@@ -115,12 +114,12 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         }
         catch(NoResultException | NonUniqueResultException ex)
         {
-            throw new ModelNotFoundException("Model " + make + " , " + model + " does not exist!");
+            throw new ModelNotFoundException("Make " + make + " , Model " + model + " does not exist!");
         }
     }
     
     
-    // Update
+    // Update (incomplete)
     @Override
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException 
     {

@@ -24,6 +24,7 @@ import javax.persistence.OneToMany;
 @Entity
 public class Employee implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,13 +36,12 @@ public class Employee implements Serializable {
     @Column(nullable = false)
     private String role;
     
+    // Relationships
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
-    
     @OneToMany(mappedBy = "employee")
     private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
-    
 
     public Long getEmployeeId() {
         return employeeId;
@@ -50,7 +50,8 @@ public class Employee implements Serializable {
     public void setEmployeeId(Long employeeId) {
         this.employeeId = employeeId;
     }
-
+    
+    // Constructors
     public Employee() {
         this.transitDriverDispatchRecords = new ArrayList<>();
     }
@@ -63,7 +64,6 @@ public class Employee implements Serializable {
         this.role = role;
         this.outlet = outlet;
     }
-    
     
     @Override
     public int hashCode() {

@@ -24,21 +24,15 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     @PersistenceContext
     private EntityManager em;
     
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-
-    public EmployeeSessionBean() {
-    }
     
-    
-    // Create
+    // Create (Backend data initialization only)
     @Override
-    public Employee createNewEmployee(Employee employee)
+    public Employee createNewEmployee(Employee newEmployee)
     {
-        em.persist(employee);
+        em.persist(newEmployee);
         em.flush();
 
-        return employee;
+        return newEmployee;
     }
     
     
@@ -57,6 +51,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
             throw new EmployeeNotFoundException("Employee does not exist: " + employeeId);
         }
     }
+    
     
     // Login via CaRMSManagamentClient
     @Override

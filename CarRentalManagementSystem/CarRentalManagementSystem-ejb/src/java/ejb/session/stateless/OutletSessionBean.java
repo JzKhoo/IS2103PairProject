@@ -26,13 +26,13 @@ public class OutletSessionBean {
     @PersistenceContext
     private EntityManager em;
 
-    // Create
-    public Outlet createNewOutlet(Outlet outlet) 
+    // Create (Backend data initialization only)
+    public Outlet createNewOutlet(Outlet newOutlet) 
     {
-        em.persist(outlet);
+        em.persist(newOutlet);
         em.flush();
         
-        return outlet;
+        return newOutlet;
     }
     
     
@@ -66,4 +66,5 @@ public class OutletSessionBean {
             throw new OutletNotFoundException("Outlet " + name + " does not exist!");
         }
     }
+    
 }

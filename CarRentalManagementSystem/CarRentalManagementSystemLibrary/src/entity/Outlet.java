@@ -23,6 +23,7 @@ import javax.persistence.OneToMany;
 @Entity
 public class Outlet implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,12 +32,15 @@ public class Outlet implements Serializable {
     private String name;
     private Time openingHour;
     private Time closingHour;
+    private String address;
     
+    // Relationships
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
 
+    
     public Long getOutletId() {
         return outletId;
     }
@@ -45,6 +49,7 @@ public class Outlet implements Serializable {
         this.outletId = outletId;
     }
 
+    // Constructors
     public Outlet() {
         this.cars = new ArrayList<>();
         this.employees = new ArrayList<>();
@@ -56,6 +61,15 @@ public class Outlet implements Serializable {
         this.name = name;
         this.openingHour = openingHour;
         this.closingHour = closingHour;
+    }
+    
+    public Outlet(String name, Time openingHour, Time closingHour, String address) {
+        this();
+        
+        this.name = name;
+        this.openingHour = openingHour;
+        this.closingHour = closingHour;
+        this.address = address;
     }
 
     @Override
@@ -106,7 +120,15 @@ public class Outlet implements Serializable {
     public void setClosingHour(Time closingHour) {
         this.closingHour = closingHour;
     }
+    
+    public String getAddress() {
+        return address;
+    }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    
     public List<Car> getCars() {
         return cars;
     }
@@ -122,5 +144,5 @@ public class Outlet implements Serializable {
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
-    
+
 }

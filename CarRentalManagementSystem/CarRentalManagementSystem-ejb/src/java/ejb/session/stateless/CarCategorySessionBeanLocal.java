@@ -16,9 +16,9 @@ import util.exception.CarCategoryNotFoundException;
 @Local
 public interface CarCategorySessionBeanLocal {
 
-    // Create
-    public CarCategory createNewCategory(CarCategory category);
+    // Create (Backend data initialization only)
+    public CarCategory createNewCategory(CarCategory newCarCategory);
     
     // Retrieve
-    public CarCategory retrieveCategoryByName(String type) throws CarCategoryNotFoundException;
+    public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException;
 }

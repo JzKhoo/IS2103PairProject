@@ -28,6 +28,6 @@ public interface ModelSessionBeanLocal {
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException;
     public Model retrieveModelByMakeAndModel(String make, String model) throws ModelNotFoundException;
 
-    // Update
+    // Update (incomplete)
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;    
 }

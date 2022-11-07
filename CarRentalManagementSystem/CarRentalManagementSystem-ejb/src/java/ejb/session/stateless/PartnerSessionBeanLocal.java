@@ -15,6 +15,7 @@ import javax.ejb.Local;
 @Local
 public interface PartnerSessionBeanLocal {
 
-    public Partner createNewPartner(Partner partner);
+    // Create (Backend data initialization only)
+    public Partner createNewPartner(Partner newPartner);
     
 }

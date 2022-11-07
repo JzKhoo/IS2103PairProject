@@ -20,14 +20,13 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     @PersistenceContext
     private EntityManager em;
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    // Create (Backend data initialization only)
     @Override
-    public Partner createNewPartner(Partner partner) 
+    public Partner createNewPartner(Partner newPartner) 
     {
-        em.persist(partner);
+        em.persist(newPartner);
         em.flush();
         
-        return partner;
+        return newPartner;
     }
 }

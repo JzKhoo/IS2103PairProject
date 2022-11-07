@@ -25,19 +25,19 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
     private EntityManager em;
     
     
-    // Create
+    // Create (Backend data initialization only)
     @Override
-    public CarCategory createNewCategory(CarCategory carCategory) 
+    public CarCategory createNewCategory(CarCategory newCarCategory) 
     {
-        em.persist(carCategory);
+        em.persist(newCarCategory);
         em.flush();
         
-        return carCategory;
+        return newCarCategory;
     }
     
     // Retrieve
     @Override
-    public CarCategory retrieveCategoryByName(String name) throws CarCategoryNotFoundException
+    public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException
     {
         Query query = em.createQuery("SELECT c FROM CarCategory c WHERE c.name = :inName");
         query.setParameter("inName", name);
@@ -48,7 +48,7 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         }
         catch(NoResultException | NonUniqueResultException ex)
         {
-            throw new CarCategoryNotFoundException("Category " + name + " does not exist!");
+            throw new CarCategoryNotFoundException("CarCategory " + name + " does not exist!");
         }
     }
 }

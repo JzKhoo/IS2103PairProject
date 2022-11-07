@@ -37,7 +37,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
     
     
-    // Create
+    // Create (incomplete)
     @Override
     public RentalRate createNewRentalrate(RentalRate newRentalRate) throws UnknownPersistenceException, InputDataValidationException
     {
@@ -69,6 +69,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
+    
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>>constraintViolations)
     {

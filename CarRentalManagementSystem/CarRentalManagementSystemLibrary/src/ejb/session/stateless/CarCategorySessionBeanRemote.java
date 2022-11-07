@@ -17,5 +17,5 @@ import util.exception.CarCategoryNotFoundException;
 public interface CarCategorySessionBeanRemote {
     
     // Retrieve
-    public CarCategory retrieveCategoryByName(String type) throws CarCategoryNotFoundException;
+    public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException;
 }

@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -23,20 +24,22 @@ import javax.persistence.OneToMany;
 @Entity
 public class Model implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long modelId;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String make;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String model;
     @Column(nullable = false)
     private boolean isDisabled = false;
     
+    // Relationships
     @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private CarCategory carCategory;
-    
     @OneToMany(mappedBy = "model")
     private List<Car> cars;
     
@@ -48,6 +51,7 @@ public class Model implements Serializable {
         this.modelId = modelId;
     }
 
+    // Constructors
     public Model() {
         this.cars = new ArrayList<>();
     }

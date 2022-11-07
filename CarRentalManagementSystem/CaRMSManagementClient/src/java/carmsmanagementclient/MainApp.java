@@ -19,9 +19,9 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
  */
 public class MainApp {
     
-    private CarCategorySessionBeanRemote categorySessionBeanRemote;
-    private ModelSessionBeanRemote modelSessionBeanRemote;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private ModelSessionBeanRemote modelSessionBeanRemote;
     
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
     private OperationsManagerModule operationsManagerModule;
@@ -33,15 +33,13 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CarCategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
-        this.categorySessionBeanRemote = categorySessionBeanRemote;
-        this.modelSessionBeanRemote = modelSessionBeanRemote;
+    public MainApp(CarCategorySessionBeanRemote carCategorySessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.modelSessionBeanRemote = modelSessionBeanRemote;
     }
-
     
-    
-    
+    // Employee Login & Logout page
     public void runApp()
     {
         Scanner scanner = new Scanner(System.in);
@@ -68,7 +66,7 @@ public class MainApp {
                         System.out.println("Login successful!\n");
                         
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(currentEmployee);
-                        operationsManagerModule = new OperationsManagerModule(currentEmployee, categorySessionBeanRemote, modelSessionBeanRemote);
+                        operationsManagerModule = new OperationsManagerModule(currentEmployee, carCategorySessionBeanRemote, modelSessionBeanRemote);
                         salesManagerModule = new SalesManagerModule(currentEmployee);
 
                         menuMain();
@@ -95,21 +93,22 @@ public class MainApp {
         }
     }
     
+    // Employee Login
     private void doLogin() throws InvalidLoginCredentialException 
     {
         Scanner scanner = new Scanner(System.in);
-        String userName = "";
+        String name = "";
         String password = "";
         
         System.out.println("*** CaRMS Management System :: Login ***\n");
-        System.out.print("Enter username> ");
-        userName = scanner.nextLine().trim();
+        System.out.print("Enter name> ");
+        name = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
         
-        if(userName.length() > 0 && password.length() > 0) 
+        if(name.length() > 0 && password.length() > 0) 
         {
-            currentEmployee = employeeSessionBeanRemote.login(userName, password);
+            currentEmployee = employeeSessionBeanRemote.login(name, password);
         }
         else 
         {
@@ -117,6 +116,7 @@ public class MainApp {
         }
     }
     
+    // Select Module page
     private void menuMain()
     {
         Scanner scanner = new Scanner(System.in);
