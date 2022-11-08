@@ -10,9 +10,9 @@
     <class>entity.Employee</class>
     <class>entity.Model</class>
     <class>entity.Outlet</class>
-    <class>entity.RentalRateRecord</class>
     <class>entity.TransitDriverDispatchRecord</class>
     <class>entity.Partner</class>
+    <class>entity.RentalRate</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

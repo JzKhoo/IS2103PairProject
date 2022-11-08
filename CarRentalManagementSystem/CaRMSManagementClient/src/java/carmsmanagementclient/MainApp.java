@@ -8,7 +8,9 @@ package carmsmanagementclient;
 import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -22,6 +24,7 @@ public class MainApp {
     private CategorySessionBeanRemote categorySessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
     private OperationsManagerModule operationsManagerModule;
@@ -33,10 +36,11 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote) {
+    public MainApp(CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
         this.categorySessionBeanRemote = categorySessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
     }
 
     
@@ -53,23 +57,25 @@ public class MainApp {
             System.out.println("1: Login");          
             System.out.println("2: Exit\n");
             response = 0;
-            
+           
             while(response < 1 || response > 2)
             {
                 System.out.print("> ");
+                 
                 
                 response = scanner.nextInt();
                 
+
                 if(response == 1)
                 {
                     try
                     {
                         doLogin();
                         System.out.println("Login successful!\n");
-                        
+
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(currentEmployee);
                         operationsManagerModule = new OperationsManagerModule(currentEmployee, categorySessionBeanRemote, modelSessionBeanRemote);
-                        salesManagerModule = new SalesManagerModule(currentEmployee);
+                        salesManagerModule = new SalesManagerModule(currentEmployee, rentalRateSessionBeanRemote, categorySessionBeanRemote);
 
                         menuMain();
                     }
@@ -86,12 +92,14 @@ public class MainApp {
                 {
                     System.out.println("Invalid option, please try again!\n");
                 }
+
             }
-            
+
             if(response == 2)
             {
                 break;
             }
+            
         }
     }
     

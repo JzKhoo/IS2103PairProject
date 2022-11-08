@@ -17,4 +17,5 @@ import util.exception.CategoryNotFoundException;
 public interface CategorySessionBeanRemote {
     
     public Category retrieveCategoryByType(String type) throws CategoryNotFoundException;
+    public Category createNewCategory(Category category);
 }

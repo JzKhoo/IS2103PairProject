@@ -20,14 +20,16 @@ import javax.persistence.ManyToOne;
  * @author khoojingzhi
  */
 @Entity
-public class RentalRateRecord implements Serializable {
+public class RentalRate implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalRateRecordId;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
+    @Column(nullable = false)
+    private String rentalRateType;
     @Column(nullable = false)
     private double ratePerDay;
     private Date validityStartDate;
@@ -47,12 +49,13 @@ public class RentalRateRecord implements Serializable {
         this.rentalRateRecordId = rentalRateRecordId;
     }
 
-    public RentalRateRecord() {
+    public RentalRate() {
     }
 
-    public RentalRateRecord(String name, double ratePerDay, Date validityStartDate, Date validityEndDate, boolean isDisabled, Category category) {
+    public RentalRate(String name, String rentalRateType, double ratePerDay, Date validityStartDate, Date validityEndDate, boolean isDisabled, Category category) {
         this.name = name;
         this.ratePerDay = ratePerDay;
+        this.rentalRateType = rentalRateType;
         this.validityStartDate = validityStartDate;
         this.validityEndDate = validityEndDate;
         this.isDisabled = isDisabled;
@@ -71,10 +74,10 @@ public class RentalRateRecord implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the rentalRateRecordId fields are not set
-        if (!(object instanceof RentalRateRecord)) {
+        if (!(object instanceof RentalRate)) {
             return false;
         }
-        RentalRateRecord other = (RentalRateRecord) object;
+        RentalRate other = (RentalRate) object;
         if ((this.rentalRateRecordId == null && other.rentalRateRecordId != null) || (this.rentalRateRecordId != null && !this.rentalRateRecordId.equals(other.rentalRateRecordId))) {
             return false;
         }
@@ -132,6 +135,20 @@ public class RentalRateRecord implements Serializable {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    /**
+     * @return the rentalRateType
+     */
+    public String getRentalRateType() {
+        return rentalRateType;
+    }
+
+    /**
+     * @param rentalRateType the rentalRateType to set
+     */
+    public void setRentalRateType(String rentalRateType) {
+        this.rentalRateType = rentalRateType;
     }
     
 }

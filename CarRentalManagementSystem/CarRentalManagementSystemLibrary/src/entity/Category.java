@@ -32,7 +32,7 @@ public class Category implements Serializable {
     @OneToMany(mappedBy = "category")
     private List<Car> cars;
     @OneToMany(mappedBy = "category")
-    private List<RentalRateRecord> rentalRateRecords;
+    private List<RentalRate> rentalRateRecords;
     @OneToMany(mappedBy = "category")
     private List<Model> models;
 
@@ -46,14 +46,14 @@ public class Category implements Serializable {
 
     public Category() {
         this.cars = new ArrayList<Car>();
-        this.rentalRateRecords = new ArrayList<RentalRateRecord>();
+        this.rentalRateRecords = new ArrayList<RentalRate>();
         this.models = new ArrayList<Model>();
     }
 
     public Category(String type) {
         this.type = type;
         this.cars = new ArrayList<Car>();
-        this.rentalRateRecords = new ArrayList<RentalRateRecord>();
+        this.rentalRateRecords = new ArrayList<RentalRate>();
         this.models = new ArrayList<Model>();
     }
     
@@ -92,11 +92,11 @@ public class Category implements Serializable {
         this.cars = cars;
     }
 
-    public List<RentalRateRecord> getRentalRateRecords() {
+    public List<RentalRate> getRentalRateRecords() {
         return rentalRateRecords;
     }
 
-    public void setRentalRateRecords(List<RentalRateRecord> rentalRateRecords) {
+    public void setRentalRateRecords(List<RentalRate> rentalRateRecords) {
         this.rentalRateRecords = rentalRateRecords;
     }
 

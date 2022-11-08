@@ -5,10 +5,22 @@
  */
 package carmsmanagementclient;
 
+import ejb.session.stateless.CategorySessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
+import entity.Category;
 import entity.Employee;
+import entity.RentalRate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 import util.enumeration.Role;
+import util.exception.CategoryNotFoundException;
+import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
+import util.exception.RentalRateNotFoundException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -17,12 +29,16 @@ import util.exception.InvalidAccessRightException;
 public class SalesManagerModule {
     
     private Employee currentEmployee;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private CategorySessionBeanRemote categorySessionBeanRemote;
 
     public SalesManagerModule() {
     }
 
-    public SalesManagerModule(Employee currentEmployee) {
+    public SalesManagerModule(Employee currentEmployee, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote) {
         this.currentEmployee = currentEmployee;
+        this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
+        this.categorySessionBeanRemote = categorySessionBeanRemote;
     }
     
     
@@ -56,15 +72,15 @@ public class SalesManagerModule {
 
                 if(response == 1)
                 {
-                    break;
+                    createRentalRate();
                 }
                 else if(response == 2)
                 {
-                    break;
+                    viewALlRentalRates();
                 }
                 else if(response == 3)
                 {
-                    break;
+                    viewRentalRateDetails();
                 }
                 else if(response == 4)
                 {
@@ -91,4 +107,92 @@ public class SalesManagerModule {
         }
     }
     
+    private void createRentalRate()
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** CaRMS Management System :: Create Rental Rate ***\n");
+        System.out.print("Enter name> ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Enter rental rate type> ");
+        String rentalRateType = scanner.nextLine().trim();
+        System.out.print("Enter car category> ");
+        String carCategory = scanner.nextLine().trim();
+        System.out.print("Enter rate per day> ");
+        double ratePerDay = scanner.nextDouble();
+        scanner.nextLine();
+        System.out.print("Enter start date time in the following format: dd/mm/yyy> ");
+        String dateFormat = "dd/MM/yyyy";
+        Date startDateTime = null;
+        Date endDateTime = null;
+        try{
+            startDateTime = new SimpleDateFormat(dateFormat).parse(scanner.nextLine().trim());
+        } catch (ParseException ex) {
+            System.out.println("start date time set to null");
+        }
+        System.out.print("Enter end date time in the following format: dd/mm/yyy> ");
+        try
+        {
+            endDateTime = new SimpleDateFormat(dateFormat).parse(scanner.nextLine().trim());
+        } 
+        catch (ParseException ex) 
+        {
+            System.out.println("start date time set to null");
+        } 
+        
+        
+        Category category = null;
+        try
+        {
+            category = categorySessionBeanRemote.retrieveCategoryByType(carCategory);
+        } 
+        catch (CategoryNotFoundException ex) 
+        {
+            System.out.println("Creating new car category: " + carCategory + "...");
+            category = categorySessionBeanRemote.createNewCategory(new Category(carCategory));
+            System.out.println("Car category: " + carCategory + "created");
+            
+        }
+        
+        
+        try 
+        {
+            rentalRateSessionBeanRemote.createNewRentalRate(new RentalRate(name, rentalRateType, ratePerDay, startDateTime, endDateTime, false, category));
+        } 
+        catch (UnknownPersistenceException ex) 
+        {
+            System.out.println("An unknown error occured when creating new rental rate: " + ex.getMessage());
+        } 
+        catch (InputDataValidationException ex) 
+        {
+            System.out.println("An unknown error occured when creating new rental rate: " + ex.getMessage());
+        }
+    }
+    
+    private void viewALlRentalRates() 
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** CaRMS Management System :: View All Rental Rates ***\n");
+        List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveAllRentalRates();
+        System.out.println("List of all rental rates: ");
+        for (RentalRate rentalRate : rentalRates) 
+        {
+            System.out.println("Name: " + rentalRate.getName() + "; Category:" + rentalRate.getCategory().getType() + "; start date: " + rentalRate.getValidityStartDate() + "; end date: " + rentalRate.getValidityEndDate());
+        }
+    }
+    
+    private void viewRentalRateDetails()
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** CaRMS Management System :: View Rental Rate Details ***\n");
+        System.out.print("Enter name> ");
+        String name = scanner.nextLine().trim();
+        
+        try{
+            RentalRate rentalRate = rentalRateSessionBeanRemote.viewRentalRateDetails(name);
+            System.out.println("Rental Rate details for " + name);
+            System.out.println("Category:" + rentalRate.getCategory().getType() + "; start date: " + rentalRate.getValidityStartDate() + "; end date: " + rentalRate.getValidityEndDate());
+        } catch (RentalRateNotFoundException ex) {
+            System.out.println("Invalid rental rate name: " + ex.getMessage());
+        }
+    }
 }
