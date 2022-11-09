@@ -119,7 +119,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     
-    // Update (incomplete)
+    // Update
     @Override
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException 
     {
@@ -136,8 +136,10 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
                     modelToUpdate.setMake(model.getMake());
                     modelToUpdate.setModel(model.getModel());
                     modelToUpdate.setIsDisabled(model.isIsDisabled());
-                    modelToUpdate.setCars(model.getCars());
-                    modelToUpdate.setCarCategory(model.getCarCategory());
+
+// Only allow updates to attributes, not relationships
+//                    modelToUpdate.setCars(model.getCars());
+//                    modelToUpdate.setCarCategory(model.getCarCategory());
                 }
                 else
                 {

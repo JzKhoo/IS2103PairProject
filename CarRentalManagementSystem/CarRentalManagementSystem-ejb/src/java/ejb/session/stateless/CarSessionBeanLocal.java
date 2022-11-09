@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import javax.ejb.Local;
+import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
@@ -20,4 +21,6 @@ public interface CarSessionBeanLocal {
     // Create
     public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException;
     
+    // Retrieve
+    public Car retrieveCarByLicensePlateNumber(String licensePlateNumber) throws CarNotFoundException;
 }

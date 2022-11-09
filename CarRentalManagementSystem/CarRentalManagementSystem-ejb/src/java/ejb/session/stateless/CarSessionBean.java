@@ -10,12 +10,16 @@ import entity.Model;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
@@ -68,6 +72,24 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         else
         {
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+        }
+    }
+    
+    
+    // Retrieve
+    @Override
+    public Car retrieveCarByLicensePlateNumber(String licensePlateNumber) throws CarNotFoundException
+    {
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.licensePlateNumber = :inLicensePlateNumber");
+        query.setParameter("inLicensePlateNumber", licensePlateNumber);
+        
+        try
+        {
+            return (Car)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex)
+        {
+            throw new CarNotFoundException("Car " + licensePlateNumber + " does not exist!");
         }
     }
     
