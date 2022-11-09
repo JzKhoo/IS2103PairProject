@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.Model;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.DeleteModelException;
 import util.exception.InputDataValidationException;
 import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -30,4 +31,7 @@ public interface ModelSessionBeanRemote {
     
     // Update
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;
+    
+    // Delete
+    public void deleteModel(Long modelId) throws ModelNotFoundException, DeleteModelException;
 }

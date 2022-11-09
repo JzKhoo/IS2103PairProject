@@ -23,10 +23,10 @@ import util.exception.UnknownPersistenceException;
 import util.exception.UpdateModelException;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
-import entity.Car;
-import entity.CarCategory;
-import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import util.exception.CarNotFoundException;
+import util.exception.DeleteModelException;
 
 /**
  *
@@ -125,7 +125,7 @@ public class OperationsManagerModule {
                 }
                 else if(response == 4)
                 {
-                    break;
+                    doDeleteModel();
                 }
                 else if(response == 5)
                 {
@@ -352,6 +352,33 @@ public class OperationsManagerModule {
         }
         
         
+    }
+    
+    
+    // Delete model
+    private void doDeleteModel()
+    {
+        Scanner scanner = new Scanner(System.in); 
+        String input;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Delete Model ***\n");
+        
+        // Retrieve model object by Make & Model
+        System.out.print("Enter Make of Model to Delete> ");
+        String make = scanner.nextLine().trim();
+        System.out.print("Enter Model of Model to Delete> ");
+        String modelName = scanner.nextLine().trim();
+        
+        try
+        {
+            Model model = modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName);
+            modelSessionBeanRemote.deleteModel(model.getModelId());
+            System.out.println("Model deleted successfully!\n");
+        }
+        catch(ModelNotFoundException | DeleteModelException ex)
+        {
+            System.out.println("An error has occurred while deleting model: " + ex.getMessage() + "\n");
+        }
     }
     
     

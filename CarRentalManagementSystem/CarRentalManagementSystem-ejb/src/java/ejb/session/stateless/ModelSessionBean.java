@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.Model;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteModelException;
 import util.exception.InputDataValidationException;
 import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -154,6 +156,25 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         else
         {
             throw new ModelNotFoundException("Model ID not provided for model to be updated");
+        }
+    }
+    
+    
+    // Delete
+    public void deleteModel(Long modelId) throws ModelNotFoundException, DeleteModelException
+    {
+        Model modelToRemove = retrieveModelByModelId(modelId);
+        
+        List<Car> cars = modelToRemove.getCars();
+        
+        if(cars.isEmpty())
+        {
+            em.remove(modelToRemove);
+        }
+        else
+        {
+            modelToRemove.setIsDisabled(true);
+            throw new DeleteModelException("Model ID " + modelId + " is associated with existing cars and cannot be deleted!");
         }
     }
     
