@@ -13,6 +13,7 @@
     <class>entity.TransitDriverDispatchRecord</class>
     <class>entity.Partner</class>
     <class>entity.RentalRate</class>
+    <class>entity.CarCategory</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>

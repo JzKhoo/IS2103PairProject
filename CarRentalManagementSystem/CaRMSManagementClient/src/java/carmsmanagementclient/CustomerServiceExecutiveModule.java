@@ -7,7 +7,6 @@ package carmsmanagementclient;
 
 import entity.Employee;
 import java.util.Scanner;
-import util.enumeration.Role;
 import util.exception.InvalidAccessRightException;
 
 /**
@@ -25,11 +24,10 @@ public class CustomerServiceExecutiveModule {
         this.currentEmployee = currentEmployee;
     }
     
-    
-    
+    // Main Navigation Page
     public void menuCustomerServiceExecutive() throws InvalidAccessRightException
     {
-        if(currentEmployee.getUserRole() != Role.CUSTOMER_SERVICE_EXECUTIVE && currentEmployee.getUserRole() != Role.SYSTEM_ADMINISTRATOR)
+        if(!currentEmployee.getRole().equals("Customer Services Executive"))
         {
             throw new InvalidAccessRightException("You don't have Customer Service Executive rights to access the customer service executive module.");
         }
@@ -39,7 +37,7 @@ public class CustomerServiceExecutiveModule {
         
         while(true)
         {
-            System.out.println("*** CaRMS Management System :: Customer Service Executive ***\n");
+            System.out.println("*** CaRMS Management System :: Customer Service Executive Module ***\n");
             System.out.println("1: Pickup Car");
             System.out.println("2: Return Car");
             System.out.println("3: Back\n");

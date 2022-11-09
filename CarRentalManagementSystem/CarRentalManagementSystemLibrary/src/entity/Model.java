@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -23,22 +24,25 @@ import javax.persistence.OneToMany;
 @Entity
 public class Model implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long modelId;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String make;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String model;
     @Column(nullable = false)
     private boolean isDisabled = false;
     
+    // Relationships
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private CarCategory carCategory;
     @OneToMany(mappedBy = "model")
     private List<Car> cars;
-    @ManyToOne(optional = false)
-    private Category category;
-
+    
     public Long getModelId() {
         return modelId;
     }
@@ -47,19 +51,18 @@ public class Model implements Serializable {
         this.modelId = modelId;
     }
 
+    // Constructors
     public Model() {
-        this.cars = new ArrayList<Car>();
+        this.cars = new ArrayList<>();
     }
 
-    public Model(String make, String model, Category category) {
+    public Model(String make, String model, CarCategory carCategory) {
+        this();
+        
         this.make = make;
         this.model = model;
-        this.category = category;
-        this.cars = new ArrayList<Car>();
+        this.carCategory = carCategory;
     }
-
-    
-    
 
     @Override
     public int hashCode() {
@@ -109,6 +112,14 @@ public class Model implements Serializable {
     public void setIsDisabled(boolean isDisabled) {
         this.isDisabled = isDisabled;
     }
+    
+    public CarCategory getCarCategory() {
+        return carCategory;
+    }
+
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
+    }
 
     public List<Car> getCars() {
         return cars;
@@ -118,13 +129,4 @@ public class Model implements Serializable {
         this.cars = cars;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    
 }

@@ -5,7 +5,6 @@
  */
 package carmsmanagementclient;
 
-import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import entity.Employee;
 import entity.Model;
@@ -16,13 +15,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.enumeration.Role;
-import util.exception.CategoryNotFoundException;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateModelException;
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 
 /**
  *
@@ -33,28 +32,27 @@ public class OperationsManagerModule {
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     
-    private CategorySessionBeanRemote categorySessionBeanRemote;
+    private Employee currentEmployee;
+    
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
     
-    private Employee currentEmployee;
-
     public OperationsManagerModule() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(Employee currentEmployee, CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
+    public OperationsManagerModule(Employee currentEmployee, CarCategorySessionBeanRemote carCategorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
         this();
         this.currentEmployee = currentEmployee;
-        this.categorySessionBeanRemote = categorySessionBeanRemote;
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
     }
     
-    
-    
+    // Main Navigation Page
     public void menuOperationsManager() throws InvalidAccessRightException
     {
-        if(currentEmployee.getUserRole() != Role.OPERATIONS_MANAGER && currentEmployee.getUserRole() != Role.SYSTEM_ADMINISTRATOR)
+        if(!currentEmployee.getRole().equals("Operations Manager"))
         {
             throw new InvalidAccessRightException("You don't have Operations Manager rights to access the operations manager module.");
         }
@@ -64,7 +62,7 @@ public class OperationsManagerModule {
         
         while(true)
         {
-            System.out.println("*** CaRMS Management System :: Operations Manager ***\n");
+            System.out.println("*** CaRMS Management System :: Operations Manager Module ***\n");
             System.out.println("1: Create New Model");
             System.out.println("2: View All Models");
             System.out.println("3: Update Model");
@@ -72,15 +70,13 @@ public class OperationsManagerModule {
             System.out.println("5: Create New Car");
             System.out.println("6: View All Cars");
             System.out.println("7: View Car Details");
-            System.out.println("8: Update Car");
-            System.out.println("9: Delete Car");
-            System.out.println("10: View Transit Driver Dispatch Records for Current Day Reservations");
-            System.out.println("11: Assign Transit Driver");
-            System.out.println("12: Update Transit As Completed");
-            System.out.println("13: Back\n");
+            System.out.println("8: View Transit Driver Dispatch Records for Current Day Reservations");
+            System.out.println("9: Assign Transit Driver");
+            System.out.println("10: Update Transit As Completed");
+            System.out.println("11: Back\n");
             response = 0;
             
-            while(response < 1 || response > 12)
+            while(response < 1 || response > 10)
             {
                 System.out.print("> ");
 
@@ -92,7 +88,7 @@ public class OperationsManagerModule {
                     {
                         doCreateNewModel();
                     }
-                    catch(CategoryNotFoundException ex)
+                    catch(CarCategoryNotFoundException ex)
                     {
                         System.out.println("Create new model unsuccessful!: " + ex.getMessage() + "\n");
                     }
@@ -101,7 +97,7 @@ public class OperationsManagerModule {
                 {
                     doViewAllModels();
                 }
-                else if(response == 3)
+                else if(response == 3) //Incomplete
                 {
                     try
                     {
@@ -144,29 +140,21 @@ public class OperationsManagerModule {
                 {
                     break;
                 }
-                else if(response == 12)
-                {
-                    break;
-                }
-                else if(response == 13)
-                {
-                    break;
-                }
                 else
                 {
                     System.out.println("Invalid option, please try again!\n");                
                 }
             }
             
-            if(response == 13)
+            if(response == 11)
             {
                 break;
             }
         }
     }
     
-    
-    private void doCreateNewModel() throws CategoryNotFoundException
+    // Create New Model
+    private void doCreateNewModel() throws CarCategoryNotFoundException
     {
         Scanner scanner = new Scanner(System.in);
         Model newModel = new Model();
@@ -180,11 +168,11 @@ public class OperationsManagerModule {
         try
         {
             System.out.print("Enter Category> ");
-            newModel.setCategory(categorySessionBeanRemote.retrieveCategoryByType(scanner.nextLine().trim()));
+            newModel.setCarCategory(carCategorySessionBeanRemote.retrieveCarCategoryByName(scanner.nextLine().trim()));
         }
-        catch(CategoryNotFoundException ex)
+        catch(CarCategoryNotFoundException ex)
         {
-            throw new CategoryNotFoundException(ex.getMessage());
+            throw new CarCategoryNotFoundException(ex.getMessage());
         }
         
         Set<ConstraintViolation<Model>>constraintViolations = validator.validate(newModel);
@@ -195,7 +183,7 @@ public class OperationsManagerModule {
             {
                 newModel = modelSessionBeanRemote.createNewModel(newModel);
 
-                System.out.println("New model created successfully!: " + newModel.getModelId()+ "\n");
+                System.out.println("New model created successfully!: Model ID = " + newModel.getModelId()+ "\n");
             }
             catch(UnknownPersistenceException ex)
             {
@@ -213,6 +201,7 @@ public class OperationsManagerModule {
     }
     
     
+    // View All Models
     private void doViewAllModels()
     {
         Scanner scanner = new Scanner(System.in);
@@ -224,7 +213,7 @@ public class OperationsManagerModule {
 
         for(Model model:models)
         {
-            System.out.printf("%20s%20s%20s%20s%20s\n", model.getCategory().getType(), model.getMake(), model.getModel(), model.getModelId(), model.isIsDisabled());
+            System.out.printf("%20s%20s%20s%20s%20s\n", model.getCarCategory().getName(), model.getMake(), model.getModel(), model.getModelId(), model.isIsDisabled());
         }
         
         System.out.print("Press any key to continue...> ");
@@ -232,6 +221,7 @@ public class OperationsManagerModule {
     }
     
     
+    // Update Model (Incomplete)
     private void doUpdateModel() throws ModelNotFoundException
     {
         Scanner scanner = new Scanner(System.in); 

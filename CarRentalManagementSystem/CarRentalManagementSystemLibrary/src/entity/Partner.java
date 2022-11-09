@@ -19,6 +19,7 @@ import javax.persistence.Id;
 @Entity
 public class Partner implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +37,7 @@ public class Partner implements Serializable {
         this.partnerId = partnerId;
     }
 
+    // Constructors
     public Partner() {
     }
 

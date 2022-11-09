@@ -5,17 +5,20 @@
  */
 package ejb.session.stateless;
 
-import entity.Partner;
+import entity.CarCategory;
 import javax.ejb.Local;
+import util.exception.CarCategoryNotFoundException;
 
 /**
  *
  * @author khoojingzhi
  */
 @Local
-public interface PartnerSessionBeanLocal {
+public interface CarCategorySessionBeanLocal {
 
     // Create (Backend data initialization only)
-    public Partner createNewPartner(Partner newPartner);
+    public CarCategory createNewCategory(CarCategory newCarCategory);
     
+    // Retrieve
+    public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException;
 }

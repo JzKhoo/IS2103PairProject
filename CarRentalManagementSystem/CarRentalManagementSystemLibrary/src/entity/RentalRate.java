@@ -6,7 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,121 +22,6 @@ import javax.persistence.ManyToOne;
 @Entity
 public class RentalRate implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long rentalRateRecordId;
-    @Column(nullable = false, unique = true)
-    private String name;
-    @Column(nullable = false)
-    private String rentalRateType;
-    @Column(nullable = false)
-    private double ratePerDay;
-    private Date validityStartDate;
-    private Date validityEndDate;
-    @Column(nullable = false)
-    private boolean isDisabled;
-    
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Category category;
-
-    public Long getRentalRateRecordId() {
-        return rentalRateRecordId;
-    }
-
-    public void setRentalRateRecordId(Long rentalRateRecordId) {
-        this.rentalRateRecordId = rentalRateRecordId;
-    }
-
-    public RentalRate() {
-    }
-
-    public RentalRate(String name, String rentalRateType, double ratePerDay, Date validityStartDate, Date validityEndDate, boolean isDisabled, Category category) {
-        this.name = name;
-        this.ratePerDay = ratePerDay;
-        this.rentalRateType = rentalRateType;
-        this.validityStartDate = validityStartDate;
-        this.validityEndDate = validityEndDate;
-        this.isDisabled = isDisabled;
-        this.category = category;
-    }
-    
-    
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (rentalRateRecordId != null ? rentalRateRecordId.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the rentalRateRecordId fields are not set
-        if (!(object instanceof RentalRate)) {
-            return false;
-        }
-        RentalRate other = (RentalRate) object;
-        if ((this.rentalRateRecordId == null && other.rentalRateRecordId != null) || (this.rentalRateRecordId != null && !this.rentalRateRecordId.equals(other.rentalRateRecordId))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "entity.RentalRateRecord[ id=" + rentalRateRecordId + " ]";
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public double getRatePerDay() {
-        return ratePerDay;
-    }
-
-    public void setRatePerDay(double ratePerDay) {
-        this.ratePerDay = ratePerDay;
-    }
-
-    public Date getValidityStartDate() {
-        return validityStartDate;
-    }
-
-    public void setValidityStartDate(Date validityStartDate) {
-        this.validityStartDate = validityStartDate;
-    }
-
-    public Date getValidityEndDate() {
-        return validityEndDate;
-    }
-
-    public void setValidityEndDate(Date validityEndDate) {
-        this.validityEndDate = validityEndDate;
-    }
-
-    public boolean isIsDisabled() {
-        return isDisabled;
-    }
-
-    public void setIsDisabled(boolean isDisabled) {
-        this.isDisabled = isDisabled;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     /**
      * @return the rentalRateType
      */
@@ -149,6 +34,134 @@ public class RentalRate implements Serializable {
      */
     public void setRentalRateType(String rentalRateType) {
         this.rentalRateType = rentalRateType;
+    }
+
+    /**
+     * @return the carCategory
+     */
+    public CarCategory getCarCategory() {
+        return carCategory;
+    }
+
+    /**
+     * @param carCategory the carCategory to set
+     */
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
+    }
+
+    // Attributes
+    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long rentalRateId;
+    @Column(nullable = false, unique = true)
+    private String name;
+    @Column(nullable = false)
+    private String rentalRateType;
+    @Column(nullable = false)
+    private int ratePerDay;
+    private Timestamp startDateTime;
+    private Timestamp endDateTime;
+    @Column(nullable = false)
+    private boolean isDisabled = false;
+    
+    // Relationships
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private CarCategory carCategory;
+
+    public Long getRentalRateId() {
+        return rentalRateId;
+    }
+
+    public void setRentalRateId(Long rentalRateId) {
+        this.rentalRateId = rentalRateId;
+    }
+
+    public RentalRate() {
+    }
+
+    public RentalRate(String name, String rentalRateType, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime, CarCategory carCategory) {
+        this.name = name;
+        this.rentalRateType = rentalRateType;
+        this.ratePerDay = ratePerDay;
+        this.startDateTime = startDateTime;
+        this.endDateTime = endDateTime;
+        this.carCategory = carCategory;
+    } 
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (rentalRateId != null ? rentalRateId.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the rentalRateId fields are not set
+        if (!(object instanceof RentalRate)) {
+            return false;
+        }
+        RentalRate other = (RentalRate) object;
+        if ((this.rentalRateId == null && other.rentalRateId != null) || (this.rentalRateId != null && !this.rentalRateId.equals(other.rentalRateId))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "entity.RentalRateRecord[ id=" + rentalRateId + " ]";
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getRatePerDay() {
+        return ratePerDay;
+    }
+
+    public void setRatePerDay(int ratePerDay) {
+        this.ratePerDay = ratePerDay;
+    }
+
+    public Timestamp getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(Timestamp startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public Timestamp getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(Timestamp endDateTime) {
+        this.endDateTime = endDateTime;
+    }
+
+    public boolean isIsDisabled() {
+        return isDisabled;
+    }
+
+    public void setIsDisabled(boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
+    public CarCategory getCategory() {
+        return getCarCategory();
+    }
+
+    public void setCategory(CarCategory carCategory) {
+        this.setCarCategory(carCategory);
     }
     
 }

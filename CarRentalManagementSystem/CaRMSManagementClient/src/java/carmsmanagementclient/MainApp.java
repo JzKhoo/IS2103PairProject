@@ -5,7 +5,6 @@
  */
 package carmsmanagementclient;
 
-import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import ejb.session.stateless.RentalRateSessionBeanRemote;
@@ -14,6 +13,7 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 
 /**
  *
@@ -21,10 +21,10 @@ import util.exception.InvalidLoginCredentialException;
  */
 public class MainApp {
     
-    private CategorySessionBeanRemote categorySessionBeanRemote;
-    private ModelSessionBeanRemote modelSessionBeanRemote;
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private ModelSessionBeanRemote modelSessionBeanRemote;
     
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
     private OperationsManagerModule operationsManagerModule;
@@ -36,16 +36,14 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
-        this.categorySessionBeanRemote = categorySessionBeanRemote;
-        this.modelSessionBeanRemote = modelSessionBeanRemote;
+    public MainApp(CarCategorySessionBeanRemote carCategorySessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
+        this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
     }
-
     
-    
-    
+    // Employee Login & Logout page
     public void runApp()
     {
         Scanner scanner = new Scanner(System.in);
@@ -74,8 +72,8 @@ public class MainApp {
                         System.out.println("Login successful!\n");
 
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(currentEmployee);
-                        operationsManagerModule = new OperationsManagerModule(currentEmployee, categorySessionBeanRemote, modelSessionBeanRemote);
-                        salesManagerModule = new SalesManagerModule(currentEmployee, rentalRateSessionBeanRemote, categorySessionBeanRemote);
+                        operationsManagerModule = new OperationsManagerModule(currentEmployee, carCategorySessionBeanRemote, modelSessionBeanRemote);
+                        salesManagerModule = new SalesManagerModule(currentEmployee, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
 
                         menuMain();
                     }
@@ -103,21 +101,22 @@ public class MainApp {
         }
     }
     
+    // Employee Login
     private void doLogin() throws InvalidLoginCredentialException 
     {
         Scanner scanner = new Scanner(System.in);
-        String userName = "";
+        String name = "";
         String password = "";
         
         System.out.println("*** CaRMS Management System :: Login ***\n");
-        System.out.print("Enter username> ");
-        userName = scanner.nextLine().trim();
+        System.out.print("Enter name> ");
+        name = scanner.nextLine().trim();
         System.out.print("Enter password> ");
         password = scanner.nextLine().trim();
         
-        if(userName.length() > 0 && password.length() > 0) 
+        if(name.length() > 0 && password.length() > 0) 
         {
-            currentEmployee = employeeSessionBeanRemote.login(userName, password);
+            currentEmployee = employeeSessionBeanRemote.login(name, password);
         }
         else 
         {
@@ -125,6 +124,7 @@ public class MainApp {
         }
     }
     
+    // Select Module page
     private void menuMain()
     {
         Scanner scanner = new Scanner(System.in);
@@ -133,7 +133,7 @@ public class MainApp {
         while(true)
         {
             System.out.println("*** CaRMS Management System ***\n");
-            System.out.println("You are login as " + currentEmployee.getUserName() + " with " + currentEmployee.getUserRole() + " rights\n");
+            System.out.println("You are login as " + currentEmployee.getName() + " with " + currentEmployee.getRole() + " rights\n");
             System.out.println("1: Customer Service Executive Operation");
             System.out.println("2: Operations Manager");
             System.out.println("3: Sales Manager");

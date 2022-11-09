@@ -5,13 +5,19 @@
  */
 package ejb.session.stateless;
 
+import entity.RentalRate;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author zychi
+ * @author khoojingzhi
  */
 @Local
 public interface RentalRateSessionBeanLocal {
+
+    // Create
+    public RentalRate createNewRentalRate(RentalRate newRentalRate) throws UnknownPersistenceException, InputDataValidationException;
     
 }

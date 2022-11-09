@@ -5,7 +5,8 @@
  */
 package ejb.session.stateless;
 
-import entity.Category;
+import entity.CarCategory;
+import entity.CarRentalReservationRecord;
 import entity.RentalRate;
 import java.util.List;
 import java.util.Set;
@@ -21,9 +22,11 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateRentalRateException;
 
 /**
  *
@@ -33,10 +36,14 @@ import util.exception.UnknownPersistenceException;
 public class RentalRateSessionBean implements RentalRateSessionBeanRemote, RentalRateSessionBeanLocal {
 
     @EJB
-    private CategorySessionBeanLocal categorySessionBeanLocal;
+    private CarRentalReservationRecordSessionBeanLocal carRentalReservationRecordSessionBeanLocal;
+
+    @EJB
+    private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
 
     @PersistenceContext
     private EntityManager em;
+    
     
     
 
@@ -85,8 +92,24 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     // sorted in ascending order by car category, validity start date and validity end date
     @Override
     public List<RentalRate> retrieveAllRentalRates() {
-        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.category, rr.validityStartDate, rr.validityEndDate");
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.startDateTime");
         return query.getResultList();
+    }
+    
+    @Override
+    public RentalRate retrieveRentalRateByName(String rentalRateName) throws RentalRateNotFoundException
+    {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.name = :inName");
+        RentalRate rentalRate = (RentalRate) query.setParameter("inName", rentalRateName).getSingleResult();
+        
+        if(rentalRate != null)
+        {
+            return rentalRate;
+        }
+        else
+        {
+            throw new RentalRateNotFoundException("Rental Rate name " + rentalRateName + " does not exist!");
+        }               
     }
     
     @Override
@@ -103,6 +126,67 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         }
     }
     
+    @Override
+    public void updateRentalRate(RentalRate rentalRate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException
+    {
+        if(rentalRate != null && rentalRate.getName()!= null)
+        {
+            Set<ConstraintViolation<RentalRate>>constraintViolations = validator.validate(rentalRate);
+        
+            if(constraintViolations.isEmpty())
+            {
+                RentalRate rentalrateToUpdate = retrieveRentalRateByName(rentalRate.getName());
+
+                if(rentalrateToUpdate.getName().equals(rentalRate.getName()))
+                {
+//                    rentalrateToUpdate.setName(rentalRate.getName());
+                    rentalrateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
+                    rentalrateToUpdate.setRatePerDay(rentalRate.getRatePerDay());
+                    rentalrateToUpdate.setStartDateTime(rentalRate.getStartDateTime());
+                    rentalrateToUpdate.setEndDateTime(rentalRate.getEndDateTime());
+                    
+                }
+                else
+                {
+                    throw new UpdateRentalRateException("Name of rental rate to be updated does not match the existing record");
+                }
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        }
+        else
+        {
+            throw new RentalRateNotFoundException("Rental Rate Name not provided for rental rate to be updated");
+        }
+    }
+    
+    @Override
+    public void deleteRentalRate(String name) throws RentalRateNotFoundException, DeleteRentalRateException
+    {
+        RentalRate rentalRateToRemove = this.viewRentalRateDetails(name);
+        
+        List<CarRentalReservationRecord> carRentalReservationRecords = carRentalReservationRecordSessionBeanLocal.retrieveAllCarRentalReservationRecords();
+        boolean isUsed = false;
+        
+        for (CarRentalReservationRecord carRentalReservationRecord : carRentalReservationRecords)
+        {
+            if (carRentalReservationRecord.getDate().compareTo(rentalRateToRemove.getStartDateTime()) > 0 && carRentalReservationRecord.getDate().compareTo(rentalRateToRemove.getEndDateTime()) < 0)
+                    {
+                        isUsed = true;
+                        rentalRateToRemove.setIsDisabled(true);
+                        throw new DeleteRentalRateException("Rental Rate has been used! Rental rate will be marked as disabled!");
+                        
+                    }
+        }
+        
+        if (!isUsed) {
+            em.remove(rentalRateToRemove);
+        }
+        
+    }
+    
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>>constraintViolations)
     {
@@ -116,3 +200,4 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         return msg;
     }
 }
+

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
@@ -35,17 +37,14 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
 
-    
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-
     public ModelSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
-    }
+    }   
+
     
-    
-    
+    // Create
+    @Override
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException
     {
         Set<ConstraintViolation<Model>>constraintViolations = validator.validate(newModel);
@@ -78,14 +77,14 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     
+    // Retrieve
     @Override
     public List<Model> retrieveAllModels()
     {
-        Query query = em.createQuery("SELECT m FROM Model m ORDER BY m.category, m.make, m.model ASC");
+        Query query = em.createQuery("SELECT m FROM Model m ORDER BY m.carCategory, m.make, m.model ASC");
         
         return query.getResultList();
     }
-    
     
     @Override
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException
@@ -103,7 +102,24 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         }
     }
     
+    @Override
+    public Model retrieveModelByMakeAndModel(String make, String model) throws ModelNotFoundException
+    {
+        Query query = em.createQuery("SELECT m FROM Model m WHERE m.make = :inMake AND m.model = :inModel");
+        query.setParameter("inMake", make).setParameter("inModel", model);
+        
+        try
+        {
+            return (Model)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex)
+        {
+            throw new ModelNotFoundException("Make " + make + " , Model " + model + " does not exist!");
+        }
+    }
     
+    
+    // Update (incomplete)
     @Override
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException 
     {
@@ -121,7 +137,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
                     modelToUpdate.setModel(model.getModel());
                     modelToUpdate.setIsDisabled(model.isIsDisabled());
                     modelToUpdate.setCars(model.getCars());
-                    modelToUpdate.setCategory(model.getCategory());
+                    modelToUpdate.setCarCategory(model.getCarCategory());
                 }
                 else
                 {
@@ -138,6 +154,8 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
             throw new ModelNotFoundException("Model ID not provided for model to be updated");
         }
     }
+    
+    
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Model>>constraintViolations)
     {

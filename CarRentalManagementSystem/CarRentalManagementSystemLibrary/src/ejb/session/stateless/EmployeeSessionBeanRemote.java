@@ -16,6 +16,7 @@ import util.exception.InvalidLoginCredentialException;
 @Remote
 public interface EmployeeSessionBeanRemote {
 
+    // Login via CaRMSManagamentClient
     public Employee login(String userName, String password) throws InvalidLoginCredentialException;
     
 }

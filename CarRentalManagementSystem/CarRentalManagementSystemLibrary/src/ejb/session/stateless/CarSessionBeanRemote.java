@@ -5,17 +5,18 @@
  */
 package ejb.session.stateless;
 
-import entity.Category;
+import entity.Car;
 import javax.ejb.Remote;
-import util.exception.CategoryNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
  * @author khoojingzhi
  */
 @Remote
-public interface CategorySessionBeanRemote {
+public interface CarSessionBeanRemote {
     
-    public Category retrieveCategoryByType(String type) throws CategoryNotFoundException;
-    public Category createNewCategory(Category category);
+    // Create
+    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException;
 }

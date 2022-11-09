@@ -5,17 +5,15 @@
  */
 package ejb.session.stateless;
 
-import entity.Partner;
+import entity.CarRentalReservationRecord;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
  *
- * @author khoojingzhi
+ * @author zychi
  */
 @Local
-public interface PartnerSessionBeanLocal {
-
-    // Create (Backend data initialization only)
-    public Partner createNewPartner(Partner newPartner);
-    
+public interface CarRentalReservationRecordSessionBeanLocal {
+    public List<CarRentalReservationRecord> retrieveAllCarRentalReservationRecords();
 }
