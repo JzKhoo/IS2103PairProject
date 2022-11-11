@@ -45,7 +45,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }   
 
     
-    // Create
+    // Create New Model
     @Override
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException
     {
@@ -80,6 +80,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     
     
     // Retrieve
+    // View All Models
     @Override
     public List<Model> retrieveAllModels()
     {
@@ -121,7 +122,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     
-    // Update
+    // Update Model
     @Override
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException 
     {
@@ -160,7 +161,8 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     
-    // Delete
+    // Delete Model
+    @Override
     public void deleteModel(Long modelId) throws ModelNotFoundException, DeleteModelException
     {
         Model modelToRemove = retrieveModelByModelId(modelId);
@@ -174,7 +176,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         else
         {
             modelToRemove.setIsDisabled(true);
-            throw new DeleteModelException("Model ID " + modelId + " is associated with existing cars and cannot be deleted!");
+            throw new DeleteModelException("Model ID " + modelId + " is associated with existing cars and cannot be deleted! Model has been marked as disabled.");
         }
     }
     

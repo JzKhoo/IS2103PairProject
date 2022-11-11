@@ -9,6 +9,7 @@ import entity.Car;
 import javax.ejb.Remote;
 import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.ModelDisabledException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -19,7 +20,7 @@ import util.exception.UnknownPersistenceException;
 public interface CarSessionBeanRemote {
     
     // Create
-    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException;
+    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException, ModelDisabledException;
 
     // Retrieve
     public Car retrieveCarByLicensePlateNumber(String licensePlateNumber) throws CarNotFoundException;

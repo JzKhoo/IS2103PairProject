@@ -8,6 +8,7 @@ package carmsmanagementclient;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import entity.Employee;
 import entity.Model;
+import entity.Car;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -19,14 +20,14 @@ import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.ModelNotFoundException;
+import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateModelException;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import util.exception.CarNotFoundException;
+import ejb.session.stateless.OutletSessionBeanRemote;
 import util.exception.DeleteModelException;
+import util.exception.ModelDisabledException;
 
 /**
  *
@@ -37,23 +38,25 @@ public class OperationsManagerModule {
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     
-    private Employee currentEmployee;
-    
     private CarSessionBeanRemote carSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
+    private OutletSessionBeanRemote outletSessionBeanRemote;
+    
+    private Employee currentEmployee;
     
     public OperationsManagerModule() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
+    public OperationsManagerModule(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
         this();
         this.currentEmployee = currentEmployee;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
     }
     
     // Main Navigation Page
@@ -97,31 +100,16 @@ public class OperationsManagerModule {
                     }
                     catch(CarCategoryNotFoundException ex)
                     {
-                        System.out.println("Create new model unsuccessful!: " + ex.getMessage() + "\n");
-                    }
+                        System.out.println(ex.getMessage() + "\n");
+                    } 
                 }
                 else if(response == 2)
                 {
                     doViewAllModels();
                 }
-                else if(response == 3) //Incomplete
+                else if(response == 3)
                 {
-                    try
-                    {
-                        doUpdateModel();
-                    }
-                    catch(ModelNotFoundException ex)
-                    {
-                        System.out.println(ex.getMessage() + "\n");
-                    }
-                    catch(CarCategoryNotFoundException ex)
-                    {
-                        System.out.println("Create new model unsuccessful!: " + ex.getMessage() + "\n");
-                    }
-                    catch(CarNotFoundException ex)
-                    {
-                        System.out.println("Create new model unsuccessful!: " + ex.getMessage() + "\n");
-                    }
+                    doUpdateModel();
                 }
                 else if(response == 4)
                 {
@@ -130,6 +118,14 @@ public class OperationsManagerModule {
                 else if(response == 5)
                 {
                     break;
+//                    try
+//                    {
+//                        doCreateNewCar();
+//                    }
+//                    catch( OutletNotFoundException | ModelNotFoundException ex)
+//                    {
+//                        System.out.println(ex.getMessage() + "\n");
+//                    }
                 }
                 else if(response == 6)
                 {
@@ -187,7 +183,7 @@ public class OperationsManagerModule {
         }
         catch(CarCategoryNotFoundException ex)
         {
-            throw new CarCategoryNotFoundException(ex.getMessage());
+            throw new CarCategoryNotFoundException("Create new model unsuccessful!: " + ex.getMessage() + "\n");
         }
         
         Set<ConstraintViolation<Model>>constraintViolations = validator.validate(newModel);
@@ -237,7 +233,7 @@ public class OperationsManagerModule {
     
     
     // Update Model
-    private void doUpdateModel() throws ModelNotFoundException, CarCategoryNotFoundException, CarNotFoundException
+    private void doUpdateModel()
     {
         Scanner scanner = new Scanner(System.in); 
         String input;
@@ -254,6 +250,8 @@ public class OperationsManagerModule {
         {
             Model model = modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName);
             
+            System.out.printf("Updating (Make: %s) (Model: %s) \n", model.getMake(), model.getModel());
+
             System.out.print("Enter Make (blank if no change)> ");
             input = scanner.nextLine().trim();
             if(input.length() > 0)
@@ -267,22 +265,39 @@ public class OperationsManagerModule {
             {
                 model.setModel(input);
             }
-            
-            System.out.print("Enter isDisabled ('T', 'F', blank if no change)> ");
-            input = scanner.nextLine().trim();
-            if(input.length() > 0)
+      
+
+            Set<ConstraintViolation<Model>>constraintViolations = validator.validate(model);
+
+            if(constraintViolations.isEmpty())
             {
-                if(input.equals("T")) 
+                try
                 {
-                   model.setIsDisabled(true);
+                    modelSessionBeanRemote.updateModel(model);
+                    System.out.println("Model updated successfully!\n");
                 }
-                if(input.equals("F")) 
+                catch (ModelNotFoundException | UpdateModelException ex) 
                 {
-                   model.setIsDisabled(false);
+                    System.out.println("An error has occurred while updating model: " + ex.getMessage() + "\n");
+                }
+                catch(InputDataValidationException ex)
+                {
+                    System.out.println(ex.getMessage() + "\n");
                 }
             }
-            
-// Only allow updating of attributes, not relationships
+            else
+            {
+                showInputDataValidationErrorsForModel(constraintViolations);
+            }
+        }
+        catch(ModelNotFoundException ex)
+        {
+            System.out.println("An error has occurred while updating model: " + ex.getMessage() + "\n");
+        }       
+    }
+    
+    
+// Updating of attributes
 //            System.out.print("Enter CarCategory (blank if no change)> ");
 //            input = scanner.nextLine().trim();
 //            if(input.length() > 0)
@@ -321,38 +336,6 @@ public class OperationsManagerModule {
 //            }
 //            
 //            model.setCars(cars);
-            
-
-            Set<ConstraintViolation<Model>>constraintViolations = validator.validate(model);
-
-            if(constraintViolations.isEmpty())
-            {
-                try
-                {
-                    modelSessionBeanRemote.updateModel(model);
-                    System.out.println("Model updated successfully!\n");
-                }
-                catch (ModelNotFoundException | UpdateModelException ex) 
-                {
-                    System.out.println("An error has occurred while updating model: " + ex.getMessage() + "\n");
-                }
-                catch(InputDataValidationException ex)
-                {
-                    System.out.println(ex.getMessage() + "\n");
-                }
-            }
-            else
-            {
-                showInputDataValidationErrorsForModel(constraintViolations);
-            }
-        }
-        catch(ModelNotFoundException ex)
-        {
-            throw new ModelNotFoundException("An error has occurred while retrieving model: " + ex.getMessage() + "\n");
-        }
-        
-        
-    }
     
     
     // Delete model
@@ -372,8 +355,19 @@ public class OperationsManagerModule {
         try
         {
             Model model = modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName);
-            modelSessionBeanRemote.deleteModel(model.getModelId());
-            System.out.println("Model deleted successfully!\n");
+            
+            System.out.printf("Confirm Delete (Make: %s) (Model: %s) (Enter 'Y' to Delete)> ", model.getMake(), model.getModel());
+            input = scanner.nextLine().trim();
+            
+            if(input.equals("Y"))
+            {
+                modelSessionBeanRemote.deleteModel(model.getModelId());
+                System.out.println("Model deleted successfully!\n");
+            }
+            else
+            {
+                System.out.println("Model NOT deleted!\n");
+            }
         }
         catch(ModelNotFoundException | DeleteModelException ex)
         {
@@ -382,7 +376,89 @@ public class OperationsManagerModule {
     }
     
     
+//    // Create New Car
+//    private void doCreateNewCar() throws OutletNotFoundException, ModelNotFoundException
+//    {
+//        Scanner scanner = new Scanner(System.in);
+//        Car newCar = new Car();
+//        
+//        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Create New Car ***\n");
+//        System.out.print("Enter License Plate Number> ");
+//        newCar.setLicensePlateNumber(scanner.nextLine().trim());
+//        System.out.print("Enter Colour> ");
+//        newCar.setColour(scanner.nextLine().trim());
+//        System.out.print("Enter Status> ");
+//        newCar.setStatus(scanner.nextLine().trim());
+//        System.out.print("Enter Location> ");
+//        newCar.setLocation(scanner.nextLine().trim());
+//        
+//        try
+//        {
+//            System.out.print("Enter Outlet Name> ");
+//            newCar.setOutlet(outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim()));
+//        }
+//        catch(OutletNotFoundException ex)
+//        {
+//            throw new OutletNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
+//        }
+//        
+//        try 
+//        {
+//            System.out.print("Enter Make of Car> ");
+//            String make = scanner.nextLine().trim();
+//            System.out.print("Enter Model of Car> ");
+//            String modelName = scanner.nextLine().trim();
+//            
+//            newCar.setModel(modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName));
+//        }
+//        catch(ModelNotFoundException ex)
+//        {
+//            throw new ModelNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
+//        }
+//        
+//        Set<ConstraintViolation<Car>>constraintViolations = validator.validate(newCar);
+//        
+//        if(constraintViolations.isEmpty())
+//        {        
+//            try
+//            {
+//                newCar = carSessionBeanRemote.createNewCar(newCar);
+//
+//                System.out.println("New car created successfully!: Car ID = " + newCar.getCarId()+ "\n");
+//            }
+//            catch(ModelDisabledException ex)
+//            {
+//                System.out.println(ex.getMessage());
+//            }
+//            catch(UnknownPersistenceException ex)
+//            {
+//                System.out.println("An unknown error has occurred while creating the new car!: " + ex.getMessage() + "\n");
+//            }
+//            catch(InputDataValidationException ex)
+//            {
+//                System.out.println(ex.getMessage() + "\n");
+//            }
+//        }
+//        else
+//        {
+//            showInputDataValidationErrorsForCar(constraintViolations);
+//        }
+//    }
+    
+    
     private void showInputDataValidationErrorsForModel(Set<ConstraintViolation<Model>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
+    private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>>constraintViolations)
     {
         System.out.println("\nInput data validation error!:");
             

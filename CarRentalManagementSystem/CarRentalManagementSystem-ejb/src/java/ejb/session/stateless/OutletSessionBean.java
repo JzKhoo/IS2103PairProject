@@ -7,7 +7,6 @@ package ejb.session.stateless;
 
 import entity.Outlet;
 import javax.ejb.Stateless;
-import javax.ejb.LocalBean;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -20,13 +19,14 @@ import util.exception.OutletNotFoundException;
  * @author khoojingzhi
  */
 @Stateless
-@LocalBean
-public class OutletSessionBean {
+public class OutletSessionBean implements OutletSessionBeanRemote, OutletSessionBeanLocal {
 
     @PersistenceContext
     private EntityManager em;
 
+    
     // Create (Backend data initialization only)
+    @Override
     public Outlet createNewOutlet(Outlet newOutlet) 
     {
         em.persist(newOutlet);
@@ -37,6 +37,7 @@ public class OutletSessionBean {
     
     
     // Retrieve
+    @Override
     public Outlet retrieveOutletById(Long outletId) throws OutletNotFoundException 
     {
         Outlet outlet = em.find(Outlet.class, outletId);
@@ -52,6 +53,7 @@ public class OutletSessionBean {
     }
     
     
+    @Override
     public Outlet retrieveOutletByName(String name) throws OutletNotFoundException
     {
         Query query = em.createQuery("SELECT o FROM Outlet o WHERE o.name = :inName");
@@ -66,5 +68,4 @@ public class OutletSessionBean {
             throw new OutletNotFoundException("Outlet " + name + " does not exist!");
         }
     }
-    
 }

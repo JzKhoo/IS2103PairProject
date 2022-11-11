@@ -21,6 +21,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.CarNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.ModelDisabledException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -44,8 +45,14 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     
     // Create
     @Override
-    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException
+    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException, ModelDisabledException
     {
+        if(newCar.getModel().isIsDisabled())
+        {
+            throw new ModelDisabledException("Model is disabled.");
+        }
+        
+        
         Set<ConstraintViolation<Car>>constraintViolations = validator.validate(newCar);
         
         if(constraintViolations.isEmpty())

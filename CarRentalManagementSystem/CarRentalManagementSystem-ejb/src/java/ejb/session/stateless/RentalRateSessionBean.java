@@ -6,17 +6,24 @@
 package ejb.session.stateless;
 
 import entity.RentalRate;
+import java.util.List;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateRentalRateException;
 
 /**
  *
@@ -37,7 +44,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
     
     
-    // Create (incomplete)
+    // Create New Rental Rate
     @Override
     public RentalRate createNewRentalrate(RentalRate newRentalRate) throws UnknownPersistenceException, InputDataValidationException
     {
@@ -69,6 +76,92 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
             throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
         }
     }
+    
+    
+    // Retrieve
+    // View All Rental Rates
+    @Override
+    public List<RentalRate> retrieveAllRentalRates() 
+    {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.startDateTime");
+        
+        return query.getResultList();
+    }
+    
+    @Override
+    public RentalRate retrieveRentalRateById(Long rentalRateId) throws RentalRateNotFoundException 
+    {
+        RentalRate rentalRate = em.find(RentalRate.class, rentalRateId);
+        
+        if(rentalRate != null)
+        {
+            return rentalRate;
+        }
+        else 
+        {
+            throw new RentalRateNotFoundException("Rental Rate " + rentalRateId + " does not exist!");
+        }
+    }
+    
+    @Override
+    public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException
+    {
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.name = :inName");
+        query.setParameter("inName", name).getSingleResult();
+        
+        try
+        {
+            return (RentalRate)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex)
+        {
+            throw new RentalRateNotFoundException("Rental Rate " + name + " does not exist!");
+        }               
+    }
+    
+    
+    // Update Rental Rate
+    @Override
+    public void updateRentalRate(RentalRate rentalRate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException
+    {
+        if(rentalRate != null && rentalRate.getRentalRateId() != null)
+        {
+            Set<ConstraintViolation<RentalRate>>constraintViolations = validator.validate(rentalRate);
+        
+            if(constraintViolations.isEmpty())
+            {
+                RentalRate rentalRateToUpdate = retrieveRentalRateById(rentalRate.getRentalRateId());
+
+                if(rentalRateToUpdate.getRentalRateId().equals(rentalRate.getRentalRateId()))
+                {
+                    rentalRateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
+                    rentalRateToUpdate.setRatePerDay(rentalRate.getRatePerDay());
+                    rentalRateToUpdate.setStartDateTime(rentalRate.getStartDateTime());
+                    rentalRateToUpdate.setEndDateTime(rentalRate.getEndDateTime());
+                }
+                else
+                {
+                    throw new UpdateRentalRateException("Rental Rate ID of rental rate record to be updated does not match the existing record");
+                }
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        }
+        else
+        {
+            throw new RentalRateNotFoundException("Rental Rate ID not provided for rental rate to be updated");
+        }
+    }
+    
+    
+    // Delete Rental Rate
+//    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException
+//    {
+//        RentalRate rentalRateToRemove = retrieveRentalRateById(rentalRateId);
+//        
+//    }
     
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>>constraintViolations)

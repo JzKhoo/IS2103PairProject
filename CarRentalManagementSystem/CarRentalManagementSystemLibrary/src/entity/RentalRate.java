@@ -27,8 +27,10 @@ public class RentalRate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rentalRateId;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
+    @Column(nullable = false)
+    private String rentalRateType;
     @Column(nullable = false)
     private int ratePerDay;
     private Timestamp startDateTime;
@@ -52,12 +54,13 @@ public class RentalRate implements Serializable {
     public RentalRate() {
     }
 
-    public RentalRate(String name, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime, CarCategory carCategory) {
+    public RentalRate(String name, String rentalRateType, CarCategory carCategory, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime) {
         this.name = name;
+        this.rentalRateType = rentalRateType;
+        this.carCategory = carCategory;
         this.ratePerDay = ratePerDay;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.carCategory = carCategory;
     } 
 
     @Override
@@ -92,8 +95,16 @@ public class RentalRate implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public String getRentalRateType() {
+        return rentalRateType;
+    }
 
-    public double getRatePerDay() {
+    public void setRentalRateType(String rentalRateType) {
+        this.rentalRateType = rentalRateType;
+    }
+
+    public int getRatePerDay() {
         return ratePerDay;
     }
 
@@ -125,11 +136,11 @@ public class RentalRate implements Serializable {
         this.isDisabled = isDisabled;
     }
 
-    public CarCategory getCategory() {
+    public CarCategory getCarCategory() {
         return carCategory;
     }
 
-    public void setCategory(CarCategory carCategory) {
+    public void setCarCategory(CarCategory carCategory) {
         this.carCategory = carCategory;
     }
     

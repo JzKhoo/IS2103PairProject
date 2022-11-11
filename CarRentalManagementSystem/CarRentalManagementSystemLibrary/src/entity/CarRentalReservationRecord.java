@@ -6,6 +6,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +29,7 @@ public class CarRentalReservationRecord implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carRentalReservationRecordId;
     @Column(nullable = false)
-    private Date date;
+    private Timestamp date;
     @Column(nullable = false)
     private String categoryTypeChoice;
     @Column(nullable = false)
@@ -61,7 +62,7 @@ public class CarRentalReservationRecord implements Serializable {
     public CarRentalReservationRecord() {
     }
 
-    public CarRentalReservationRecord(Date date, String categoryTypeChoice, String makeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, boolean isCancelled, Car car, Customer customer) {
+    public CarRentalReservationRecord(Timestamp date, String categoryTypeChoice, String makeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, boolean isCancelled, Car car, Customer customer) {
         this.date = date;
         this.categoryTypeChoice = categoryTypeChoice;
         this.makeChoice = makeChoice;
@@ -105,7 +106,7 @@ public class CarRentalReservationRecord implements Serializable {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 
