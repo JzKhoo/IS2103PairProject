@@ -6,7 +6,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -30,8 +29,8 @@ public class Outlet implements Serializable {
     private Long outletId;
     @Column(nullable = false, unique = true)
     private String name;
-    private Time openingHour;
-    private Time closingHour;
+    private String openingHour;
+    private String closingHour;
     private String address;
     
     // Relationships
@@ -55,7 +54,7 @@ public class Outlet implements Serializable {
         this.employees = new ArrayList<>();
     }
 
-    public Outlet(String name, Time openingHour, Time closingHour) {
+    public Outlet(String name, String openingHour, String closingHour) {
         this();
         
         this.name = name;
@@ -63,7 +62,7 @@ public class Outlet implements Serializable {
         this.closingHour = closingHour;
     }
     
-    public Outlet(String name, Time openingHour, Time closingHour, String address) {
+    public Outlet(String name, String openingHour, String closingHour, String address) {
         this();
         
         this.name = name;
@@ -105,19 +104,19 @@ public class Outlet implements Serializable {
         this.name = name;
     }
 
-    public Time getOpeningHour() {
+    public String getOpeningHour() {
         return openingHour;
     }
 
-    public void setOpeningHour(Time openingHour) {
+    public void setOpeningHour(String openingHour) {
         this.openingHour = openingHour;
     }
 
-    public Time getClosingHour() {
+    public String getClosingHour() {
         return closingHour;
     }
 
-    public void setClosingHour(Time closingHour) {
+    public void setClosingHour(String closingHour) {
         this.closingHour = closingHour;
     }
     

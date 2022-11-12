@@ -22,6 +22,7 @@ import javax.persistence.OneToMany;
 @Entity
 public class Customer implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +42,7 @@ public class Customer implements Serializable {
     @Column(nullable = false)
     private double balance = 0.0;
     
+    // Relationships
     @OneToMany(mappedBy = "customer")
     private List<CarRentalReservationRecord> carRentalReservationRecords;
 
@@ -52,18 +54,20 @@ public class Customer implements Serializable {
         this.customerId = customerId;
     }
 
+    // Constructors
     public Customer() {
-        this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
+        this.carRentalReservationRecords = new ArrayList<>();
     }
 
     public Customer(String email, String phoneNumber, String passportNumber, String name, String password, String cardNumber) {
+        this();
+        
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.passportNumber = passportNumber;
         this.name = name;
         this.password = password;
         this.cardNumber = cardNumber;
-        this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
     }
 
     

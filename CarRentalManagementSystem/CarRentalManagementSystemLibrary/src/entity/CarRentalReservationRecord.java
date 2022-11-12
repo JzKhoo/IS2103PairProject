@@ -6,15 +6,18 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 import util.enumeration.RentalFeeOption;
 
 /**
@@ -24,35 +27,37 @@ import util.enumeration.RentalFeeOption;
 @Entity
 public class CarRentalReservationRecord implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carRentalReservationRecordId;
     @Column(nullable = false)
-    private Timestamp date;
-    @Column(nullable = false)
-    private String categoryTypeChoice;
-    @Column(nullable = false)
-    private String makeChoice;
-    @Column(nullable = false)
-    private String modelChoice;
-    @Column(nullable = false)
     private String pickupLocation;
     @Column(nullable = false)
     private String returnLocation;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date pickUpDate;
+    @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date returnDate;
+    @Column(nullable = false)
     private RentalFeeOption rentalFeeOption;
     @Column(nullable = false)
-    private boolean isCancelled;
+    private boolean isCancelled = false;
     
-    @ManyToOne
+    // Relationships
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
     private Car car;
-    @ManyToOne
+    
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Customer customer;
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private RentalRate rentalRate;
+    
+    @ManyToMany(mappedBy = "carRentalReservationRecords")
+    private List<RentalRate> rentalRates;
 
     public Long getCarRentalReservationRecordId() {
         return carRentalReservationRecordId;
@@ -62,23 +67,23 @@ public class CarRentalReservationRecord implements Serializable {
         this.carRentalReservationRecordId = carRentalReservationRecordId;
     }
 
+    
+    // Constructor
     public CarRentalReservationRecord() {
+        this.rentalRates = new ArrayList<>();
     }
 
-    public CarRentalReservationRecord(Timestamp date, String categoryTypeChoice, String makeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, boolean isCancelled, Car car, Customer customer, RentalRate rentalrate) {
-        this.date = date;
-        this.categoryTypeChoice = categoryTypeChoice;
-        this.makeChoice = makeChoice;
-        this.modelChoice = modelChoice;
+    public CarRentalReservationRecord(String pickupLocation, String returnLocation, Date pickUpDate, Date returnDate, RentalFeeOption rentalFeeOption, Car car, Customer customer) {
+        this();
+        
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
+        this.pickUpDate = pickUpDate;
+        this.returnDate = returnDate;
         this.rentalFeeOption = rentalFeeOption;
-        this.isCancelled = isCancelled;
         this.car = car;
         this.customer = customer;
-        this.rentalRate = rentalRate;
     }
-    
 
 
     @Override
@@ -106,38 +111,6 @@ public class CarRentalReservationRecord implements Serializable {
         return "entity.CarRentalReservationRecord[ id=" + carRentalReservationRecordId + " ]";
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Timestamp date) {
-        this.date = date;
-    }
-
-    public String getCategoryTypeChoice() {
-        return categoryTypeChoice;
-    }
-
-    public void setCategoryTypeChoice(String categoryTypeChoice) {
-        this.categoryTypeChoice = categoryTypeChoice;
-    }
-
-    public String getMakeChoice() {
-        return makeChoice;
-    }
-
-    public void setMakeChoice(String makeChoice) {
-        this.makeChoice = makeChoice;
-    }
-
-    public String getModelChoice() {
-        return modelChoice;
-    }
-
-    public void setModelChoice(String modelChoice) {
-        this.modelChoice = modelChoice;
-    }
-
     public String getPickupLocation() {
         return pickupLocation;
     }
@@ -152,6 +125,22 @@ public class CarRentalReservationRecord implements Serializable {
 
     public void setReturnLocation(String returnLocation) {
         this.returnLocation = returnLocation;
+    }
+
+    public Date getPickUpDate() {
+        return pickUpDate;
+    }
+
+    public void setPickUpDate(Date pickUpDate) {
+        this.pickUpDate = pickUpDate;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
     }
 
     public RentalFeeOption getRentalFeeOption() {
@@ -186,12 +175,12 @@ public class CarRentalReservationRecord implements Serializable {
         this.customer = customer;
     }
 
-    public RentalRate getRentalRate() {
-        return rentalRate;
+    public List<RentalRate> getRentalRates() {
+        return rentalRates;
     }
 
-    public void setRentalRate(RentalRate rentalRate) {
-        this.rentalRate = rentalRate;
+    public void setRentalRates(List<RentalRate> rentalRates) {
+        this.rentalRates = rentalRates;
     }
-    
+ 
 }

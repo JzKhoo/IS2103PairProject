@@ -22,6 +22,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class TransitDriverDispatchRecord implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,6 +32,7 @@ public class TransitDriverDispatchRecord implements Serializable {
     @Column(nullable = false)
     private boolean isCompleted;
     
+    // Relationships
     @ManyToOne
     private Employee employee;
     @ManyToOne(optional = false)
@@ -46,6 +48,7 @@ public class TransitDriverDispatchRecord implements Serializable {
         this.transitDriverDispatchRecordId = transitDriverDispatchRecordId;
     }
 
+    // Constructor
     public TransitDriverDispatchRecord() {
     }
 

@@ -10,6 +10,7 @@ import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
 import entity.RentalRate;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -143,10 +144,31 @@ public class SalesManagerModule {
         newRentalRate.setRatePerDay(scanner.nextInt());
         scanner.nextLine();
 
-        System.out.print("Enter start date time in the following format: yyyy-mm-dd hh:mm:ss> ");
-        newRentalRate.setStartDateTime(Timestamp.valueOf(scanner.nextLine().trim()));
-        System.out.print("Enter end date time in the following format: yyyy-mm-dd hh:mm:sss> ");      
-        newRentalRate.setEndDateTime(Timestamp.valueOf(scanner.nextLine().trim()));
+        System.out.println("Enter year of start date (YYYY)");
+        int startYear = scanner.nextInt() - 1900;
+        System.out.println("Enter month of start date (MM) (1-12)");
+        int startMonth = scanner.nextInt() - 1;
+        System.out.println("Enter day of start date (DD) (1-31)");
+        int startDay = scanner.nextInt();
+        System.out.println("Enter hour of start date (HH) (0-23)");
+        int startHour = scanner.nextInt();
+        System.out.println("Enter minutes of start date (HH) (0-59)");
+        int startMinutes = scanner.nextInt();
+        newRentalRate.setStartDate(new Date(startYear, startMonth, startDay, startHour, startMinutes));
+        
+        System.out.println("Enter year of end date (YYYY)");
+        int endYear = scanner.nextInt() - 1900;
+        System.out.println("Enter month of end date (MM) (1-12)");
+        int endMonth = scanner.nextInt() - 1;
+        System.out.println("Enter day of end date (DD) (1-31)");
+        int endDay = scanner.nextInt();
+        System.out.println("Enter hour of end date (HH) (0-23)");
+        int endHour = scanner.nextInt();
+        System.out.println("Enter minutes of end date (HH) (0-59)");
+        int endMinutes = scanner.nextInt();
+        newRentalRate.setEndDate(new Date(endYear, endMonth, endDay, endHour, endMinutes));
+        
+        scanner.nextLine();
         
         
         Set<ConstraintViolation<RentalRate>>constraintViolations = validator.validate(newRentalRate);
@@ -184,11 +206,11 @@ public class SalesManagerModule {
         System.out.println("*** CaRMS Management System :: Sales Manager Module :: View All Rental Rates ***\n");
         
         List<RentalRate> rentalRates = rentalRateSessionBeanRemote.retrieveAllRentalRates();
-        System.out.printf("%30s%30s%30s%30s%30s%30s%30s%30s\n", "Rental Rate ID", "Name", "Type", "Rate Per Day", "Start Date Time", "Start End Time", "Is Disabled", "Car Category");
+        System.out.printf("%15s%40s%15s%15s%40s%40s%15s%15s\n", "Rental Rate ID", "Name", "Type", "Rate Per Day", "Start Date", "End Date", "Is Disabled", "Car Category");
 
         for(RentalRate rentalRate:rentalRates)
         {
-            System.out.printf("%30s%30s%30s%30s%30s%30s%30s%30s\n", rentalRate.getRentalRateId(), rentalRate.getName(), rentalRate.getRentalRateType(), rentalRate.getRatePerDay(), rentalRate.getStartDateTime(), rentalRate.getEndDateTime(), rentalRate.isIsDisabled(), rentalRate.getCarCategory().getName());
+            System.out.printf("%15s%40s%15s%15s%40s%40s%15s%15s\n", rentalRate.getRentalRateId(), rentalRate.getName(), rentalRate.getRentalRateType(), rentalRate.getRatePerDay(), rentalRate.getStartDate(), rentalRate.getEndDate(), rentalRate.isIsDisabled(), rentalRate.getCarCategory().getName());
         }
         
         System.out.print("Press any key to continue...> ");
@@ -209,8 +231,8 @@ public class SalesManagerModule {
         try
         {
             RentalRate rentalRate = rentalRateSessionBeanRemote.retrieveRentalRateByName(name);
-            System.out.printf("%30s%30s%30s%30s%30s%30s%30s%30s\n", "Rental Rate ID", "Name", "Type", "Rate Per Day", "Start Date Time", "Start End Time", "Is Disabled", "Car Category");
-            System.out.printf("%30s%30s%30s%30s%30s%30s%30s%30s\n", rentalRate.getRentalRateId(), rentalRate.getName(), rentalRate.getRentalRateType(), rentalRate.getRatePerDay(), rentalRate.getStartDateTime(), rentalRate.getEndDateTime(), rentalRate.isIsDisabled(), rentalRate.getCarCategory().getName());
+            System.out.printf("%15s%40s%15s%15s%40s%40s%15s%15s\n", "Rental Rate ID", "Name", "Type", "Rate Per Day", "Start Date", "End Date", "Is Disabled", "Car Category");
+            System.out.printf("%15s%40s%15s%15s%40s%40s%15s%15s\n", rentalRate.getRentalRateId(), rentalRate.getName(), rentalRate.getRentalRateType(), rentalRate.getRatePerDay(), rentalRate.getStartDate(), rentalRate.getEndDate(), rentalRate.isIsDisabled(), rentalRate.getCarCategory().getName());
             System.out.println("------------------------");
             System.out.println("1: Update Rental Rate");
             System.out.println("2: Delete Rental Rate");
@@ -259,23 +281,40 @@ public class SalesManagerModule {
         
         scanner.nextLine();
         
-        System.out.print("Enter Start Date Time in format 'yyyy-mm-dd hh:mm:ss' (blank if no change)> ");
+        System.out.println("Update Start Date? (Enter 'Y' or blank)> ");
         input = scanner.nextLine().trim();
-        if(input.length() > 0)
+        if(input.equals("Y"))
         {
-            timestampInput = Timestamp.valueOf(input);
-            rentalRate.setStartDateTime(timestampInput);
+            System.out.println("Enter year of start date (YYYY)");
+            int startYear = scanner.nextInt() - 1900;
+            System.out.println("Enter month of start date (MM) (1-12)");
+            int startMonth = scanner.nextInt() - 1;
+            System.out.println("Enter day of start date (DD) (1-31)");
+            int startDay = scanner.nextInt();
+            System.out.println("Enter hour of start date (HH) (0-23)");
+            int startHour = scanner.nextInt();
+            System.out.println("Enter minutes of start date (HH) (0-59)");
+            int startMinutes = scanner.nextInt();
+            rentalRate.setStartDate(new Date(startYear, startMonth, startDay, startHour, startMinutes));
         }
         
-        System.out.print("Enter End Date Time in format 'yyyy-mm-dd hh:mm:ss' (blank if no change)> ");
+        System.out.println("Update End Date? (Enter 'Y' or blank)> ");
         input = scanner.nextLine().trim();
-        if(input.length() > 0)
+        if(input.equals("Y"))
         {
-            timestampInput = Timestamp.valueOf(input);
-            rentalRate.setStartDateTime(timestampInput);
+            System.out.println("Enter year of end date (YYYY)");
+            int endYear = scanner.nextInt() - 1900;
+            System.out.println("Enter month of end date (MM) (1-12)");
+            int endMonth = scanner.nextInt() - 1;
+            System.out.println("Enter day of end date (DD) (1-31)");
+            int endDay = scanner.nextInt();
+            System.out.println("Enter hour of end date (HH) (0-23)");
+            int endHour = scanner.nextInt();
+            System.out.println("Enter minutes of end date (HH) (0-59)");
+            int endMinutes = scanner.nextInt();
+            rentalRate.setEndDate(new Date(endYear, endMonth, endDay, endHour, endMinutes));
         }
-
-        
+          
         Set<ConstraintViolation<RentalRate>>constraintViolations = validator.validate(rentalRate);
         
         if(constraintViolations.isEmpty())

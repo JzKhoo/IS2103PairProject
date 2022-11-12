@@ -33,6 +33,7 @@ public class Car implements Serializable {
     private String licensePlateNumber;
     @Column(nullable = false)
     private String status;
+    @Column(nullable = false)
     private String location;
     @Column(nullable = false)
     private boolean isDisabled = false;
@@ -41,11 +42,14 @@ public class Car implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
+    
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Model model;
+    
     @OneToMany(mappedBy = "car")
     private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
+    
     @OneToMany(mappedBy = "car")
     private List<CarRentalReservationRecord> carRentalReservationRecords; 
 
@@ -61,15 +65,6 @@ public class Car implements Serializable {
     public Car() {
         this.transitDriverDispatchRecords = new ArrayList<>();
         this.carRentalReservationRecords = new ArrayList<>();
-    }
-
-    public Car(String licensePlateNumber, String status, Outlet outlet, Model model) {
-        this();
-        
-        this.licensePlateNumber = licensePlateNumber;
-        this.status = status;
-        this.outlet = outlet;
-        this.model = model;
     }
 
     public Car(String licensePlateNumber, String status, String location, Outlet outlet, Model model) {

@@ -20,7 +20,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import util.exception.DeleteCarException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
@@ -85,7 +84,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     @Override
     public List<RentalRate> retrieveAllRentalRates() 
     {
-        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.startDateTime");
+        Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.startDate");
         
         return query.getResultList();
     }
@@ -109,7 +108,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException
     {
         Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.name = :inName");
-        query.setParameter("inName", name).getSingleResult();
+        query.setParameter("inName", name);
         
         try
         {
@@ -138,8 +137,8 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
                 {
                     rentalRateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
                     rentalRateToUpdate.setRatePerDay(rentalRate.getRatePerDay());
-                    rentalRateToUpdate.setStartDateTime(rentalRate.getStartDateTime());
-                    rentalRateToUpdate.setEndDateTime(rentalRate.getEndDateTime());
+                    rentalRateToUpdate.setStartDate(rentalRate.getStartDate());
+                    rentalRateToUpdate.setEndDate(rentalRate.getEndDate());
                 }
                 else
                 {

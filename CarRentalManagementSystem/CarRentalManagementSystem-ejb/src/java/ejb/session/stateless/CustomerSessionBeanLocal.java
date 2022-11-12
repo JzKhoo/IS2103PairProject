@@ -19,8 +19,10 @@ import util.exception.UnknownPersistenceException;
 @Local
 public interface CustomerSessionBeanLocal {
 
-    public Customer retrieveCustomerById(Long customerId) throws CustomerNotFoundException;
-
+    // Register As Customer
     public Long createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException, InputDataValidationException;
     
+    // Retrieve
+    public Customer retrieveCustomerById(Long customerId) throws CustomerNotFoundException;
+
 }

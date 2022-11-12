@@ -33,6 +33,7 @@ public class CarCategory implements Serializable {
     // Relationships
     @OneToMany(mappedBy = "carCategory")
     private List<RentalRate> rentalRates;
+    
     @OneToMany(mappedBy = "carCategory")
     private List<Model> models;
 

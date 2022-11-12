@@ -42,48 +42,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
     }
 
     
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-    @Override
-    public Customer retrieveCustomerById(Long customerId) throws CustomerNotFoundException 
-    {
-        Customer customer = em.find(Customer.class, customerId);
-        
-        if(customer != null) 
-        {
-            return customer;
-        }
-        else 
-        {
-            throw new CustomerNotFoundException("Customer does not exist: " + customerId);
-        }
-    }
-    
-    @Override
-    public Customer login(String email, String password) throws InvalidLoginCredentialException
-    {
-        try 
-        {
-            Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email = :inEmail");
-            query.setParameter("inEmail", email);
-            Customer customer = (Customer)query.getSingleResult();
-            
-            if(customer.getPassword().equals(password))
-            {
-                return customer;
-            }
-            else
-            {
-                throw new InvalidLoginCredentialException("Invalid login credential");
-            }
-            
-        }
-        catch(NoResultException ex) 
-        {
-            throw new InvalidLoginCredentialException("Invalid login credential");
-        }
-    }
-    
+    // Register As Customer
     @Override
     public Long createNewCustomer(Customer newCustomer) throws CustomerExistException, UnknownPersistenceException, InputDataValidationException
     {
@@ -123,6 +82,49 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         }
     }
     
+    
+    // Retrieve Customer
+    @Override
+    public Customer retrieveCustomerById(Long customerId) throws CustomerNotFoundException 
+    {
+        Customer customer = em.find(Customer.class, customerId);
+        
+        if(customer != null) 
+        {
+            return customer;
+        }
+        else 
+        {
+            throw new CustomerNotFoundException("Customer does not exist: " + customerId);
+        }
+    }
+    
+    
+    @Override
+    public Customer login(String email, String password) throws InvalidLoginCredentialException
+    {
+        try 
+        {
+            Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email = :inEmail");
+            query.setParameter("inEmail", email);
+            Customer customer = (Customer)query.getSingleResult();
+            
+            if(customer.getPassword().equals(password))
+            {
+                return customer;
+            }
+            else
+            {
+                throw new InvalidLoginCredentialException("Invalid login credential");
+            }
+            
+        }
+        catch(NoResultException ex) 
+        {
+            throw new InvalidLoginCredentialException("Invalid login credential");
+        }
+    }
+    
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Customer>>constraintViolations)
     {
         String msg = "Input data validation error!:";
@@ -134,4 +136,7 @@ public class CustomerSessionBean implements CustomerSessionBeanRemote, CustomerS
         
         return msg;
     }
+    
+
+    
 }

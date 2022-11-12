@@ -8,6 +8,7 @@ package entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,8 +16,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 /**
  *
@@ -36,8 +37,8 @@ public class RentalRate implements Serializable {
     private String rentalRateType;
     @Column(nullable = false)
     private int ratePerDay;
-    private Timestamp startDateTime;
-    private Timestamp endDateTime;
+    private Date startDate;
+    private Date endDate;
     @Column(nullable = false)
     private boolean isDisabled = false;
     
@@ -45,7 +46,7 @@ public class RentalRate implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
-    @OneToMany(mappedBy = "rentalRate")
+    @ManyToMany
     private List<CarRentalReservationRecord> carRentalReservationRecords;
 
     public Long getRentalRateId() {
@@ -60,15 +61,15 @@ public class RentalRate implements Serializable {
         this.carRentalReservationRecords = new ArrayList<>();
     }
 
-    public RentalRate(String name, String rentalRateType, CarCategory carCategory, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime) {
+    public RentalRate(String name, String rentalRateType, CarCategory carCategory, int ratePerDay, Date startDate, Date endDate) {
         this();
         
         this.name = name;
         this.rentalRateType = rentalRateType;
         this.carCategory = carCategory;
         this.ratePerDay = ratePerDay;
-        this.startDateTime = startDateTime;
-        this.endDateTime = endDateTime;
+        this.startDate = startDate;
+        this.endDate = endDate;
     } 
 
     @Override
@@ -120,20 +121,20 @@ public class RentalRate implements Serializable {
         this.ratePerDay = ratePerDay;
     }
 
-    public Timestamp getStartDateTime() {
-        return startDateTime;
+    public Date getStartDate() {
+        return startDate;
     }
 
-    public void setStartDateTime(Timestamp startDateTime) {
-        this.startDateTime = startDateTime;
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 
-    public Timestamp getEndDateTime() {
-        return endDateTime;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setEndDateTime(Timestamp endDateTime) {
-        this.endDateTime = endDateTime;
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 
     public boolean isIsDisabled() {
