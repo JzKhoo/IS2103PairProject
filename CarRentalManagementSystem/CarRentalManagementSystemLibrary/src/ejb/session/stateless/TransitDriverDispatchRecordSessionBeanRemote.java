@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.TransitDriverDispatchRecord;
 import javax.ejb.Remote;
 import util.exception.InputDataValidationException;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -18,5 +19,7 @@ import util.exception.UnknownPersistenceException;
 public interface TransitDriverDispatchRecordSessionBeanRemote {
 
     public Long createNewTransitDriverDispatchRecord(TransitDriverDispatchRecord newTransitDriverDispatchRecord) throws UnknownPersistenceException, InputDataValidationException;
+
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long TransitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException;
     
 }

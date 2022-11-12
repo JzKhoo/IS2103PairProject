@@ -60,6 +60,9 @@ public class EjbTimerSessionBean implements EjbTimerSessionBeanRemote, EjbTimerS
                 if (carRentalReservationRecord.getCategoryTypeChoice().equals(car.getModel().getCarCategory()) && 
                         carRentalReservationRecord.getMakeChoice().equals(car.getModel().getMake()) && 
                         carRentalReservationRecord.getModelChoice().equals(car.getModel()))
+                {
+                    break;
+                }
             }
         }
         

@@ -16,6 +16,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.InputDataValidationException;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
