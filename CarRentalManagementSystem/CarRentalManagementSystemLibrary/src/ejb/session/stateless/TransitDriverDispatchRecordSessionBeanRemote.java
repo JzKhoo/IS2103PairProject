@@ -5,22 +5,18 @@
  */
 package ejb.session.stateless;
 
-import entity.Car;
-import java.util.List;
-import javax.ejb.Local;
+import entity.TransitDriverDispatchRecord;
+import javax.ejb.Remote;
 import util.exception.InputDataValidationException;
 import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author khoojingzhi
+ * @author zychi
  */
-@Local
-public interface CarSessionBeanLocal {
+@Remote
+public interface TransitDriverDispatchRecordSessionBeanRemote {
 
-    // Create
-    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException;
-
-    public List<Car> retrieveAllCars();
+    public Long createNewTransitDriverDispatchRecord(TransitDriverDispatchRecord newTransitDriverDispatchRecord) throws UnknownPersistenceException, InputDataValidationException;
     
 }

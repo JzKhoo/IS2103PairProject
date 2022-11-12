@@ -16,4 +16,6 @@ import javax.ejb.Local;
 @Local
 public interface CarRentalReservationRecordSessionBeanLocal {
     public List<CarRentalReservationRecord> retrieveAllCarRentalReservationRecords();
+
+    public List<CarRentalReservationRecord> retrieveCurrentDayReservationRecords();
 }

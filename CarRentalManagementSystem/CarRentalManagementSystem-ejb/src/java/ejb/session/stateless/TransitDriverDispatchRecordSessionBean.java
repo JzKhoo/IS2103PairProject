@@ -5,15 +5,12 @@
  */
 package ejb.session.stateless;
 
-import entity.Car;
-import entity.Model;
-import java.util.List;
+import entity.TransitDriverDispatchRecord;
 import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -23,37 +20,53 @@ import util.exception.UnknownPersistenceException;
 
 /**
  *
- * @author khoojingzhi
+ * @author zychi
  */
 @Stateless
-public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal {
+public class TransitDriverDispatchRecordSessionBean implements TransitDriverDispatchRecordSessionBeanRemote, TransitDriverDispatchRecordSessionBeanLocal {
 
     @PersistenceContext
     private EntityManager em;
-
+    
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
-    
-    public CarSessionBean() {
+
+    public TransitDriverDispatchRecordSessionBean() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
-    }  
+    }
+
     
-    
-    // Create
+    // Add business logic below. (Right-click in editor and choose
+    // "Insert Code > Add Business Method")
     @Override
-    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long TransitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException 
     {
-        Set<ConstraintViolation<Car>>constraintViolations = validator.validate(newCar);
+        TransitDriverDispatchRecord transitDriverDispatchRecord = em.find(TransitDriverDispatchRecord.class, TransitDriverDispatchRecordId);
+        
+        if(transitDriverDispatchRecord != null) 
+        {
+            return transitDriverDispatchRecord;
+        }
+        else 
+        {
+            throw new TransitDriverDispatchRecordNotFoundException("Transit Driver Dispatch Record does not exist: " + TransitDriverDispatchRecordId);
+        }
+    }
+    
+    @Override
+    public Long createNewTransitDriverDispatchRecord(TransitDriverDispatchRecord newTransitDriverDispatchRecord) throws UnknownPersistenceException, InputDataValidationException
+    {
+        Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations = validator.validate(newTransitDriverDispatchRecord);
         
         if(constraintViolations.isEmpty())
         {
             try
             {
-                em.persist(newCar);
+                em.persist(newTransitDriverDispatchRecord);
                 em.flush();
 
-                return newCar;
+                return newTransitDriverDispatchRecord.getTransitDriverDispatchRecordId();
             }
             catch(PersistenceException ex)
             {
@@ -73,13 +86,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
     }
     
-    @Override
-    public List<Car> retrieveAllCars() {
-        Query query = em.createQuery("SELECT c FROM Car c");
-        return query.getResultList();
-    }
-    
-    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<Car>>constraintViolations)
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations)
     {
         String msg = "Input data validation error!:";
             
