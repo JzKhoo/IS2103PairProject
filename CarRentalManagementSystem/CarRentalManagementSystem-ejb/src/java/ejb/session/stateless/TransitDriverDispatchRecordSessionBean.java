@@ -9,16 +9,18 @@ import entity.Outlet;
 import entity.TransitDriverDispatchRecord;
 import java.sql.Date;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.InputDataValidationException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
@@ -57,5 +59,66 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
         }
     }
     
+    @Override
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException
+    {
+        TransitDriverDispatchRecord transitDriverDispatchRecord = em.find(TransitDriverDispatchRecord.class, transitDriverDispatchRecordId);
+        
+        if(transitDriverDispatchRecord != null)
+        {
+            return transitDriverDispatchRecord;
+        }
+        else 
+        {
+            throw new TransitDriverDispatchRecordNotFoundException("Transit Driver Dispatch Record ID " + transitDriverDispatchRecordId + " does not exist!");
+        }
+    }
     
+    
+    // Update
+    // Assign Transit Driver
+    @Override
+    public void assignTransitDriver(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException, InputDataValidationException 
+    {
+        if(transitDriverDispatchRecord != null && transitDriverDispatchRecord.getTransitDriverDispatchRecordId()!= null)
+        {
+            Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations = validator.validate(transitDriverDispatchRecord);
+        
+            if(constraintViolations.isEmpty())
+            {
+                TransitDriverDispatchRecord transitDriverDispatchRecordToUpdate = retrieveTransitDriverDispatchRecordById(transitDriverDispatchRecord.getTransitDriverDispatchRecordId());
+
+                if(transitDriverDispatchRecordToUpdate.getTransitDriverDispatchRecordId().equals(transitDriverDispatchRecord.getTransitDriverDispatchRecordId()))
+                {
+                    transitDriverDispatchRecordToUpdate.setEmployee(transitDriverDispatchRecord.getEmployee());                    
+                }
+                else
+                {
+                    throw new UpdateTransitDriverDispatchRecordException("ID of transit driver dispatch record to be updated does not match the existing record");
+                }
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        }
+        else
+        {
+            throw new TransitDriverDispatchRecordNotFoundException("ID not provided for transit driver dispatch record to be updated");
+        }
+    }
+    
+    
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations)
+    {
+        String msg = "Input data validation error!:";
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+        
+        return msg;
+    }
 }

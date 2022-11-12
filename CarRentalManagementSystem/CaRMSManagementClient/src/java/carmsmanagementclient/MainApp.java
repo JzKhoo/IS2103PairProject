@@ -78,7 +78,7 @@ public class MainApp {
                         System.out.println("Login successful!\n");
                         
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(currentEmployee);
-                        operationsManagerModule = new OperationsManagerModule(currentEmployee, carSessionBeanRemote, carCategorySessionBeanRemote, modelSessionBeanRemote, outletSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote);
+                        operationsManagerModule = new OperationsManagerModule(currentEmployee, carSessionBeanRemote, carCategorySessionBeanRemote, employeeSessionBeanRemote, modelSessionBeanRemote, outletSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote);
                         salesManagerModule = new SalesManagerModule(currentEmployee, carCategorySessionBeanRemote, rentalRateSessionBeanRemote);
 
                         menuMain();

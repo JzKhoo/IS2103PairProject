@@ -24,6 +24,7 @@ import util.exception.UnknownPersistenceException;
 import util.exception.UpdateModelException;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 import entity.Outlet;
@@ -32,10 +33,12 @@ import java.sql.Date;
 import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
 import util.exception.DeleteModelException;
+import util.exception.EmployeeNotFoundException;
 import util.exception.ModelDisabledException;
 import util.exception.OutletNotFoundException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UpdateCarException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
@@ -48,6 +51,7 @@ public class OperationsManagerModule {
     
     private CarSessionBeanRemote carSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
+    private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
@@ -59,11 +63,12 @@ public class OperationsManagerModule {
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote) {
+    public OperationsManagerModule(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote) {
         this();
         this.currentEmployee = currentEmployee;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
+        this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
@@ -157,7 +162,14 @@ public class OperationsManagerModule {
                 }
                 else if(response == 9)
                 {
-                    break;
+                    try
+                    {
+                        assignTransitDriver();
+                    }
+                    catch(EmployeeNotFoundException ex)
+                    {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
                 else if(response == 10)
                 {
@@ -656,8 +668,81 @@ public class OperationsManagerModule {
     }
     
     
+    // Assign Transit Driver
+    public void assignTransitDriver() throws EmployeeNotFoundException 
+    {
+        Scanner scanner = new Scanner(System.in); 
+        Employee employeeInput;
+        Long idInput;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Assign Transit Driver ***\n");
+        
+        // Retrieve model object by Make & Model
+        System.out.print("Enter ID of Transit Driver Dispatch Record> ");
+        idInput = new Long(scanner.nextLine().trim());
+        
+        try
+        {
+            TransitDriverDispatchRecord transitDriverDispatchRecord = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(idInput);
+            
+            System.out.printf("Assigning Transit Driver to Record (Date: %s) (Car License Plate Number: %s) \n", transitDriverDispatchRecord.getDate(), transitDriverDispatchRecord.getCar().getLicensePlateNumber());
+
+            try
+            {
+                System.out.print("Enter Employee Name> ");
+                employeeInput = employeeSessionBeanRemote.retrieveEmployeeByName(scanner.nextLine().trim());
+                transitDriverDispatchRecord.setEmployee(employeeInput);
+            }
+            catch(EmployeeNotFoundException ex)
+            {
+                throw new EmployeeNotFoundException("Assign transit driver unsuccessful!: " + ex.getMessage() + "\n");
+            }
+      
+
+            Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations = validator.validate(transitDriverDispatchRecord);
+
+            if(constraintViolations.isEmpty())
+            {
+                try
+                {
+                    transitDriverDispatchRecordSessionBeanRemote.assignTransitDriver(transitDriverDispatchRecord);
+                    System.out.println("Driver assigned successfully!\n");
+                }
+                catch (TransitDriverDispatchRecordNotFoundException | UpdateTransitDriverDispatchRecordException ex) 
+                {
+                    System.out.println("An error has occurred while assigning driver: " + ex.getMessage() + "\n");
+                }
+                catch(InputDataValidationException ex)
+                {
+                    System.out.println(ex.getMessage() + "\n");
+                }
+            }
+            else
+            {
+                showInputDataValidationErrorsForTransitDriverDispatchRecord(constraintViolations);
+            }
+        }
+        catch(TransitDriverDispatchRecordNotFoundException ex)
+        {
+            System.out.println("An error has occurred while assigning driver: " + ex.getMessage() + "\n");
+        }  
+    }
+    
+    
     
     private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
+    private void showInputDataValidationErrorsForTransitDriverDispatchRecord(Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations)
     {
         System.out.println("\nInput data validation error!:");
             

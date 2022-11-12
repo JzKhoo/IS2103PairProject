@@ -21,5 +21,6 @@ public interface EmployeeSessionBeanLocal {
 
     // Retrieve
     public Employee retrieveEmployeeById(Long employeeId) throws EmployeeNotFoundException;
+    public Employee retrieveEmployeeByName(String name) throws EmployeeNotFoundException;
 
 }

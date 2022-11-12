@@ -10,7 +10,9 @@ import entity.TransitDriverDispatchRecord;
 import java.sql.Date;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
@@ -21,5 +23,9 @@ public interface TransitDriverDispatchRecordSessionBeanLocal {
 
     // Retrieve Transit Driver Dispatch Records based on date and outlet
     public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordsForCurrentDay(Date date, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException;
+
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException;
+
+    public void assignTransitDriver(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException, InputDataValidationException;
     
 }
