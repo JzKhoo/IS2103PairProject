@@ -25,11 +25,16 @@ import util.exception.UpdateModelException;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
+import entity.Outlet;
+import entity.TransitDriverDispatchRecord;
+import java.sql.Date;
 import util.exception.CarNotFoundException;
 import util.exception.DeleteCarException;
 import util.exception.DeleteModelException;
 import util.exception.ModelDisabledException;
 import util.exception.OutletNotFoundException;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UpdateCarException;
 
 /**
@@ -45,6 +50,7 @@ public class OperationsManagerModule {
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
+    private TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
     
     private Employee currentEmployee;
     
@@ -53,13 +59,14 @@ public class OperationsManagerModule {
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote) {
+    public OperationsManagerModule(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote) {
         this();
         this.currentEmployee = currentEmployee;
         this.carSessionBeanRemote = carSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
     }
     
     // Main Navigation Page
@@ -139,7 +146,14 @@ public class OperationsManagerModule {
                 }
                 else if(response == 8)
                 {
-                    break;
+                    try
+                    {
+                        doViewTransitDriverDispatchRecordsForCurrentDay();
+                    }
+                    catch(OutletNotFoundException ex)
+                    {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
                 else if(response == 9)
                 {
@@ -598,6 +612,47 @@ public class OperationsManagerModule {
             System.out.println("Car NOT deleted!\n");
         }
 
+    }
+    
+    
+    // View Transit Driver Dispatch Records for Current Day Reservations
+    public void doViewTransitDriverDispatchRecordsForCurrentDay() throws OutletNotFoundException 
+    {
+        Scanner scanner = new Scanner(System.in);        
+        Outlet outletInput;
+        Date dateInput;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Transit Driver Dispatch Records for Current Day Reservations ***\n");
+        System.out.print("Enter Date in format 'yyyy-mm-dd'> ");
+        dateInput = Date.valueOf(scanner.nextLine().trim());
+        
+        try
+        {
+            System.out.print("Enter Outlet Name> ");
+            outletInput = outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim());
+        }
+        catch(OutletNotFoundException ex)
+        {
+            throw new OutletNotFoundException("View transit driver dispatch records unsuccessful!: " + ex.getMessage() + "\n");
+        }
+       
+        try
+        {
+            List<TransitDriverDispatchRecord> transitDriverDispatchRecords = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordsForCurrentDay(dateInput, outletInput);
+            System.out.printf("%10s%30s%30s%20s\n", "ID", "Date", "License Plate Number", "Employee Name");
+
+            for(TransitDriverDispatchRecord transitDriverDispatchRecord:transitDriverDispatchRecords)
+            {
+                System.out.printf("%10s%30s%20s%20s\n", transitDriverDispatchRecord.getTransitDriverDispatchRecordId(), transitDriverDispatchRecord.getDate().toString(), transitDriverDispatchRecord.getCar().getLicensePlateNumber(), transitDriverDispatchRecord.getEmployee().getName());
+            }
+
+            System.out.print("Press any key to continue...> ");
+            scanner.nextLine();
+        }
+        catch(TransitDriverDispatchRecordNotFoundException ex)
+        {
+            System.out.println(ex.getMessage() + "\n");
+        }
     }
     
     
