@@ -18,6 +18,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import util.exception.CarCategoryNotFoundException;
+import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.RentalRateNotFoundException;
@@ -222,10 +223,10 @@ public class SalesManagerModule {
             {
                 doUpdateRentalRate(rentalRate);
             }
-//            else if(response == 2)
-//            {
-//                doDeleteRentalRate(rentalRate);
-//            }
+            else if(response == 2)
+            {
+                doDeleteRentalRate(rentalRate);
+            }
         } 
         catch (RentalRateNotFoundException ex) {
             System.out.println("An error has occurred while retrieving rental rate: " + ex.getMessage() + "\n");
@@ -297,6 +298,36 @@ public class SalesManagerModule {
         {
             showInputDataValidationErrorsForRentalRate(constraintViolations);
         }
+    }
+    
+    
+    // Delete Rental Rate
+    private void doDeleteRentalRate(RentalRate rentalRate)
+    {
+        Scanner scanner = new Scanner(System.in); 
+        String input;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Rental Rate Details :: Delete Rental Rate ***\n");
+        System.out.printf("Confirm Delete Rental Rate %s (Enter 'Y' to Delete)> ", rentalRate.getName());
+        input = scanner.nextLine().trim();
+        
+        if(input.equals("Y"))
+        {
+            try
+            {
+                rentalRateSessionBeanRemote.deleteRentalRate(rentalRate.getRentalRateId());
+                System.out.println("Rental Rate deleted successfully!\n");
+            }
+            catch (RentalRateNotFoundException | DeleteRentalRateException ex) 
+            {
+                System.out.println("An error has occurred while deleting rental rate: " + ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            System.out.println("Rental rate NOT deleted!\n");
+        }
+
     }
     
     

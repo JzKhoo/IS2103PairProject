@@ -8,6 +8,7 @@ package ejb.session.stateless;
 import entity.RentalRate;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -31,5 +32,8 @@ public interface RentalRateSessionBeanRemote {
 
     // Update Rental Rate
     public void updateRentalRate(RentalRate rentalRate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
+
+    // Delete Rental Rate
+    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException;
     
 }

@@ -7,6 +7,8 @@ package entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -42,6 +45,8 @@ public class RentalRate implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
+    @OneToMany(mappedBy = "rentalRate")
+    private List<CarRentalReservationRecord> carRentalReservationRecords;
 
     public Long getRentalRateId() {
         return rentalRateId;
@@ -52,9 +57,12 @@ public class RentalRate implements Serializable {
     }
 
     public RentalRate() {
+        this.carRentalReservationRecords = new ArrayList<>();
     }
 
     public RentalRate(String name, String rentalRateType, CarCategory carCategory, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime) {
+        this();
+        
         this.name = name;
         this.rentalRateType = rentalRateType;
         this.carCategory = carCategory;
@@ -142,6 +150,14 @@ public class RentalRate implements Serializable {
 
     public void setCarCategory(CarCategory carCategory) {
         this.carCategory = carCategory;
+    }
+
+    public List<CarRentalReservationRecord> getCarRentalReservationRecords() {
+        return carRentalReservationRecords;
+    }
+
+    public void setCarRentalReservationRecords(List<CarRentalReservationRecord> carRentalReservationRecords) {
+        this.carRentalReservationRecords = carRentalReservationRecords;
     }
     
 }

@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarRentalReservationRecord;
 import entity.RentalRate;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteCarException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
@@ -157,11 +159,25 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     
     
     // Delete Rental Rate
-//    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException
-//    {
-//        RentalRate rentalRateToRemove = retrieveRentalRateById(rentalRateId);
-//        
-//    }
+    @Override
+    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException
+    {
+        RentalRate rentalRateToRemove = retrieveRentalRateById(rentalRateId);
+
+        List<CarRentalReservationRecord> carRentalReservationRecords = rentalRateToRemove.getCarRentalReservationRecords();
+        
+        if(carRentalReservationRecords.isEmpty())
+        {
+            rentalRateToRemove.getCarCategory().getRentalRates().remove(rentalRateToRemove);
+            
+            em.remove(rentalRateToRemove);
+        }
+        else
+        {
+            rentalRateToRemove.setIsDisabled(true);
+            throw new DeleteRentalRateException("Rental Rate ID " + rentalRateId + " is associated with existing car rental reservations and cannot be deleted! Car has been marked as disabled.");
+        }
+    }
     
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>>constraintViolations)

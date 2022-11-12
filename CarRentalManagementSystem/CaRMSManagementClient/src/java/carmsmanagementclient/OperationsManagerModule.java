@@ -20,14 +20,17 @@ import util.exception.CarCategoryNotFoundException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidAccessRightException;
 import util.exception.ModelNotFoundException;
-import util.exception.OutletNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateModelException;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import util.exception.CarNotFoundException;
+import util.exception.DeleteCarException;
 import util.exception.DeleteModelException;
 import util.exception.ModelDisabledException;
+import util.exception.OutletNotFoundException;
+import util.exception.UpdateCarException;
 
 /**
  *
@@ -117,23 +120,22 @@ public class OperationsManagerModule {
                 }
                 else if(response == 5)
                 {
-                    break;
-//                    try
-//                    {
-//                        doCreateNewCar();
-//                    }
-//                    catch( OutletNotFoundException | ModelNotFoundException ex)
-//                    {
-//                        System.out.println(ex.getMessage() + "\n");
-//                    }
+                    try
+                    {
+                        doCreateNewCar();
+                    }
+                    catch( OutletNotFoundException | ModelNotFoundException ex)
+                    {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
                 else if(response == 6)
                 {
-                    break;
+                    doViewAllCars();
                 }
                 else if(response == 7)
                 {
-                    break;
+                    doViewCarDetails();
                 }
                 else if(response == 8)
                 {
@@ -376,75 +378,185 @@ public class OperationsManagerModule {
     }
     
     
-//    // Create New Car
-//    private void doCreateNewCar() throws OutletNotFoundException, ModelNotFoundException
-//    {
-//        Scanner scanner = new Scanner(System.in);
-//        Car newCar = new Car();
-//        
-//        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Create New Car ***\n");
-//        System.out.print("Enter License Plate Number> ");
-//        newCar.setLicensePlateNumber(scanner.nextLine().trim());
-//        System.out.print("Enter Colour> ");
-//        newCar.setColour(scanner.nextLine().trim());
-//        System.out.print("Enter Status> ");
-//        newCar.setStatus(scanner.nextLine().trim());
-//        System.out.print("Enter Location> ");
-//        newCar.setLocation(scanner.nextLine().trim());
-//        
-//        try
-//        {
-//            System.out.print("Enter Outlet Name> ");
-//            newCar.setOutlet(outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim()));
-//        }
-//        catch(OutletNotFoundException ex)
-//        {
-//            throw new OutletNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
-//        }
-//        
-//        try 
-//        {
-//            System.out.print("Enter Make of Car> ");
-//            String make = scanner.nextLine().trim();
-//            System.out.print("Enter Model of Car> ");
-//            String modelName = scanner.nextLine().trim();
-//            
-//            newCar.setModel(modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName));
-//        }
-//        catch(ModelNotFoundException ex)
-//        {
-//            throw new ModelNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
-//        }
-//        
-//        Set<ConstraintViolation<Car>>constraintViolations = validator.validate(newCar);
-//        
-//        if(constraintViolations.isEmpty())
-//        {        
-//            try
-//            {
-//                newCar = carSessionBeanRemote.createNewCar(newCar);
-//
-//                System.out.println("New car created successfully!: Car ID = " + newCar.getCarId()+ "\n");
-//            }
-//            catch(ModelDisabledException ex)
-//            {
-//                System.out.println(ex.getMessage());
-//            }
-//            catch(UnknownPersistenceException ex)
-//            {
-//                System.out.println("An unknown error has occurred while creating the new car!: " + ex.getMessage() + "\n");
-//            }
-//            catch(InputDataValidationException ex)
-//            {
-//                System.out.println(ex.getMessage() + "\n");
-//            }
-//        }
-//        else
-//        {
-//            showInputDataValidationErrorsForCar(constraintViolations);
-//        }
-//    }
+    // Create New Car
+    private void doCreateNewCar() throws OutletNotFoundException, ModelNotFoundException
+    {
+        Scanner scanner = new Scanner(System.in);
+        Car newCar = new Car();
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Create New Car ***\n");
+        System.out.print("Enter License Plate Number> ");
+        newCar.setLicensePlateNumber(scanner.nextLine().trim());
+        System.out.print("Enter Status> ");
+        newCar.setStatus(scanner.nextLine().trim());
+        System.out.print("Enter Location> ");
+        newCar.setLocation(scanner.nextLine().trim());
+        
+        try
+        {
+            System.out.print("Enter Outlet Name> ");
+            newCar.setOutlet(outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim()));
+        }
+        catch(OutletNotFoundException ex)
+        {
+            throw new OutletNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
+        }
+        
+        try 
+        {
+            System.out.print("Enter Make of Car> ");
+            String make = scanner.nextLine().trim();
+            System.out.print("Enter Model of Car> ");
+            String modelName = scanner.nextLine().trim();
+            
+            newCar.setModel(modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName));
+        }
+        catch(ModelNotFoundException ex)
+        {
+            throw new ModelNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
+        }
+        
+        
+        Set<ConstraintViolation<Car>>constraintViolations = validator.validate(newCar);
+        
+        if(constraintViolations.isEmpty())
+        {        
+            try
+            {
+                newCar = carSessionBeanRemote.createNewCar(newCar);
+
+                System.out.println("New car created successfully!: Car ID = " + newCar.getCarId()+ "\n");
+            }
+            catch(ModelDisabledException ex)
+            {
+                System.out.println(ex.getMessage());
+            }
+            catch(UnknownPersistenceException ex)
+            {
+                System.out.println("An unknown error has occurred while creating the new car!: " + ex.getMessage() + "\n");
+            }
+            catch(InputDataValidationException ex)
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            showInputDataValidationErrorsForCar(constraintViolations);
+        }
+    }
     
+    
+    // View All Cars
+    private void doViewAllCars()
+    {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View All Cars ***\n");
+        
+        List<Car> cars = carSessionBeanRemote.retrieveAllCars();
+        System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet");
+
+        for(Car car:cars)
+        {
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+        }
+        
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
+    }
+    
+    
+    // View Car Details
+    private void doViewCarDetails()
+    {
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 0;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Car Details ***\n");
+        System.out.print("Enter License Plate Number> ");
+        String licensePlateNumber = scanner.nextLine().trim();
+        
+        try
+        {
+            Car car = carSessionBeanRemote.retrieveCarByLicensePlateNumber(licensePlateNumber);
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet");
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+            System.out.println("------------------------");
+            System.out.println("1: Update Car");
+            System.out.println("2: Delete Car");
+            System.out.println("3: Back\n");
+            System.out.print("> ");
+            
+            response = scanner.nextInt();
+
+            if(response == 1)
+            {
+                doUpdateCar(car);
+            }
+            else if(response == 2)
+            {
+                doDeleteCar(car);
+            }
+        } 
+        catch (CarNotFoundException ex) {
+            System.out.println("An error has occurred while retrieving car: " + ex.getMessage() + "\n");
+        }
+    }
+    
+    
+    // Update Car
+    private void doUpdateCar(Car car)
+    {
+        Scanner scanner = new Scanner(System.in);        
+        String input;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Car Details :: Update Car ***\n");
+        System.out.print("Enter License Plate Number (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            car.setLicensePlateNumber(input);
+        }
+
+        System.out.print("Enter Status (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            car.setStatus(input);
+        }
+
+        System.out.print("Enter Location (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            car.setLocation(input);
+        }
+
+        
+        Set<ConstraintViolation<Car>>constraintViolations = validator.validate(car);
+        
+        if(constraintViolations.isEmpty())
+        {
+            try
+            {
+                carSessionBeanRemote.updateCar(car);
+                System.out.println("Car updated successfully!\n");
+            }
+            catch (CarNotFoundException | UpdateCarException ex) 
+            {
+                System.out.println("An error has occurred while updating car: " + ex.getMessage() + "\n");
+            }
+            catch(InputDataValidationException ex)
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            showInputDataValidationErrorsForCar(constraintViolations);
+        }
+    }
     
     private void showInputDataValidationErrorsForModel(Set<ConstraintViolation<Model>>constraintViolations)
     {
@@ -457,6 +569,38 @@ public class OperationsManagerModule {
 
         System.out.println("\nPlease try again......\n");
     }
+    
+    
+    // Delete Car
+    private void doDeleteCar(Car car)
+    {
+        Scanner scanner = new Scanner(System.in); 
+        String input;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Car Details :: Delete Car ***\n");
+        System.out.printf("Confirm Delete Car %s (Enter 'Y' to Delete)> ", car.getLicensePlateNumber());
+        input = scanner.nextLine().trim();
+        
+        if(input.equals("Y"))
+        {
+            try
+            {
+                carSessionBeanRemote.deleteCar(car.getCarId());
+                System.out.println("Car deleted successfully!\n");
+            }
+            catch (CarNotFoundException | DeleteCarException ex) 
+            {
+                System.out.println("An error has occurred while deleting car: " + ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            System.out.println("Car NOT deleted!\n");
+        }
+
+    }
+    
+    
     
     private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>>constraintViolations)
     {

@@ -171,6 +171,8 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         
         if(cars.isEmpty())
         {
+            modelToRemove.getCarCategory().getModels().remove(modelToRemove);
+            
             em.remove(modelToRemove);
         }
         else

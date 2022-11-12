@@ -50,6 +50,9 @@ public class CarRentalReservationRecord implements Serializable {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Customer customer;
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private RentalRate rentalRate;
 
     public Long getCarRentalReservationRecordId() {
         return carRentalReservationRecordId;
@@ -62,7 +65,7 @@ public class CarRentalReservationRecord implements Serializable {
     public CarRentalReservationRecord() {
     }
 
-    public CarRentalReservationRecord(Timestamp date, String categoryTypeChoice, String makeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, boolean isCancelled, Car car, Customer customer) {
+    public CarRentalReservationRecord(Timestamp date, String categoryTypeChoice, String makeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, boolean isCancelled, Car car, Customer customer, RentalRate rentalrate) {
         this.date = date;
         this.categoryTypeChoice = categoryTypeChoice;
         this.makeChoice = makeChoice;
@@ -73,6 +76,7 @@ public class CarRentalReservationRecord implements Serializable {
         this.isCancelled = isCancelled;
         this.car = car;
         this.customer = customer;
+        this.rentalRate = rentalRate;
     }
     
 
@@ -180,6 +184,14 @@ public class CarRentalReservationRecord implements Serializable {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public RentalRate getRentalRate() {
+        return rentalRate;
+    }
+
+    public void setRentalRate(RentalRate rentalRate) {
+        this.rentalRate = rentalRate;
     }
     
 }
