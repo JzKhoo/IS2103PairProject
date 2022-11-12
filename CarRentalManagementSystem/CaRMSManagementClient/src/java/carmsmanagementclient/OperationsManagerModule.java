@@ -164,7 +164,7 @@ public class OperationsManagerModule {
                 {
                     try
                     {
-                        assignTransitDriver();
+                        doAssignTransitDriver();
                     }
                     catch(EmployeeNotFoundException ex)
                     {
@@ -173,7 +173,7 @@ public class OperationsManagerModule {
                 }
                 else if(response == 10)
                 {
-                    break;
+                    doUpdateTransitAsCompleted();
                 }
                 else if(response == 11)
                 {
@@ -669,7 +669,7 @@ public class OperationsManagerModule {
     
     
     // Assign Transit Driver
-    public void assignTransitDriver() throws EmployeeNotFoundException 
+    public void doAssignTransitDriver() throws EmployeeNotFoundException 
     {
         Scanner scanner = new Scanner(System.in); 
         Employee employeeInput;
@@ -677,7 +677,6 @@ public class OperationsManagerModule {
         
         System.out.println("*** CaRMS Management System :: Operations Manager Module :: Assign Transit Driver ***\n");
         
-        // Retrieve model object by Make & Model
         System.out.print("Enter ID of Transit Driver Dispatch Record> ");
         idInput = new Long(scanner.nextLine().trim());
         
@@ -725,6 +724,40 @@ public class OperationsManagerModule {
         catch(TransitDriverDispatchRecordNotFoundException ex)
         {
             System.out.println("An error has occurred while assigning driver: " + ex.getMessage() + "\n");
+        }  
+    }
+    
+    
+    // Update Transit as Completed
+    public void doUpdateTransitAsCompleted()  
+    {
+        Scanner scanner = new Scanner(System.in); 
+        Long idInput;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Update Transit As Completed ***\n");
+        
+        System.out.print("Enter ID of Transit Driver Dispatch Record> ");
+        idInput = new Long(scanner.nextLine().trim());
+        
+        try
+        {
+            TransitDriverDispatchRecord transitDriverDispatchRecord = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(idInput);
+            
+            System.out.printf("Updating Transit As Completed to Record (Date: %s) (Car License Plate Number: %s) \n", transitDriverDispatchRecord.getDate(), transitDriverDispatchRecord.getCar().getLicensePlateNumber());
+
+            try
+            {
+                transitDriverDispatchRecordSessionBeanRemote.updateTransitAsCompleted(idInput);
+                System.out.println("Transit updated successfully!\n");
+            }
+            catch (UpdateTransitDriverDispatchRecordException ex) 
+            {
+                System.out.println("An error has occurred while updating record: " + ex.getMessage() + "\n");
+            }
+        }
+        catch(TransitDriverDispatchRecordNotFoundException ex)
+        {
+            System.out.println("An error has occurred while updating transit: " + ex.getMessage() + "\n");
         }  
     }
     

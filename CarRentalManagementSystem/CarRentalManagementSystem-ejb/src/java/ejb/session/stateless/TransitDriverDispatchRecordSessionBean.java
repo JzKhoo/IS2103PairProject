@@ -108,6 +108,28 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
         }
     }
     
+    // Update Transit As Completed
+    public void updateTransitAsCompleted(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException
+    {
+        if(transitDriverDispatchRecordId!= null)
+        {
+            TransitDriverDispatchRecord transitDriverDispatchRecordToUpdate = retrieveTransitDriverDispatchRecordById(transitDriverDispatchRecordId);
+
+            if(transitDriverDispatchRecordToUpdate.getTransitDriverDispatchRecordId().equals(transitDriverDispatchRecordId))
+            {
+                transitDriverDispatchRecordToUpdate.setIsCompleted(true);                    
+            }
+            else
+            {
+                throw new UpdateTransitDriverDispatchRecordException("ID of transit driver dispatch record to be updated does not match the existing record");
+            }
+        }
+        else
+        {
+            throw new TransitDriverDispatchRecordNotFoundException("ID not provided for transit driver dispatch record to be updated");
+        }
+    }
+    
     
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations)
