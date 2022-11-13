@@ -5,21 +5,30 @@
  */
 package ejb.session.stateless;
 
+import entity.Outlet;
 import entity.TransitDriverDispatchRecord;
+import java.sql.Date;
+import java.util.List;
 import javax.ejb.Remote;
 import util.exception.InputDataValidationException;
 import util.exception.TransitDriverDispatchRecordNotFoundException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
- * @author zychi
+ * @author khoojingzhi
  */
 @Remote
 public interface TransitDriverDispatchRecordSessionBeanRemote {
-
-    public Long createNewTransitDriverDispatchRecord(TransitDriverDispatchRecord newTransitDriverDispatchRecord) throws UnknownPersistenceException, InputDataValidationException;
-
-    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long TransitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException;
     
+    public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordsForCurrentDay(Date date, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException;
+    
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException;
+
+    public void assignTransitDriver(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException, InputDataValidationException;
+    
+    public void updateTransitAsCompleted(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException;
+
+    public TransitDriverDispatchRecord createTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) throws InputDataValidationException, UnknownPersistenceException;
 }

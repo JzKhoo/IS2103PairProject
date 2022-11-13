@@ -5,13 +5,31 @@
  */
 package ejb.session.stateless;
 
+import entity.Outlet;
+import entity.TransitDriverDispatchRecord;
+import java.sql.Date;
+import java.util.List;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
+import util.exception.UnknownPersistenceException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
- * @author zychi
+ * @author khoojingzhi
  */
 @Local
 public interface TransitDriverDispatchRecordSessionBeanLocal {
+
+    // Retrieve Transit Driver Dispatch Records based on date and outlet
+    public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordsForCurrentDay(Date date, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException;
+
+    public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException;
+
+    public void assignTransitDriver(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException, InputDataValidationException;
+
+    public void updateTransitAsCompleted(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException;
     
+    public TransitDriverDispatchRecord createTransitDriverDispatchRecord(TransitDriverDispatchRecord transitDriverDispatchRecord) throws InputDataValidationException, UnknownPersistenceException ;
 }

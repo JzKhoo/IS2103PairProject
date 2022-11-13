@@ -68,6 +68,8 @@ public class Model implements Serializable {
     public int hashCode() {
         int hash = 0;
         hash += (modelId != null ? modelId.hashCode() : 0);
+        hash += (make != null ? make.hashCode() : 0);
+        hash += (model != null ? model.hashCode() : 0);
         return hash;
     }
 
@@ -79,6 +81,12 @@ public class Model implements Serializable {
         }
         Model other = (Model) object;
         if ((this.modelId == null && other.modelId != null) || (this.modelId != null && !this.modelId.equals(other.modelId))) {
+            return false;
+        }
+        if ((this.make == null && other.make != null) || (this.make != null && !this.make.equals(other.make))) {
+            return false;
+        }
+        if ((this.model == null && other.model != null) || (this.model != null && !this.model.equals(other.model))) {
             return false;
         }
         return true;

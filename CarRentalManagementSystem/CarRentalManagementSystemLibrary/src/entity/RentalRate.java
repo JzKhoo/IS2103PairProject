@@ -7,13 +7,17 @@ package entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -21,34 +25,6 @@ import javax.persistence.ManyToOne;
  */
 @Entity
 public class RentalRate implements Serializable {
-
-    /**
-     * @return the rentalRateType
-     */
-    public String getRentalRateType() {
-        return rentalRateType;
-    }
-
-    /**
-     * @param rentalRateType the rentalRateType to set
-     */
-    public void setRentalRateType(String rentalRateType) {
-        this.rentalRateType = rentalRateType;
-    }
-
-    /**
-     * @return the carCategory
-     */
-    public CarCategory getCarCategory() {
-        return carCategory;
-    }
-
-    /**
-     * @param carCategory the carCategory to set
-     */
-    public void setCarCategory(CarCategory carCategory) {
-        this.carCategory = carCategory;
-    }
 
     // Attributes
     private static final long serialVersionUID = 1L;
@@ -70,6 +46,8 @@ public class RentalRate implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private CarCategory carCategory;
+    @ManyToMany
+    private List<CarRentalReservationRecord> carRentalReservationRecords;
 
     public Long getRentalRateId() {
         return rentalRateId;
@@ -80,15 +58,18 @@ public class RentalRate implements Serializable {
     }
 
     public RentalRate() {
+        this.carRentalReservationRecords = new ArrayList<>();
     }
 
-    public RentalRate(String name, String rentalRateType, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime, CarCategory carCategory) {
+    public RentalRate(String name, String rentalRateType, CarCategory carCategory, int ratePerDay, Timestamp startDateTime, Timestamp endDateTime) {
+        this();
+        
         this.name = name;
         this.rentalRateType = rentalRateType;
+        this.carCategory = carCategory;
         this.ratePerDay = ratePerDay;
         this.startDateTime = startDateTime;
         this.endDateTime = endDateTime;
-        this.carCategory = carCategory;
     } 
 
     @Override
@@ -123,6 +104,14 @@ public class RentalRate implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+    
+    public String getRentalRateType() {
+        return rentalRateType;
+    }
+
+    public void setRentalRateType(String rentalRateType) {
+        this.rentalRateType = rentalRateType;
+    }
 
     public int getRatePerDay() {
         return ratePerDay;
@@ -156,12 +145,20 @@ public class RentalRate implements Serializable {
         this.isDisabled = isDisabled;
     }
 
-    public CarCategory getCategory() {
-        return getCarCategory();
+    public CarCategory getCarCategory() {
+        return carCategory;
     }
 
-    public void setCategory(CarCategory carCategory) {
-        this.setCarCategory(carCategory);
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
+    }
+
+    public List<CarRentalReservationRecord> getCarRentalReservationRecords() {
+        return carRentalReservationRecords;
+    }
+
+    public void setCarRentalReservationRecords(List<CarRentalReservationRecord> carRentalReservationRecords) {
+        this.carRentalReservationRecords = carRentalReservationRecords;
     }
     
 }

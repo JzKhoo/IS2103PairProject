@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.Car;
 import entity.Model;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.DeleteModelException;
 import util.exception.InputDataValidationException;
 import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
@@ -43,7 +45,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }   
 
     
-    // Create
+    // Create New Model
     @Override
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException
     {
@@ -78,6 +80,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     
     
     // Retrieve
+    // View All Models
     @Override
     public List<Model> retrieveAllModels()
     {
@@ -119,7 +122,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     
-    // Update (incomplete)
+    // Update Model
     @Override
     public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException 
     {
@@ -136,8 +139,10 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
                     modelToUpdate.setMake(model.getMake());
                     modelToUpdate.setModel(model.getModel());
                     modelToUpdate.setIsDisabled(model.isIsDisabled());
-                    modelToUpdate.setCars(model.getCars());
-                    modelToUpdate.setCarCategory(model.getCarCategory());
+
+// Only allow updates to attributes, not relationships
+//                    modelToUpdate.setCars(model.getCars());
+//                    modelToUpdate.setCarCategory(model.getCarCategory());
                 }
                 else
                 {
@@ -152,6 +157,28 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         else
         {
             throw new ModelNotFoundException("Model ID not provided for model to be updated");
+        }
+    }
+    
+    
+    // Delete Model
+    @Override
+    public void deleteModel(Long modelId) throws ModelNotFoundException, DeleteModelException
+    {
+        Model modelToRemove = retrieveModelByModelId(modelId);
+        
+        List<Car> cars = modelToRemove.getCars();
+        
+        if(cars.isEmpty())
+        {
+            modelToRemove.getCarCategory().getModels().remove(modelToRemove);
+            
+            em.remove(modelToRemove);
+        }
+        else
+        {
+            modelToRemove.setIsDisabled(true);
+            throw new DeleteModelException("Model ID " + modelId + " is associated with existing cars and cannot be deleted! Model has been marked as disabled.");
         }
     }
     

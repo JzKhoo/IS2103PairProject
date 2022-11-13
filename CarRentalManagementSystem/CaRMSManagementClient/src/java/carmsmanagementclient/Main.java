@@ -7,9 +7,13 @@ package carmsmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
-import ejb.session.stateless.RentalRateSessionBeanRemote;
 import javax.ejb.EJB;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.EjbTimerSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 
 /**
  *
@@ -18,18 +22,30 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
 public class Main {
 
     @EJB
+    private static EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote;
+
+    @EJB
+    private static CarSessionBeanRemote carSessionBeanRemote;
+    @EJB
     private static CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     @EJB
     private static EmployeeSessionBeanRemote employeeSessionBeanRemote;
     @EJB
+    private static ModelSessionBeanRemote modelSessionBeanRemote;
+    @EJB
+    private static OutletSessionBeanRemote outletSessionBeanRemote;
+    @EJB
     private static RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     @EJB
-    private static ModelSessionBeanRemote modelSessionBeanRemote;
+    private static TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
+    
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(carCategorySessionBeanRemote, employeeSessionBeanRemote, modelSessionBeanRemote, rentalRateSessionBeanRemote);
+        // TODO code application logic here
+        MainApp mainApp = new MainApp(carSessionBeanRemote, carCategorySessionBeanRemote, employeeSessionBeanRemote, modelSessionBeanRemote, outletSessionBeanRemote, rentalRateSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, ejbTimerSessionBeanRemote);
         mainApp.runApp();
     }
     

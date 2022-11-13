@@ -7,13 +7,16 @@ package carmsmanagementclient;
 
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
-import ejb.session.stateless.RentalRateSessionBeanRemote;
 import entity.Employee;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.EjbTimerSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.RentalRateSessionBeanRemote;
+import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
 
 /**
  *
@@ -21,10 +24,14 @@ import ejb.session.stateless.CarCategorySessionBeanRemote;
  */
 public class MainApp {
     
+    private CarSessionBeanRemote carSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private EmployeeSessionBeanRemote employeeSessionBeanRemote;
-    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
+    private OutletSessionBeanRemote outletSessionBeanRemote;
+    private RentalRateSessionBeanRemote rentalRateSessionBeanRemote;
+    private TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
+    private EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote;
     
     private CustomerServiceExecutiveModule customerServiceExecutiveModule;
     private OperationsManagerModule operationsManagerModule;
@@ -36,11 +43,15 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(CarCategorySessionBeanRemote carCategorySessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote) {
+    public MainApp(CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, RentalRateSessionBeanRemote rentalRateSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote) {
+        this.carSessionBeanRemote = carSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.rentalRateSessionBeanRemote = rentalRateSessionBeanRemote;
+        this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
+        this.ejbTimerSessionBeanRemote = ejbTimerSessionBeanRemote;
     }
     
     // Employee Login & Logout page
@@ -55,25 +66,23 @@ public class MainApp {
             System.out.println("1: Login");          
             System.out.println("2: Exit\n");
             response = 0;
-           
+            
             while(response < 1 || response > 2)
             {
                 System.out.print("> ");
-                 
                 
                 response = scanner.nextInt();
                 
-
                 if(response == 1)
                 {
                     try
                     {
                         doLogin();
                         System.out.println("Login successful!\n");
-
+                        
                         customerServiceExecutiveModule = new CustomerServiceExecutiveModule(currentEmployee);
-                        operationsManagerModule = new OperationsManagerModule(currentEmployee, carCategorySessionBeanRemote, modelSessionBeanRemote);
-                        salesManagerModule = new SalesManagerModule(currentEmployee, rentalRateSessionBeanRemote, carCategorySessionBeanRemote);
+                        operationsManagerModule = new OperationsManagerModule(currentEmployee, carSessionBeanRemote, carCategorySessionBeanRemote, employeeSessionBeanRemote, modelSessionBeanRemote, outletSessionBeanRemote, transitDriverDispatchRecordSessionBeanRemote, ejbTimerSessionBeanRemote);
+                        salesManagerModule = new SalesManagerModule(currentEmployee, carCategorySessionBeanRemote, rentalRateSessionBeanRemote);
 
                         menuMain();
                     }
@@ -90,14 +99,12 @@ public class MainApp {
                 {
                     System.out.println("Invalid option, please try again!\n");
                 }
-
             }
-
+            
             if(response == 2)
             {
                 break;
             }
-            
         }
     }
     

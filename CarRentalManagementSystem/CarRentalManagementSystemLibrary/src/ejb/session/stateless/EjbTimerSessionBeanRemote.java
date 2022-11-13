@@ -5,7 +5,10 @@
  */
 package ejb.session.stateless;
 
+import java.sql.Timestamp;
 import javax.ejb.Remote;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -13,5 +16,9 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface EjbTimerSessionBeanRemote {
+
+    public void allocateCarsToCurrentDayReservations(Timestamp todayDate);
+
+    public void generateTransitDriverDispatchRecordsForCurrentDayReservations(Timestamp todayDate) throws InputDataValidationException, UnknownPersistenceException;
     
 }

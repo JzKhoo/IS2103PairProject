@@ -6,7 +6,8 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.sql.Date;
+import java.sql.Timestamp;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 /**
  *
@@ -27,7 +29,7 @@ public class TransitDriverDispatchRecord implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transitDriverDispatchRecordId;
     @Column(nullable = false)
-    private Date date;
+    private Timestamp transitStartTime;
     @Column(nullable = false)
     private boolean isCompleted;
     
@@ -36,6 +38,7 @@ public class TransitDriverDispatchRecord implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Car car;
+    
     
 
     public Long getTransitDriverDispatchRecordId() {
@@ -49,14 +52,14 @@ public class TransitDriverDispatchRecord implements Serializable {
     public TransitDriverDispatchRecord() {
     }
 
-    public TransitDriverDispatchRecord(Date date, boolean isCompleted, Car car) {
-        this.date = date;
+    public TransitDriverDispatchRecord(Timestamp transitStartTime, boolean isCompleted, Car car) {
+        this.transitStartTime = transitStartTime;
         this.isCompleted = isCompleted;
         this.car = car;
     }
 
-    public TransitDriverDispatchRecord(Date date, boolean isCompleted, Employee employee, Car car) {
-        this.date = date;
+    public TransitDriverDispatchRecord(Timestamp transitStartTime, boolean isCompleted, Employee employee, Car car) {
+        this.transitStartTime = transitStartTime;
         this.isCompleted = isCompleted;
         this.employee = employee;
         this.car = car;
@@ -89,14 +92,6 @@ public class TransitDriverDispatchRecord implements Serializable {
         return "entity.TransitDriverDispatchRecord[ id=" + transitDriverDispatchRecordId + " ]";
     }
 
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
     public boolean isIsCompleted() {
         return isCompleted;
     }
@@ -119,6 +114,20 @@ public class TransitDriverDispatchRecord implements Serializable {
 
     public void setCar(Car car) {
         this.car = car;
+    }
+
+    /**
+     * @return the transitStartTime
+     */
+    public Timestamp getTransitStartTime() {
+        return transitStartTime;
+    }
+
+    /**
+     * @param transitStartTime the transitStartTime to set
+     */
+    public void setTransitStartTime(Timestamp transitStartTime) {
+        this.transitStartTime = transitStartTime;
     }
     
 }

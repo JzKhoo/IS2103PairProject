@@ -7,6 +7,7 @@ package util.exception;
 
 /**
  *
+<<<<<<< HEAD
  * @author zychi
  */
 public class TransitDriverDispatchRecordNotFoundException extends Exception {

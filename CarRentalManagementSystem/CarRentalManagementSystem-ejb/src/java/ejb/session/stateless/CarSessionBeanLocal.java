@@ -6,10 +6,15 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.Outlet;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.CarNotFoundException;
+import util.exception.DeleteCarException;
 import util.exception.InputDataValidationException;
+import util.exception.ModelDisabledException;
 import util.exception.UnknownPersistenceException;
+import util.exception.UpdateCarException;
 
 /**
  *
@@ -17,10 +22,21 @@ import util.exception.UnknownPersistenceException;
  */
 @Local
 public interface CarSessionBeanLocal {
-
-    // Create
-    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException;
-
-    public List<Car> retrieveAllCars();
+    // Create New Car
+    public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException, ModelDisabledException;
     
+    // Retrieve
+    public Car retrieveCarByLicensePlateNumber(String licensePlateNumber) throws CarNotFoundException;
+    public Car retrieveCarByCarId(Long carId) throws CarNotFoundException;
+    public List<Car> retrieveAllCars();
+
+    // Update Car
+    public void updateCar(Car car) throws CarNotFoundException, UpdateCarException, InputDataValidationException;
+
+    // Delete Car
+    public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException;
+
+    public List<Car> retrieveCarsAtOutlet(Outlet outlet);
+
+    public List<Car> retrieveCarsNotAtOutlet(Outlet outlet);
 }

@@ -8,8 +8,14 @@ package ejb.session.stateless;
 import entity.CarCategory;
 import entity.CarRentalReservationRecord;
 import entity.RentalRate;
+import java.util.Date;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale.Category;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,6 +28,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import util.exception.CarCategoryNotFoundException;
+import util.exception.DeleteCarException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
@@ -36,14 +44,10 @@ import util.exception.UpdateRentalRateException;
 public class RentalRateSessionBean implements RentalRateSessionBeanRemote, RentalRateSessionBeanLocal {
 
     @EJB
-    private CarRentalReservationRecordSessionBeanLocal carRentalReservationRecordSessionBeanLocal;
-
-    @EJB
     private CarCategorySessionBeanLocal carCategorySessionBeanLocal;
 
     @PersistenceContext
     private EntityManager em;
-    
     
     
 
@@ -56,7 +60,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
     
     
-    // Create (incomplete)
+    // Create New Rental Rate
     @Override
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws UnknownPersistenceException, InputDataValidationException
     {
@@ -89,33 +93,38 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         }
     }
     
-    // sorted in ascending order by car category, validity start date and validity end date
+    
+    // Retrieve
+    // View All Rental Rates
     @Override
-    public List<RentalRate> retrieveAllRentalRates() {
+    public List<RentalRate> retrieveAllRentalRates() 
+    {
         Query query = em.createQuery("SELECT rr FROM RentalRate rr ORDER BY rr.carCategory, rr.startDateTime");
+        
         return query.getResultList();
     }
     
     @Override
-    public RentalRate retrieveRentalRateByName(String rentalRateName) throws RentalRateNotFoundException
+    public RentalRate retrieveRentalRateById(Long rentalRateId) throws RentalRateNotFoundException 
     {
-        Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.name = :inName");
-        RentalRate rentalRate = (RentalRate) query.setParameter("inName", rentalRateName).getSingleResult();
+        RentalRate rentalRate = em.find(RentalRate.class, rentalRateId);
         
         if(rentalRate != null)
         {
             return rentalRate;
         }
-        else
+        else 
         {
-            throw new RentalRateNotFoundException("Rental Rate name " + rentalRateName + " does not exist!");
-        }               
+            throw new RentalRateNotFoundException("Rental Rate " + rentalRateId + " does not exist!");
+        }
     }
     
     @Override
-    public RentalRate viewRentalRateDetails(String name) throws RentalRateNotFoundException{
+    public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException
+    {
         Query query = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.name = :inName");
-        query.setParameter("inName", name);
+        query.setParameter("inName", name).getSingleResult();
+        
         try
         {
             return (RentalRate)query.getSingleResult();
@@ -123,32 +132,32 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         catch(NoResultException | NonUniqueResultException ex)
         {
             throw new RentalRateNotFoundException("Rental Rate " + name + " does not exist!");
-        }
+        }               
     }
     
+    
+    // Update Rental Rate
     @Override
     public void updateRentalRate(RentalRate rentalRate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException
     {
-        if(rentalRate != null && rentalRate.getName()!= null)
+        if(rentalRate != null && rentalRate.getRentalRateId() != null)
         {
             Set<ConstraintViolation<RentalRate>>constraintViolations = validator.validate(rentalRate);
         
             if(constraintViolations.isEmpty())
             {
-                RentalRate rentalrateToUpdate = retrieveRentalRateByName(rentalRate.getName());
+                RentalRate rentalRateToUpdate = retrieveRentalRateById(rentalRate.getRentalRateId());
 
-                if(rentalrateToUpdate.getName().equals(rentalRate.getName()))
+                if(rentalRateToUpdate.getRentalRateId().equals(rentalRate.getRentalRateId()))
                 {
-//                    rentalrateToUpdate.setName(rentalRate.getName());
-                    rentalrateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
-                    rentalrateToUpdate.setRatePerDay(rentalRate.getRatePerDay());
-                    rentalrateToUpdate.setStartDateTime(rentalRate.getStartDateTime());
-                    rentalrateToUpdate.setEndDateTime(rentalRate.getEndDateTime());
-                    
+                    rentalRateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
+                    rentalRateToUpdate.setRatePerDay(rentalRate.getRatePerDay());
+                    rentalRateToUpdate.setStartDateTime(rentalRate.getStartDateTime());
+                    rentalRateToUpdate.setEndDateTime(rentalRate.getEndDateTime());
                 }
                 else
                 {
-                    throw new UpdateRentalRateException("Name of rental rate to be updated does not match the existing record");
+                    throw new UpdateRentalRateException("Rental Rate ID of rental rate record to be updated does not match the existing record");
                 }
             }
             else
@@ -158,35 +167,86 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         }
         else
         {
-            throw new RentalRateNotFoundException("Rental Rate Name not provided for rental rate to be updated");
+            throw new RentalRateNotFoundException("Rental Rate ID not provided for rental rate to be updated");
+        }
+    }
+    
+    
+    // Delete Rental Rate
+    @Override
+    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException
+    {
+        RentalRate rentalRateToRemove = retrieveRentalRateById(rentalRateId);
+
+        List<CarRentalReservationRecord> carRentalReservationRecords = rentalRateToRemove.getCarRentalReservationRecords();
+        
+        if(carRentalReservationRecords.isEmpty())
+        {
+            rentalRateToRemove.getCarCategory().getRentalRates().remove(rentalRateToRemove);
+            
+            em.remove(rentalRateToRemove);
+        }
+        else
+        {
+            rentalRateToRemove.setIsDisabled(true);
+            throw new DeleteRentalRateException("Rental Rate ID " + rentalRateId + " is associated with existing car rental reservations and cannot be deleted! Car has been marked as disabled.");
         }
     }
     
     @Override
-    public void deleteRentalRate(String name) throws RentalRateNotFoundException, DeleteRentalRateException
+    public int calculateRentalFee(String carCategoryName, Timestamp startDateTime, Timestamp endDateTime) throws CarCategoryNotFoundException
     {
-        RentalRate rentalRateToRemove = this.viewRentalRateDetails(name);
+        // Get Car Category
+        CarCategory carCategory = carCategorySessionBeanLocal.retrieveCarCategoryByName(carCategoryName);
         
-        List<CarRentalReservationRecord> carRentalReservationRecords = carRentalReservationRecordSessionBeanLocal.retrieveAllCarRentalReservationRecords();
-        boolean isUsed = false;
+        int totalRentalFee = 0;
+        // Get rental rates for promotions & peak
+        Query promoPeakRRQuery = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.rentalRateType != :type AND rr.carCategory = :carCategory ORDER BY rr.startDateTime");
+        promoPeakRRQuery.setParameter("type", "Default");
+        promoPeakRRQuery.setParameter("carCategory", carCategory);
+        List<RentalRate> promoPeakRRs = promoPeakRRQuery.getResultList();
         
-        for (CarRentalReservationRecord carRentalReservationRecord : carRentalReservationRecords)
+        // Get default rental rate
+        Query defaultQuery = em.createQuery("SELECT rr FROM RentalRate rr WHERE rr.rentalRateType = :type AND rr.carCategory = :carCategory");
+        defaultQuery.setParameter("type", "Default");
+        defaultQuery.setParameter("carCategory", carCategory);
+        RentalRate defaultRR = (RentalRate) defaultQuery.getSingleResult();
+        
+        // Calculate total rental fee
+        for (int i = 0; i < promoPeakRRs.size(); i++) 
         {
-            if (carRentalReservationRecord.getDate().compareTo(rentalRateToRemove.getStartDateTime()) > 0 && carRentalReservationRecord.getDate().compareTo(rentalRateToRemove.getEndDateTime()) < 0)
+            if (startDateTime.before(promoPeakRRs.get(i).getStartDateTime()))
+            {
+                totalRentalFee += defaultRR.getRatePerDay();
+                totalRentalFee += promoPeakRRs.get(i).getRatePerDay();
+                if (i < promoPeakRRs.size() - 1){
+                    if (promoPeakRRs.get(i + 1).getStartDateTime().before(promoPeakRRs.get(i).getEndDateTime()))
                     {
-                        isUsed = true;
-                        rentalRateToRemove.setIsDisabled(true);
-                        throw new DeleteRentalRateException("Rental Rate has been used! Rental rate will be marked as disabled!");
-                        
+                        if (promoPeakRRs.get(i + 1).getRentalRateType().equals("Promotion"))
+                        {
+                            totalRentalFee += promoPeakRRs.get(i + 1).getRatePerDay();
+                            startDateTime = addSecondsToDate(60, promoPeakRRs.get(i + 1).getEndDateTime());
+                        } else {
+                            startDateTime = addSecondsToDate(60, promoPeakRRs.get(i).getEndDateTime());
+                        }
                     }
+                }
+            } else {
+                totalRentalFee += promoPeakRRs.get(i).getRatePerDay();
+                startDateTime = addSecondsToDate(60, promoPeakRRs.get(i).getEndDateTime());
+            }
+            
         }
-        
-        if (!isUsed) {
-            em.remove(rentalRateToRemove);
-        }
-        
+        return totalRentalFee;
     }
     
+    private Timestamp addSecondsToDate(int numOfSeconds, Timestamp date)
+    {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.add(Calendar.SECOND, numOfSeconds);
+        return new Timestamp(cal.getTime().getTime());
+    }
     
     private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<RentalRate>>constraintViolations)
     {
@@ -200,4 +260,3 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         return msg;
     }
 }
-

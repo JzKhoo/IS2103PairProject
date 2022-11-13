@@ -6,8 +6,11 @@
 package ejb.session.stateless;
 
 import entity.CarRentalReservationRecord;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.InputDataValidationException;
+import util.exception.UnknownPersistenceException;
 
 /**
  *
@@ -17,5 +20,7 @@ import javax.ejb.Local;
 public interface CarRentalReservationRecordSessionBeanLocal {
     public List<CarRentalReservationRecord> retrieveAllCarRentalReservationRecords();
 
-    public List<CarRentalReservationRecord> retrieveCurrentDayReservationRecords();
+    public List<CarRentalReservationRecord> retrieveCurrentDayReservationRecords(Timestamp todayDate);
+
+    public CarRentalReservationRecord createNewCarRentalReservationRecord(CarRentalReservationRecord newCarRentalReservationRecord) throws UnknownPersistenceException, InputDataValidationException;
 }

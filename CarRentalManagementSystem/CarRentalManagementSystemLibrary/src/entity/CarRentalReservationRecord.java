@@ -7,14 +7,18 @@ package entity;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import util.enumeration.RentalFeeOption;
 
 /**
@@ -28,13 +32,7 @@ public class CarRentalReservationRecord implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carRentalReservationRecordId;
-    @Column(nullable = false)
-    private Timestamp date;
-    @Column(nullable = false)
     private String categoryTypeChoice;
-    @Column(nullable = false)
-    private String makeChoice;
-    @Column(nullable = false)
     private String modelChoice;
     @Column(nullable = false)
     private String pickupLocation;
@@ -44,12 +42,19 @@ public class CarRentalReservationRecord implements Serializable {
     private RentalFeeOption rentalFeeOption;
     @Column(nullable = false)
     private boolean isCancelled;
+    @Column(nullable = false)
+    private Timestamp pickupTime;
+    @Column(nullable = false)
+    private Timestamp returnTime;
+    private String reservationDetails;
     
     @ManyToOne
     private Car car;
     @ManyToOne
     @JoinColumn(nullable = false)
     private Customer customer;
+    @ManyToMany(mappedBy = "carRentalReservationRecords")
+    private List<RentalRate> rentalRates;
 
     public Long getCarRentalReservationRecordId() {
         return carRentalReservationRecordId;
@@ -57,22 +62,24 @@ public class CarRentalReservationRecord implements Serializable {
 
     public void setCarRentalReservationRecordId(Long carRentalReservationRecordId) {
         this.carRentalReservationRecordId = carRentalReservationRecordId;
+        this.setRentalRates(new ArrayList<RentalRate>());
     }
 
     public CarRentalReservationRecord() {
     }
 
-    public CarRentalReservationRecord(Timestamp date, String categoryTypeChoice, String makeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, boolean isCancelled, Car car, Customer customer) {
-        this.date = date;
+    public CarRentalReservationRecord(String categoryTypeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, Timestamp pickupTime, Timestamp returnTime, String reservationDetails, Customer customer) {
         this.categoryTypeChoice = categoryTypeChoice;
-        this.makeChoice = makeChoice;
         this.modelChoice = modelChoice;
         this.pickupLocation = pickupLocation;
         this.returnLocation = returnLocation;
         this.rentalFeeOption = rentalFeeOption;
-        this.isCancelled = isCancelled;
-        this.car = car;
+        this.isCancelled = false;
+        this.pickupTime = pickupTime;
+        this.returnTime = returnTime;
+        this.reservationDetails = reservationDetails;
         this.customer = customer;
+        this.rentalRates = new ArrayList<RentalRate>();
     }
     
 
@@ -80,7 +87,7 @@ public class CarRentalReservationRecord implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (carRentalReservationRecordId != null ? carRentalReservationRecordId.hashCode() : 0);
+        hash += (getCarRentalReservationRecordId() != null ? getCarRentalReservationRecordId().hashCode() : 0);
         return hash;
     }
 
@@ -91,7 +98,7 @@ public class CarRentalReservationRecord implements Serializable {
             return false;
         }
         CarRentalReservationRecord other = (CarRentalReservationRecord) object;
-        if ((this.carRentalReservationRecordId == null && other.carRentalReservationRecordId != null) || (this.carRentalReservationRecordId != null && !this.carRentalReservationRecordId.equals(other.carRentalReservationRecordId))) {
+        if ((this.getCarRentalReservationRecordId() == null && other.getCarRentalReservationRecordId() != null) || (this.getCarRentalReservationRecordId() != null && !this.carRentalReservationRecordId.equals(other.carRentalReservationRecordId))) {
             return false;
         }
         return true;
@@ -99,31 +106,20 @@ public class CarRentalReservationRecord implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.CarRentalReservationRecord[ id=" + carRentalReservationRecordId + " ]";
+        return "entity.CarRentalReservationRecord[ id=" + getCarRentalReservationRecordId() + " ]";
     }
-
-    public Timestamp getDate() {
-        return date;
+    
+    public Long setcarRentalReservationRecordId()
+    {
+        return carRentalReservationRecordId;
     }
-
-    public void setDate(Timestamp date) {
-        this.date = date;
-    }
-
+            
     public String getCategoryTypeChoice() {
         return categoryTypeChoice;
     }
 
     public void setCategoryTypeChoice(String categoryTypeChoice) {
         this.categoryTypeChoice = categoryTypeChoice;
-    }
-
-    public String getMakeChoice() {
-        return makeChoice;
-    }
-
-    public void setMakeChoice(String makeChoice) {
-        this.makeChoice = makeChoice;
     }
 
     public String getModelChoice() {
@@ -180,6 +176,63 @@ public class CarRentalReservationRecord implements Serializable {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    public List<RentalRate> getRentalRates() {
+        return rentalRates;
+    }
+
+    public void setRentalRate(List<RentalRate> rentalRates) {
+        this.setRentalRates(rentalRates);
+    }
+
+    /**
+     * @return the pickupTime
+     */
+    public Timestamp getPickupTime() {
+        return pickupTime;
+    }
+
+    /**
+     * @param pickupTime the pickupTime to set
+     */
+    public void setPickupTime(Timestamp pickupTime) {
+        this.pickupTime = pickupTime;
+    }
+
+    /**
+     * @return the returnTime
+     */
+    public Timestamp getReturnTime() {
+        return returnTime;
+    }
+
+    /**
+     * @param returnTime the returnTime to set
+     */
+    public void setReturnTime(Timestamp returnTime) {
+        this.returnTime = returnTime;
+    }
+
+    /**
+     * @return the reservationDetails
+     */
+    public String getReservationDetails() {
+        return reservationDetails;
+    }
+
+    /**
+     * @param reservationDetails the reservationDetails to set
+     */
+    public void setReservationDetails(String reservationDetails) {
+        this.reservationDetails = reservationDetails;
+    }
+
+    /**
+     * @param rentalRates the rentalRates to set
+     */
+    public void setRentalRates(List<RentalRate> rentalRates) {
+        this.rentalRates = rentalRates;
     }
     
 }

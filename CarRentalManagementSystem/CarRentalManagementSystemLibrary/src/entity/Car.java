@@ -31,7 +31,6 @@ public class Car implements Serializable {
     private Long carId;
     @Column(nullable = false, unique = true)
     private String licensePlateNumber;
-    private String colour;
     @Column(nullable = false)
     private String status;
     private String location;
@@ -73,11 +72,10 @@ public class Car implements Serializable {
         this.model = model;
     }
 
-    public Car(String licensePlateNumber, String colour, String status, String location, Outlet outlet, Model model) {
+    public Car(String licensePlateNumber, String status, String location, Outlet outlet, Model model) {
         this();
         
         this.licensePlateNumber = licensePlateNumber;
-        this.colour = colour;
         this.status = status;
         this.location = location;
         this.outlet = outlet;
@@ -115,14 +113,6 @@ public class Car implements Serializable {
 
     public void setLicensePlateNumber(String licensePlateNumber) {
         this.licensePlateNumber = licensePlateNumber;
-    }
-    
-    public String getColour() {
-        return colour;
-    }
-
-    public void setColour(String colour) {
-        this.colour = colour;
     }
 
     public String getStatus() {

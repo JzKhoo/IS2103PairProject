@@ -9,6 +9,7 @@ import entity.Employee;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.EmployeeNotFoundException;
@@ -49,6 +50,22 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         else 
         {
             throw new EmployeeNotFoundException("Employee does not exist: " + employeeId);
+        }
+    }
+    
+    @Override
+    public Employee retrieveEmployeeByName(String name) throws EmployeeNotFoundException
+    {
+        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.name = :inName");
+        query.setParameter("inName", name);
+        
+        try
+        {
+            return (Employee)query.getSingleResult();
+        }
+        catch(NoResultException | NonUniqueResultException ex)
+        {
+            throw new EmployeeNotFoundException("Employee " + name + " does not exist!");
         }
     }
     

@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import javax.ejb.Remote;
+import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -19,4 +20,5 @@ public interface EmployeeSessionBeanRemote {
     // Login via CaRMSManagamentClient
     public Employee login(String userName, String password) throws InvalidLoginCredentialException;
     
+    public Employee retrieveEmployeeByName(String name) throws EmployeeNotFoundException;
 }

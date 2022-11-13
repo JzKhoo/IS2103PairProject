@@ -7,13 +7,14 @@ package util.exception;
 
 /**
  *
+<<<<<<< HEAD
  * @author zychi
  */
 public class DeleteRentalRateException extends Exception{
 
     public DeleteRentalRateException() {
     }
-    
+
     public DeleteRentalRateException(String msg) {
         super(msg);
     }

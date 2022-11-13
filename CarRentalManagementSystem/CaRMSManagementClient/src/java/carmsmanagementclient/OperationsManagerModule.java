@@ -8,6 +8,7 @@ package carmsmanagementclient;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import entity.Employee;
 import entity.Model;
+import entity.Car;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -22,6 +23,24 @@ import util.exception.ModelNotFoundException;
 import util.exception.UnknownPersistenceException;
 import util.exception.UpdateModelException;
 import ejb.session.stateless.CarCategorySessionBeanRemote;
+import ejb.session.stateless.CarSessionBeanRemote;
+import ejb.session.stateless.EjbTimerSessionBeanRemote;
+import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.TransitDriverDispatchRecordSessionBeanRemote;
+import entity.Outlet;
+import entity.TransitDriverDispatchRecord;
+import java.sql.Date;
+import java.sql.Timestamp;
+import util.exception.CarNotFoundException;
+import util.exception.DeleteCarException;
+import util.exception.DeleteModelException;
+import util.exception.EmployeeNotFoundException;
+import util.exception.ModelDisabledException;
+import util.exception.OutletNotFoundException;
+import util.exception.TransitDriverDispatchRecordNotFoundException;
+import util.exception.UpdateCarException;
+import util.exception.UpdateTransitDriverDispatchRecordException;
 
 /**
  *
@@ -32,21 +51,31 @@ public class OperationsManagerModule {
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     
-    private Employee currentEmployee;
-    
+    private CarSessionBeanRemote carSessionBeanRemote;
     private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
+    private EmployeeSessionBeanRemote employeeSessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
+    private OutletSessionBeanRemote outletSessionBeanRemote;
+    private TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote;
+    private EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote;
+    
+    private Employee currentEmployee;
     
     public OperationsManagerModule() {
         validatorFactory = Validation.buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
     }
 
-    public OperationsManagerModule(Employee currentEmployee, CarCategorySessionBeanRemote carCategorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
+    public OperationsManagerModule(Employee currentEmployee, CarSessionBeanRemote carSessionBeanRemote, CarCategorySessionBeanRemote carCategorySessionBeanRemote, EmployeeSessionBeanRemote employeeSessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, TransitDriverDispatchRecordSessionBeanRemote transitDriverDispatchRecordSessionBeanRemote, EjbTimerSessionBeanRemote ejbTimerSessionBeanRemote) {
         this();
         this.currentEmployee = currentEmployee;
+        this.carSessionBeanRemote = carSessionBeanRemote;
         this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
+        this.employeeSessionBeanRemote = employeeSessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
+        this.outletSessionBeanRemote = outletSessionBeanRemote;
+        this.transitDriverDispatchRecordSessionBeanRemote = transitDriverDispatchRecordSessionBeanRemote;
+        this.ejbTimerSessionBeanRemote = ejbTimerSessionBeanRemote;
     }
     
     // Main Navigation Page
@@ -73,7 +102,9 @@ public class OperationsManagerModule {
             System.out.println("8: View Transit Driver Dispatch Records for Current Day Reservations");
             System.out.println("9: Assign Transit Driver");
             System.out.println("10: Update Transit As Completed");
-            System.out.println("11: Back\n");
+            System.out.println("11: Input date to allocate cars");
+            System.out.println("12: Generate Transit Driver Dispatch Records for current day reservations");
+            System.out.println("13: Back\n");
             response = 0;
             
             while(response < 1 || response > 10)
@@ -90,53 +121,77 @@ public class OperationsManagerModule {
                     }
                     catch(CarCategoryNotFoundException ex)
                     {
-                        System.out.println("Create new model unsuccessful!: " + ex.getMessage() + "\n");
-                    }
+                        System.out.println(ex.getMessage() + "\n");
+                    } 
                 }
                 else if(response == 2)
                 {
                     doViewAllModels();
                 }
-                else if(response == 3) //Incomplete
+                else if(response == 3)
+                {
+                    doUpdateModel();
+                }
+                else if(response == 4)
+                {
+                    doDeleteModel();
+                }
+                else if(response == 5)
                 {
                     try
                     {
-                        doUpdateModel();
+                        doCreateNewCar();
                     }
-                    catch(ModelNotFoundException ex)
+                    catch( OutletNotFoundException | ModelNotFoundException ex)
                     {
                         System.out.println(ex.getMessage() + "\n");
                     }
                 }
-                else if(response == 4)
-                {
-                    break;
-                }
-                else if(response == 5)
-                {
-                    break;
-                }
                 else if(response == 6)
                 {
-                    break;
+                    doViewAllCars();
                 }
                 else if(response == 7)
                 {
-                    break;
+                    doViewCarDetails();
                 }
                 else if(response == 8)
                 {
-                    break;
+                    try
+                    {
+                        doViewTransitDriverDispatchRecordsForCurrentDay();
+                    }
+                    catch(OutletNotFoundException ex)
+                    {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
                 else if(response == 9)
                 {
-                    break;
+                    try
+                    {
+                        doAssignTransitDriver();
+                    }
+                    catch(EmployeeNotFoundException ex)
+                    {
+                        System.out.println(ex.getMessage() + "\n");
+                    }
                 }
                 else if(response == 10)
                 {
-                    break;
+                    doUpdateTransitAsCompleted();
                 }
                 else if(response == 11)
+                {
+                    doInputeDateToAllocateCars();
+                    break;
+                }
+                else if(response == 12)
+                {
+                    doGenerateTransitDriverDispatchRecordsForCurrentDayReservations();
+                    break;
+                }
+                else if(response == 13)
                 {
                     break;
                 }
@@ -146,7 +201,7 @@ public class OperationsManagerModule {
                 }
             }
             
-            if(response == 11)
+            if(response == 13)
             {
                 break;
             }
@@ -172,7 +227,7 @@ public class OperationsManagerModule {
         }
         catch(CarCategoryNotFoundException ex)
         {
-            throw new CarCategoryNotFoundException(ex.getMessage());
+            throw new CarCategoryNotFoundException("Create new model unsuccessful!: " + ex.getMessage() + "\n");
         }
         
         Set<ConstraintViolation<Model>>constraintViolations = validator.validate(newModel);
@@ -221,56 +276,206 @@ public class OperationsManagerModule {
     }
     
     
-    // Update Model (Incomplete)
-    private void doUpdateModel() throws ModelNotFoundException
+    // Update Model
+    private void doUpdateModel()
     {
         Scanner scanner = new Scanner(System.in); 
         String input;
-        Model model = null;
         
         System.out.println("*** CaRMS Management System :: Operations Manager Module :: Update Model ***\n");
         
-        // Retrieve model object by ID
-        System.out.print("Enter Id of Model to Update> ");
-        Long modelId = new Long(scanner.nextInt());
-        
-        scanner.nextLine();
+        // Retrieve model object by Make & Model
+        System.out.print("Enter Make of Model to Update> ");
+        String make = scanner.nextLine().trim();
+        System.out.print("Enter Model of Model to Update> ");
+        String modelName = scanner.nextLine().trim();
         
         try
         {
-            model = modelSessionBeanRemote.retrieveModelByModelId(modelId);
+            Model model = modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName);
+            
+            System.out.printf("Updating (Make: %s) (Model: %s) \n", model.getMake(), model.getModel());
+
+            System.out.print("Enter Make (blank if no change)> ");
+            input = scanner.nextLine().trim();
+            if(input.length() > 0)
+            {
+                model.setMake(input);
+            }
+
+            System.out.print("Enter Model (blank if no change)> ");
+            input = scanner.nextLine().trim();
+            if(input.length() > 0)
+            {
+                model.setModel(input);
+            }
+      
+
+            Set<ConstraintViolation<Model>>constraintViolations = validator.validate(model);
+
+            if(constraintViolations.isEmpty())
+            {
+                try
+                {
+                    modelSessionBeanRemote.updateModel(model);
+                    System.out.println("Model updated successfully!\n");
+                }
+                catch (ModelNotFoundException | UpdateModelException ex) 
+                {
+                    System.out.println("An error has occurred while updating model: " + ex.getMessage() + "\n");
+                }
+                catch(InputDataValidationException ex)
+                {
+                    System.out.println(ex.getMessage() + "\n");
+                }
+            }
+            else
+            {
+                showInputDataValidationErrorsForModel(constraintViolations);
+            }
         }
         catch(ModelNotFoundException ex)
         {
-            throw new ModelNotFoundException("An error has occurred while retrieving model: " + ex.getMessage() + "\n");
-        }
+            System.out.println("An error has occurred while updating model: " + ex.getMessage() + "\n");
+        }       
+    }
+    
+    
+// Updating of attributes
+//            System.out.print("Enter CarCategory (blank if no change)> ");
+//            input = scanner.nextLine().trim();
+//            if(input.length() > 0)
+//            {
+//                try
+//                {
+//                    CarCategory carCategory = carCategorySessionBeanRemote.retrieveCarCategoryByName(input);
+//                    model.setCarCategory(carCategory);
+//                }
+//                catch(CarCategoryNotFoundException ex)
+//                {
+//                    throw new CarCategoryNotFoundException(ex.getMessage());
+//                }
+//            }
+//            
+//            System.out.print("Enter number of Cars to add to model (0 if no change)> ");
+//            int numCars = scanner.nextInt();
+//            
+//            List<Car> cars = new ArrayList<>();
+//            for (int i = 0; i < numCars; i++)
+//            {
+//                System.out.print("Enter Car license plate number> ");
+//                input = scanner.nextLine().trim();
+//                if(input.length() > 0)
+//                {
+//                    try
+//                    {
+//                        Car car = carSessionBeanRemote.retrieveCarByLicensePlateNumber(modelName);
+//                        cars.add(car);
+//                    }
+//                    catch(CarNotFoundException ex)
+//                    {
+//                        throw new CarNotFoundException(ex.getMessage());
+//                    }
+//                }
+//            }
+//            
+//            model.setCars(cars);
+    
+    
+    // Delete model
+    private void doDeleteModel()
+    {
+        Scanner scanner = new Scanner(System.in); 
+        String input;
         
-        System.out.print("Enter Make (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0)
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Delete Model ***\n");
+        
+        // Retrieve model object by Make & Model
+        System.out.print("Enter Make of Model to Delete> ");
+        String make = scanner.nextLine().trim();
+        System.out.print("Enter Model of Model to Delete> ");
+        String modelName = scanner.nextLine().trim();
+        
+        try
         {
-            model.setMake(input);
+            Model model = modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName);
+            
+            System.out.printf("Confirm Delete (Make: %s) (Model: %s) (Enter 'Y' to Delete)> ", model.getMake(), model.getModel());
+            input = scanner.nextLine().trim();
+            
+            if(input.equals("Y"))
+            {
+                modelSessionBeanRemote.deleteModel(model.getModelId());
+                System.out.println("Model deleted successfully!\n");
+            }
+            else
+            {
+                System.out.println("Model NOT deleted!\n");
+            }
         }
-        
-        System.out.print("Enter Model (blank if no change)> ");
-        input = scanner.nextLine().trim();
-        if(input.length() > 0)
+        catch(ModelNotFoundException | DeleteModelException ex)
         {
-            model.setModel(input);
+            System.out.println("An error has occurred while deleting model: " + ex.getMessage() + "\n");
+        }
+    }
+    
+    
+    // Create New Car
+    private void doCreateNewCar() throws OutletNotFoundException, ModelNotFoundException
+    {
+        Scanner scanner = new Scanner(System.in);
+        Car newCar = new Car();
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Create New Car ***\n");
+        System.out.print("Enter License Plate Number> ");
+        newCar.setLicensePlateNumber(scanner.nextLine().trim());
+        System.out.print("Enter Status> ");
+        newCar.setStatus(scanner.nextLine().trim());
+        System.out.print("Enter Location> ");
+        newCar.setLocation(scanner.nextLine().trim());
+        
+        try
+        {
+            System.out.print("Enter Outlet Name> ");
+            newCar.setOutlet(outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim()));
+        }
+        catch(OutletNotFoundException ex)
+        {
+            throw new OutletNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
         }
         
-        Set<ConstraintViolation<Model>>constraintViolations = validator.validate(model);
+        try 
+        {
+            System.out.print("Enter Make of Car> ");
+            String make = scanner.nextLine().trim();
+            System.out.print("Enter Model of Car> ");
+            String modelName = scanner.nextLine().trim();
+            
+            newCar.setModel(modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName));
+        }
+        catch(ModelNotFoundException ex)
+        {
+            throw new ModelNotFoundException("Create new car unsuccessful!: " + ex.getMessage() + "\n");
+        }
+        
+        
+        Set<ConstraintViolation<Car>>constraintViolations = validator.validate(newCar);
         
         if(constraintViolations.isEmpty())
-        {
+        {        
             try
             {
-                modelSessionBeanRemote.updateModel(model);
-                System.out.println("Model updated successfully!\n");
+                newCar = carSessionBeanRemote.createNewCar(newCar);
+
+                System.out.println("New car created successfully!: Car ID = " + newCar.getCarId()+ "\n");
             }
-            catch (ModelNotFoundException | UpdateModelException ex) 
+            catch(ModelDisabledException ex)
             {
-                System.out.println("An error has occurred while updating model: " + ex.getMessage() + "\n");
+                System.out.println(ex.getMessage());
+            }
+            catch(UnknownPersistenceException ex)
+            {
+                System.out.println("An unknown error has occurred while creating the new car!: " + ex.getMessage() + "\n");
             }
             catch(InputDataValidationException ex)
             {
@@ -279,12 +484,348 @@ public class OperationsManagerModule {
         }
         else
         {
-            showInputDataValidationErrorsForModel(constraintViolations);
+            showInputDataValidationErrorsForCar(constraintViolations);
         }
     }
     
     
+    // View All Cars
+    private void doViewAllCars()
+    {
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View All Cars ***\n");
+        
+        List<Car> cars = carSessionBeanRemote.retrieveAllCars();
+        System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet");
+
+        for(Car car:cars)
+        {
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+        }
+        
+        System.out.print("Press any key to continue...> ");
+        scanner.nextLine();
+    }
+    
+    
+    // View Car Details
+    private void doViewCarDetails()
+    {
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 0;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Car Details ***\n");
+        System.out.print("Enter License Plate Number> ");
+        String licensePlateNumber = scanner.nextLine().trim();
+        
+        try
+        {
+            Car car = carSessionBeanRemote.retrieveCarByLicensePlateNumber(licensePlateNumber);
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet");
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+            System.out.println("------------------------");
+            System.out.println("1: Update Car");
+            System.out.println("2: Delete Car");
+            System.out.println("3: Back\n");
+            System.out.print("> ");
+            
+            response = scanner.nextInt();
+
+            if(response == 1)
+            {
+                doUpdateCar(car);
+            }
+            else if(response == 2)
+            {
+                doDeleteCar(car);
+            }
+        } 
+        catch (CarNotFoundException ex) {
+            System.out.println("An error has occurred while retrieving car: " + ex.getMessage() + "\n");
+        }
+    }
+    
+    
+    // Update Car
+    private void doUpdateCar(Car car)
+    {
+        Scanner scanner = new Scanner(System.in);        
+        String input;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Car Details :: Update Car ***\n");
+        System.out.print("Enter License Plate Number (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            car.setLicensePlateNumber(input);
+        }
+
+        System.out.print("Enter Status (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            car.setStatus(input);
+        }
+
+        System.out.print("Enter Location (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            car.setLocation(input);
+        }
+
+        
+        Set<ConstraintViolation<Car>>constraintViolations = validator.validate(car);
+        
+        if(constraintViolations.isEmpty())
+        {
+            try
+            {
+                carSessionBeanRemote.updateCar(car);
+                System.out.println("Car updated successfully!\n");
+            }
+            catch (CarNotFoundException | UpdateCarException ex) 
+            {
+                System.out.println("An error has occurred while updating car: " + ex.getMessage() + "\n");
+            }
+            catch(InputDataValidationException ex)
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            showInputDataValidationErrorsForCar(constraintViolations);
+        }
+    }
+    
     private void showInputDataValidationErrorsForModel(Set<ConstraintViolation<Model>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
+    
+    // Delete Car
+    private void doDeleteCar(Car car)
+    {
+        Scanner scanner = new Scanner(System.in); 
+        String input;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Car Details :: Delete Car ***\n");
+        System.out.printf("Confirm Delete Car %s (Enter 'Y' to Delete)> ", car.getLicensePlateNumber());
+        input = scanner.nextLine().trim();
+        
+        if(input.equals("Y"))
+        {
+            try
+            {
+                carSessionBeanRemote.deleteCar(car.getCarId());
+                System.out.println("Car deleted successfully!\n");
+            }
+            catch (CarNotFoundException | DeleteCarException ex) 
+            {
+                System.out.println("An error has occurred while deleting car: " + ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            System.out.println("Car NOT deleted!\n");
+        }
+
+    }
+    
+    
+    // View Transit Driver Dispatch Records for Current Day Reservations
+    public void doViewTransitDriverDispatchRecordsForCurrentDay() throws OutletNotFoundException 
+    {
+        Scanner scanner = new Scanner(System.in);        
+        Outlet outletInput;
+        Date dateInput;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: View Transit Driver Dispatch Records for Current Day Reservations ***\n");
+        System.out.print("Enter Date in format 'yyyy-mm-dd'> ");
+        dateInput = Date.valueOf(scanner.nextLine().trim());
+        
+        try
+        {
+            System.out.print("Enter Outlet Name> ");
+            outletInput = outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim());
+        }
+        catch(OutletNotFoundException ex)
+        {
+            throw new OutletNotFoundException("View transit driver dispatch records unsuccessful!: " + ex.getMessage() + "\n");
+        }
+       
+        try
+        {
+            List<TransitDriverDispatchRecord> transitDriverDispatchRecords = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordsForCurrentDay(dateInput, outletInput);
+            System.out.printf("%10s%30s%30s%20s\n", "ID", "Date", "License Plate Number", "Employee Name");
+
+            for(TransitDriverDispatchRecord transitDriverDispatchRecord:transitDriverDispatchRecords)
+            {
+                System.out.printf("%10s%30s%20s%20s\n", transitDriverDispatchRecord.getTransitDriverDispatchRecordId(), transitDriverDispatchRecord.getTransitStartTime().toString(), transitDriverDispatchRecord.getCar().getLicensePlateNumber(), transitDriverDispatchRecord.getEmployee().getName());
+            }
+
+            System.out.print("Press any key to continue...> ");
+            scanner.nextLine();
+        }
+        catch(TransitDriverDispatchRecordNotFoundException ex)
+        {
+            System.out.println(ex.getMessage() + "\n");
+        }
+    }
+    
+    
+    // Assign Transit Driver
+    public void doAssignTransitDriver() throws EmployeeNotFoundException 
+    {
+        Scanner scanner = new Scanner(System.in); 
+        Employee employeeInput;
+        Long idInput;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Assign Transit Driver ***\n");
+        
+        System.out.print("Enter ID of Transit Driver Dispatch Record> ");
+        idInput = new Long(scanner.nextLine().trim());
+        
+        try
+        {
+            TransitDriverDispatchRecord transitDriverDispatchRecord = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(idInput);
+            
+            System.out.printf("Assigning Transit Driver to Record (Date: %s) (Car License Plate Number: %s) \n", transitDriverDispatchRecord.getTransitStartTime(), transitDriverDispatchRecord.getCar().getLicensePlateNumber());
+
+            try
+            {
+                System.out.print("Enter Employee Name> ");
+                employeeInput = employeeSessionBeanRemote.retrieveEmployeeByName(scanner.nextLine().trim());
+                transitDriverDispatchRecord.setEmployee(employeeInput);
+            }
+            catch(EmployeeNotFoundException ex)
+            {
+                throw new EmployeeNotFoundException("Assign transit driver unsuccessful!: " + ex.getMessage() + "\n");
+            }
+      
+
+            Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations = validator.validate(transitDriverDispatchRecord);
+
+            if(constraintViolations.isEmpty())
+            {
+                try
+                {
+                    transitDriverDispatchRecordSessionBeanRemote.assignTransitDriver(transitDriverDispatchRecord);
+                    System.out.println("Driver assigned successfully!\n");
+                }
+                catch (TransitDriverDispatchRecordNotFoundException | UpdateTransitDriverDispatchRecordException ex) 
+                {
+                    System.out.println("An error has occurred while assigning driver: " + ex.getMessage() + "\n");
+                }
+                catch(InputDataValidationException ex)
+                {
+                    System.out.println(ex.getMessage() + "\n");
+                }
+            }
+            else
+            {
+                showInputDataValidationErrorsForTransitDriverDispatchRecord(constraintViolations);
+            }
+        }
+        catch(TransitDriverDispatchRecordNotFoundException ex)
+        {
+            System.out.println("An error has occurred while assigning driver: " + ex.getMessage() + "\n");
+        }  
+    }
+    
+    
+    // Update Transit as Completed
+    public void doUpdateTransitAsCompleted()  
+    {
+        Scanner scanner = new Scanner(System.in); 
+        Long idInput;
+        
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Update Transit As Completed ***\n");
+        
+        System.out.print("Enter ID of Transit Driver Dispatch Record> ");
+        idInput = new Long(scanner.nextLine().trim());
+        
+        try
+        {
+            TransitDriverDispatchRecord transitDriverDispatchRecord = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(idInput);
+            
+            System.out.printf("Updating Transit As Completed to Record (Date: %s) (Car License Plate Number: %s) \n", transitDriverDispatchRecord.getTransitStartTime(), transitDriverDispatchRecord.getCar().getLicensePlateNumber());
+
+            try
+            {
+                transitDriverDispatchRecordSessionBeanRemote.updateTransitAsCompleted(idInput);
+                System.out.println("Transit updated successfully!\n");
+            }
+            catch (UpdateTransitDriverDispatchRecordException ex) 
+            {
+                System.out.println("An error has occurred while updating record: " + ex.getMessage() + "\n");
+            }
+        }
+        catch(TransitDriverDispatchRecordNotFoundException ex)
+        {
+            System.out.println("An error has occurred while updating transit: " + ex.getMessage() + "\n");
+        }  
+    }
+    
+    //Allocate cars for current day reservation
+    public void doInputeDateToAllocateCars()
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: Inpute Date To Allocate Cars ***\n");
+        
+        System.out.print("Enter Date in the following format yyyy-mm-dd hh:mm:ss> ");
+        Timestamp date = Timestamp.valueOf(scanner.nextLine().trim());
+        
+        ejbTimerSessionBeanRemote.allocateCarsToCurrentDayReservations(date);
+        System.out.println("All reservations successfully allocated with cars");
+    }
+    
+    
+    public void doGenerateTransitDriverDispatchRecordsForCurrentDayReservations()
+    {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** CaRMS Management System :: Operations Manager Module :: generate Transit Driver Dispatch for current day reservations ***\n");
+        
+        System.out.print("Enter Date in the following format yyyy-mm-dd hh:mm:ss> ");
+        Timestamp date = Timestamp.valueOf(scanner.nextLine().trim());
+        
+        try {
+            ejbTimerSessionBeanRemote.generateTransitDriverDispatchRecordsForCurrentDayReservations(date);
+            System.out.println("Transit Driver Dispatch Records generated.");
+        } catch(InputDataValidationException ex) {
+            System.out.println(ex.getMessage());
+        } catch (UnknownPersistenceException ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+    }
+    
+    
+    
+    
+    private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
+    private void showInputDataValidationErrorsForTransitDriverDispatchRecord(Set<ConstraintViolation<TransitDriverDispatchRecord>>constraintViolations)
     {
         System.out.println("\nInput data validation error!:");
             

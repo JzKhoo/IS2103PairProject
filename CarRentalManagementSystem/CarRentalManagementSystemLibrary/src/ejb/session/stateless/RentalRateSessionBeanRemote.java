@@ -5,9 +5,12 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategory;
 import entity.RentalRate;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.CarCategoryNotFoundException;
 import util.exception.DeleteRentalRateException;
 import util.exception.InputDataValidationException;
 import util.exception.RentalRateNotFoundException;
@@ -21,11 +24,22 @@ import util.exception.UpdateRentalRateException;
 @Remote
 public interface RentalRateSessionBeanRemote {
     
-    // Create
+    // Create Rental Rate
     public RentalRate createNewRentalRate(RentalRate newRentalRate) throws UnknownPersistenceException, InputDataValidationException;
+
+    // Retrieve
+    // View All Rental Rates
     public List<RentalRate> retrieveAllRentalRates();
-    public RentalRate retrieveRentalRateByName(String rentalRateName) throws RentalRateNotFoundException;
-    public RentalRate viewRentalRateDetails(String name) throws RentalRateNotFoundException;
+    public RentalRate retrieveRentalRateById(Long rentalRateId) throws RentalRateNotFoundException;
+    public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException;
+
+    // Update Rental Rate
     public void updateRentalRate(RentalRate rentalRate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
-    public void deleteRentalRate(String name) throws RentalRateNotFoundException, DeleteRentalRateException;
+
+    // Delete Rental Rate
+    public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException;
+
+    public int calculateRentalFee(String carCategory, Timestamp startDateTime, Timestamp endDateTime) throws CarCategoryNotFoundException;
+
+    
 }
