@@ -16,11 +16,13 @@ import util.exception.OutletNotFoundException;
 @Local
 public interface OutletSessionBeanLocal {
 
-    // Create new Outlet
+    // Create (Backend data initialization only)
     public Outlet createNewOutlet(Outlet newOutlet);
 
-    // Retrieve
+    // Retrieve by ID
     public Outlet retrieveOutletById(Long outletId) throws OutletNotFoundException;
+    
+    // Rerieve by Name
     public Outlet retrieveOutletByName(String name) throws OutletNotFoundException;
     
 }

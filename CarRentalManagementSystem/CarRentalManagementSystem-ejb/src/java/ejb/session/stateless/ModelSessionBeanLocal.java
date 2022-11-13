@@ -24,10 +24,13 @@ public interface ModelSessionBeanLocal {
     // Create New Model
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException;
 
-    // Retrieve
     // View All Models
     public List<Model> retrieveAllModels();
+    
+    // Retrieve by ID
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException;
+    
+    // Retrieve by Make and Model
     public Model retrieveModelByMakeAndModel(String make, String model) throws ModelNotFoundException;
 
     // Update Model

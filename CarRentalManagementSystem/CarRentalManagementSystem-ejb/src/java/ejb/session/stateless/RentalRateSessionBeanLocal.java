@@ -21,13 +21,16 @@ import util.exception.UpdateRentalRateException;
 @Local
 public interface RentalRateSessionBeanLocal {
 
-    // Create Rental Rate
+    // Create New Rental Rate
     public RentalRate createNewRentalrate(RentalRate newRentalRate) throws UnknownPersistenceException, InputDataValidationException;
 
-    // Retrieve
     // View All Rental Rates
     public List<RentalRate> retrieveAllRentalRates();
+    
+    // Retrieve by ID
     public RentalRate retrieveRentalRateById(Long rentalRateId) throws RentalRateNotFoundException;
+    
+    // Retrieve by Name
     public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException;
 
     // Update Rental Rate

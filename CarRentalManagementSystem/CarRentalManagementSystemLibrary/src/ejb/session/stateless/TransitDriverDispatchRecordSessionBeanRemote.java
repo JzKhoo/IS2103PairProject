@@ -21,11 +21,15 @@ import util.exception.UpdateTransitDriverDispatchRecordException;
 @Remote
 public interface TransitDriverDispatchRecordSessionBeanRemote {
     
-    public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordsForCurrentDay(Date date, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException;
+    // Retrieve by Date and Outlet
+    public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordsForCurrentDayToCurrentOutlet(Date date, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException;
     
+    // Retrieve by ID
     public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException;
 
+    // Assign Transit Driver
     public void assignTransitDriver(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException, InputDataValidationException;
     
+    // Update Transit As Completed
     public void updateTransitAsCompleted(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException;
 }

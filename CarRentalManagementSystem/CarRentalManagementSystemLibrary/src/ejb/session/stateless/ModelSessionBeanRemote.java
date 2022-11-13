@@ -23,16 +23,19 @@ public interface ModelSessionBeanRemote {
     
     // Create New Model
     public Model createNewModel(Model newModel) throws UnknownPersistenceException, InputDataValidationException;
-    
-    // Retrieve
+
     // View All Models
     public List<Model> retrieveAllModels();
+    
+    // Retrieve by ID
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException;
+    
+    // Retrieve by Make and Model
     public Model retrieveModelByMakeAndModel(String make, String model) throws ModelNotFoundException;
-    
+
     // Update Model
-    public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;
-    
+    public void updateModel(Model model) throws ModelNotFoundException, UpdateModelException, InputDataValidationException;    
+
     // Delete Model
     public void deleteModel(Long modelId) throws ModelNotFoundException, DeleteModelException;
 }

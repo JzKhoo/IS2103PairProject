@@ -79,7 +79,6 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     
-    // Retrieve
     // View All Models
     @Override
     public List<Model> retrieveAllModels()
@@ -89,6 +88,8 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         return query.getResultList();
     }
     
+    
+    // Retrieve by ID
     @Override
     public Model retrieveModelByModelId(Long modelId) throws ModelNotFoundException
     {
@@ -105,6 +106,8 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         }
     }
     
+    
+    // Retrieve by Make and Model
     @Override
     public Model retrieveModelByMakeAndModel(String make, String model) throws ModelNotFoundException
     {
@@ -138,11 +141,6 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
                 {
                     modelToUpdate.setMake(model.getMake());
                     modelToUpdate.setModel(model.getModel());
-                    modelToUpdate.setIsDisabled(model.isIsDisabled());
-
-// Only allow updates to attributes, not relationships
-//                    modelToUpdate.setCars(model.getCars());
-//                    modelToUpdate.setCarCategory(model.getCarCategory());
                 }
                 else
                 {

@@ -79,7 +79,6 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
     }
     
     
-    // Retrieve
     // View All Rental Rates
     @Override
     public List<RentalRate> retrieveAllRentalRates() 
@@ -89,6 +88,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         return query.getResultList();
     }
     
+    // Retrieve by ID
     @Override
     public RentalRate retrieveRentalRateById(Long rentalRateId) throws RentalRateNotFoundException 
     {
@@ -100,10 +100,11 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         }
         else 
         {
-            throw new RentalRateNotFoundException("Rental Rate " + rentalRateId + " does not exist!");
+            throw new RentalRateNotFoundException("Rental Rate ID " + rentalRateId + " does not exist!");
         }
     }
     
+    // Retrieve by Name
     @Override
     public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException
     {
@@ -135,6 +136,7 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
 
                 if(rentalRateToUpdate.getRentalRateId().equals(rentalRate.getRentalRateId()))
                 {
+                    rentalRateToUpdate.setName(rentalRate.getName());
                     rentalRateToUpdate.setRentalRateType(rentalRate.getRentalRateType());
                     rentalRateToUpdate.setRatePerDay(rentalRate.getRatePerDay());
                     rentalRateToUpdate.setStartDate(rentalRate.getStartDate());

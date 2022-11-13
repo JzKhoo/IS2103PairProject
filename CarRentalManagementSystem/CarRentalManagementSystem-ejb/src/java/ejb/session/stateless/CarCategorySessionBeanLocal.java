@@ -19,6 +19,6 @@ public interface CarCategorySessionBeanLocal {
     // Create (Backend data initialization only)
     public CarCategory createNewCategory(CarCategory newCarCategory);
     
-    // Retrieve
+    // Retrieve by Name
     public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException;
 }

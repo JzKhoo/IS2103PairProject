@@ -16,9 +16,14 @@ import util.exception.InvalidLoginCredentialException;
  */
 @Remote
 public interface EmployeeSessionBeanRemote {
+    
+    // Retrieve by ID
+    public Employee retrieveEmployeeById(Long employeeId) throws EmployeeNotFoundException;
+    
+    // Retrieve by Name
+    public Employee retrieveEmployeeByName(String name) throws EmployeeNotFoundException;
 
     // Login via CaRMSManagamentClient
     public Employee login(String userName, String password) throws InvalidLoginCredentialException;
     
-    public Employee retrieveEmployeeByName(String name) throws EmployeeNotFoundException;
 }

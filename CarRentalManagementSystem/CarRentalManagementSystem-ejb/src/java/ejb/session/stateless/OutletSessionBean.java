@@ -36,7 +36,7 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     }
     
     
-    // Retrieve
+    // Retrieve by ID
     @Override
     public Outlet retrieveOutletById(Long outletId) throws OutletNotFoundException 
     {
@@ -52,7 +52,7 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
         }
     }
     
-    
+    // Rerieve by Name
     @Override
     public Outlet retrieveOutletByName(String name) throws OutletNotFoundException
     {

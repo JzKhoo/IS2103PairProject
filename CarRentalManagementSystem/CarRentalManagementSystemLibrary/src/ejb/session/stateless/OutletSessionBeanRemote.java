@@ -16,7 +16,9 @@ import util.exception.OutletNotFoundException;
 @Remote
 public interface OutletSessionBeanRemote {
 
-    // Retrieve
+    // Retrieve by ID
     public Outlet retrieveOutletById(Long outletId) throws OutletNotFoundException;
+    
+    // Rerieve by Name
     public Outlet retrieveOutletByName(String name) throws OutletNotFoundException;
 }

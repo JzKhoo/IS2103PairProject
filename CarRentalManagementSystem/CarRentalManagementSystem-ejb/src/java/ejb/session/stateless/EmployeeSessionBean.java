@@ -37,7 +37,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     }
     
     
-    // Retrieve
+    // Retrieve by ID
     @Override
     public Employee retrieveEmployeeById(Long employeeId) throws EmployeeNotFoundException
     {
@@ -49,10 +49,11 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         }
         else 
         {
-            throw new EmployeeNotFoundException("Employee does not exist: " + employeeId);
+            throw new EmployeeNotFoundException("Employee ID " + employeeId + " does not exist!");
         }
     }
     
+    // Retrieve by Name
     @Override
     public Employee retrieveEmployeeByName(String name) throws EmployeeNotFoundException
     {

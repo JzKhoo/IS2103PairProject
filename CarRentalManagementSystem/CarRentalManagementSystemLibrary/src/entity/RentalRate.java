@@ -6,7 +6,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -37,7 +37,9 @@ public class RentalRate implements Serializable {
     private String rentalRateType;
     @Column(nullable = false)
     private int ratePerDay;
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date startDate;
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date endDate;
     @Column(nullable = false)
     private boolean isDisabled = false;

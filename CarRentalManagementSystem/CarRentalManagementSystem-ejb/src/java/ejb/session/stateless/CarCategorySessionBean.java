@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -35,7 +36,8 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
         return newCarCategory;
     }
     
-    // Retrieve
+    
+    // Retrieve by Name
     @Override
     public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException
     {

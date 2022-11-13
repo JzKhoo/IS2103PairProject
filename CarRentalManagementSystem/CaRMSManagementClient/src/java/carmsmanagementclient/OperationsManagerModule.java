@@ -192,9 +192,11 @@ public class OperationsManagerModule {
         }
     }
     
+    
     // Create New Model
     private void doCreateNewModel() throws CarCategoryNotFoundException
     {
+        // Input fields
         Scanner scanner = new Scanner(System.in);
         Model newModel = new Model();
         
@@ -214,6 +216,7 @@ public class OperationsManagerModule {
             throw new CarCategoryNotFoundException("Create new model unsuccessful!: " + ex.getMessage() + "\n");
         }
         
+        // Create
         Set<ConstraintViolation<Model>>constraintViolations = validator.validate(newModel);
         
         if(constraintViolations.isEmpty())
@@ -278,6 +281,7 @@ public class OperationsManagerModule {
         {
             Model model = modelSessionBeanRemote.retrieveModelByMakeAndModel(make, modelName);
             
+            // Input fields
             System.out.printf("Updating (Make: %s) (Model: %s) \n", model.getMake(), model.getModel());
 
             System.out.print("Enter Make (blank if no change)> ");
@@ -294,7 +298,7 @@ public class OperationsManagerModule {
                 model.setModel(input);
             }
       
-
+            // Update
             Set<ConstraintViolation<Model>>constraintViolations = validator.validate(model);
 
             if(constraintViolations.isEmpty())
@@ -325,48 +329,7 @@ public class OperationsManagerModule {
     }
     
     
-// Updating of attributes
-//            System.out.print("Enter CarCategory (blank if no change)> ");
-//            input = scanner.nextLine().trim();
-//            if(input.length() > 0)
-//            {
-//                try
-//                {
-//                    CarCategory carCategory = carCategorySessionBeanRemote.retrieveCarCategoryByName(input);
-//                    model.setCarCategory(carCategory);
-//                }
-//                catch(CarCategoryNotFoundException ex)
-//                {
-//                    throw new CarCategoryNotFoundException(ex.getMessage());
-//                }
-//            }
-//            
-//            System.out.print("Enter number of Cars to add to model (0 if no change)> ");
-//            int numCars = scanner.nextInt();
-//            
-//            List<Car> cars = new ArrayList<>();
-//            for (int i = 0; i < numCars; i++)
-//            {
-//                System.out.print("Enter Car license plate number> ");
-//                input = scanner.nextLine().trim();
-//                if(input.length() > 0)
-//                {
-//                    try
-//                    {
-//                        Car car = carSessionBeanRemote.retrieveCarByLicensePlateNumber(modelName);
-//                        cars.add(car);
-//                    }
-//                    catch(CarNotFoundException ex)
-//                    {
-//                        throw new CarNotFoundException(ex.getMessage());
-//                    }
-//                }
-//            }
-//            
-//            model.setCars(cars);
-    
-    
-    // Delete model
+    // Delete Model
     private void doDeleteModel()
     {
         Scanner scanner = new Scanner(System.in); 
@@ -407,12 +370,15 @@ public class OperationsManagerModule {
     // Create New Car
     private void doCreateNewCar() throws OutletNotFoundException, ModelNotFoundException
     {
+        // Input fields
         Scanner scanner = new Scanner(System.in);
         Car newCar = new Car();
         
         System.out.println("*** CaRMS Management System :: Operations Manager Module :: Create New Car ***\n");
         System.out.print("Enter License Plate Number> ");
         newCar.setLicensePlateNumber(scanner.nextLine().trim());
+        System.out.print("Enter Colour> ");
+        newCar.setColour(scanner.nextLine().trim());
         System.out.print("Enter Status> ");
         newCar.setStatus(scanner.nextLine().trim());
         System.out.print("Enter Location> ");
@@ -443,6 +409,7 @@ public class OperationsManagerModule {
         }
         
         
+        // Create
         Set<ConstraintViolation<Car>>constraintViolations = validator.validate(newCar);
         
         if(constraintViolations.isEmpty())
@@ -481,11 +448,11 @@ public class OperationsManagerModule {
         System.out.println("*** CaRMS Management System :: Operations Manager Module :: View All Cars ***\n");
         
         List<Car> cars = carSessionBeanRemote.retrieveAllCars();
-        System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet");
+        System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Colour", "Status", "Location", "Is Disabled", "Outlet");
 
         for(Car car:cars)
         {
-            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getColour(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
         }
         
         System.out.print("Press any key to continue...> ");
@@ -506,8 +473,8 @@ public class OperationsManagerModule {
         try
         {
             Car car = carSessionBeanRemote.retrieveCarByLicensePlateNumber(licensePlateNumber);
-            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet");
-            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Colour", "Status", "Location", "Is Disabled", "Outlet");
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getColour(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
             System.out.println("------------------------");
             System.out.println("1: Update Car");
             System.out.println("2: Delete Car");
@@ -534,6 +501,7 @@ public class OperationsManagerModule {
     // Update Car
     private void doUpdateCar(Car car)
     {
+        // Input fields
         Scanner scanner = new Scanner(System.in);        
         String input;
         
@@ -543,6 +511,13 @@ public class OperationsManagerModule {
         if(input.length() > 0)
         {
             car.setLicensePlateNumber(input);
+        }
+        
+        System.out.print("Enter Colour (blank if no change)> ");
+        input = scanner.nextLine().trim();
+        if(input.length() > 0)
+        {
+            car.setColour(input);
         }
 
         System.out.print("Enter Status (blank if no change)> ");
@@ -559,7 +534,7 @@ public class OperationsManagerModule {
             car.setLocation(input);
         }
 
-        
+        // Update
         Set<ConstraintViolation<Car>>constraintViolations = validator.validate(car);
         
         if(constraintViolations.isEmpty())
@@ -582,18 +557,6 @@ public class OperationsManagerModule {
         {
             showInputDataValidationErrorsForCar(constraintViolations);
         }
-    }
-    
-    private void showInputDataValidationErrorsForModel(Set<ConstraintViolation<Model>>constraintViolations)
-    {
-        System.out.println("\nInput data validation error!:");
-            
-        for(ConstraintViolation constraintViolation:constraintViolations)
-        {
-            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
-        }
-
-        System.out.println("\nPlease try again......\n");
     }
     
     
@@ -623,13 +586,13 @@ public class OperationsManagerModule {
         {
             System.out.println("Car NOT deleted!\n");
         }
-
     }
     
     
     // View Transit Driver Dispatch Records for Current Day Reservations
     public void doViewTransitDriverDispatchRecordsForCurrentDay() throws OutletNotFoundException 
     {
+        // Input fields
         Scanner scanner = new Scanner(System.in);        
         Outlet outletInput;
         Date dateInput;
@@ -648,14 +611,15 @@ public class OperationsManagerModule {
             throw new OutletNotFoundException("View transit driver dispatch records unsuccessful!: " + ex.getMessage() + "\n");
         }
        
+        // Fetch
         try
         {
-            List<TransitDriverDispatchRecord> transitDriverDispatchRecords = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordsForCurrentDay(dateInput, outletInput);
-            System.out.printf("%10s%30s%30s%20s\n", "ID", "Date", "License Plate Number", "Employee Name");
+            List<TransitDriverDispatchRecord> transitDriverDispatchRecords = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordsForCurrentDayToCurrentOutlet(dateInput, outletInput);
+            System.out.printf("%10s%30s%20s%30s%20s%30s%20s\n", "ID", "Pickup Date", "Pickup Location", "Arrive Date", "Arrive Location", "License Plate Number", "Employee Name");
 
             for(TransitDriverDispatchRecord transitDriverDispatchRecord:transitDriverDispatchRecords)
             {
-                System.out.printf("%10s%30s%20s%20s\n", transitDriverDispatchRecord.getTransitDriverDispatchRecordId(), transitDriverDispatchRecord.getDate().toString(), transitDriverDispatchRecord.getCar().getLicensePlateNumber(), transitDriverDispatchRecord.getEmployee().getName());
+                System.out.printf("%10s%30s%20s%30s%20s%30s%20s\n", transitDriverDispatchRecord.getTransitDriverDispatchRecordId(), transitDriverDispatchRecord.getPickupDate().toString(), transitDriverDispatchRecord.getPickupLocation(), transitDriverDispatchRecord.getArriveDate().toString(), transitDriverDispatchRecord.getArriveLocation(), transitDriverDispatchRecord.getCar().getLicensePlateNumber(), transitDriverDispatchRecord.getEmployee().getName());
             }
 
             System.out.print("Press any key to continue...> ");
@@ -683,8 +647,6 @@ public class OperationsManagerModule {
         try
         {
             TransitDriverDispatchRecord transitDriverDispatchRecord = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(idInput);
-            
-            System.out.printf("Assigning Transit Driver to Record (Date: %s) (Car License Plate Number: %s) \n", transitDriverDispatchRecord.getDate(), transitDriverDispatchRecord.getCar().getLicensePlateNumber());
 
             try
             {
@@ -709,7 +671,7 @@ public class OperationsManagerModule {
                 }
                 catch (TransitDriverDispatchRecordNotFoundException | UpdateTransitDriverDispatchRecordException ex) 
                 {
-                    System.out.println("An error has occurred while assigning driver: " + ex.getMessage() + "\n");
+                    System.out.println("Assign transit driver unsuccessful!: " + ex.getMessage() + "\n");
                 }
                 catch(InputDataValidationException ex)
                 {
@@ -723,7 +685,7 @@ public class OperationsManagerModule {
         }
         catch(TransitDriverDispatchRecordNotFoundException ex)
         {
-            System.out.println("An error has occurred while assigning driver: " + ex.getMessage() + "\n");
+            System.out.println("Assign transit driver unsuccessful!: " + ex.getMessage() + "\n");
         }  
     }
     
@@ -742,26 +704,35 @@ public class OperationsManagerModule {
         try
         {
             TransitDriverDispatchRecord transitDriverDispatchRecord = transitDriverDispatchRecordSessionBeanRemote.retrieveTransitDriverDispatchRecordById(idInput);
-            
-            System.out.printf("Updating Transit As Completed to Record (Date: %s) (Car License Plate Number: %s) \n", transitDriverDispatchRecord.getDate(), transitDriverDispatchRecord.getCar().getLicensePlateNumber());
 
             try
             {
-                transitDriverDispatchRecordSessionBeanRemote.updateTransitAsCompleted(idInput);
+                transitDriverDispatchRecordSessionBeanRemote.updateTransitAsCompleted(transitDriverDispatchRecord.getTransitDriverDispatchRecordId());
                 System.out.println("Transit updated successfully!\n");
             }
             catch (UpdateTransitDriverDispatchRecordException ex) 
             {
-                System.out.println("An error has occurred while updating record: " + ex.getMessage() + "\n");
+                System.out.println("An error has occurred while updating transit record: " + ex.getMessage() + "\n");
             }
         }
         catch(TransitDriverDispatchRecordNotFoundException ex)
         {
-            System.out.println("An error has occurred while updating transit: " + ex.getMessage() + "\n");
+            System.out.println("An error has occurred while updating transit record: " + ex.getMessage() + "\n");
         }  
     }
     
     
+    private void showInputDataValidationErrorsForModel(Set<ConstraintViolation<Model>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
     
     private void showInputDataValidationErrorsForCar(Set<ConstraintViolation<Car>>constraintViolations)
     {

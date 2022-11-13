@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarCategoryNotFoundException;
 
@@ -16,6 +17,6 @@ import util.exception.CarCategoryNotFoundException;
 @Remote
 public interface CarCategorySessionBeanRemote {
     
-    // Retrieve
+    // Retrieve by Name
     public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException;
 }

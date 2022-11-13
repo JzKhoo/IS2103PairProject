@@ -19,8 +19,10 @@ public interface EmployeeSessionBeanLocal {
     // Create (Backend data initialization only)
     public Employee createNewEmployee(Employee newEmployee);
 
-    // Retrieve
+    // Retrieve by ID
     public Employee retrieveEmployeeById(Long employeeId) throws EmployeeNotFoundException;
+    
+    // Retrieve by Name
     public Employee retrieveEmployeeByName(String name) throws EmployeeNotFoundException;
 
 }

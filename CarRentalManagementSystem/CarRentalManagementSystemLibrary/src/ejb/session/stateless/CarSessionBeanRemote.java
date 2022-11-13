@@ -6,8 +6,6 @@
 package ejb.session.stateless;
 
 import entity.Car;
-import entity.Outlet;
-import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarNotFoundException;
@@ -27,9 +25,13 @@ public interface CarSessionBeanRemote {
     // Create New Car
     public Car createNewCar(Car newCar) throws UnknownPersistenceException, InputDataValidationException, ModelDisabledException;
     
-    // Retrieve
+    // Retrieve by License Plate Number
     public Car retrieveCarByLicensePlateNumber(String licensePlateNumber) throws CarNotFoundException;
+    
+    // Retrieve by ID
     public Car retrieveCarByCarId(Long carId) throws CarNotFoundException;
+    
+    // View All Cars
     public List<Car> retrieveAllCars();
 
     // Update Car
@@ -37,7 +39,4 @@ public interface CarSessionBeanRemote {
 
     // Delete Car
     public void deleteCar(Long carId) throws CarNotFoundException, DeleteCarException;
-    
-    // Search Car
-    public List<Car> searchCar(Date pickUpDateTime, Date returnDateTime, Outlet pickUpOutlet, Outlet returnOutlet);
 }

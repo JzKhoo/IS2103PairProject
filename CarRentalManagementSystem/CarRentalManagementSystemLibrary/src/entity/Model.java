@@ -29,9 +29,9 @@ public class Model implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long modelId;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String make;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String model;
     @Column(nullable = false)
     private boolean isDisabled = false;

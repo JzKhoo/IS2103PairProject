@@ -31,6 +31,7 @@ public class Car implements Serializable {
     private Long carId;
     @Column(nullable = false, unique = true)
     private String licensePlateNumber;
+    private String colour;
     @Column(nullable = false)
     private String status;
     @Column(nullable = false)
@@ -42,14 +43,11 @@ public class Car implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
-    
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Model model;
-    
     @OneToMany(mappedBy = "car")
     private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
-    
     @OneToMany(mappedBy = "car")
     private List<CarRentalReservationRecord> carRentalReservationRecords; 
 
@@ -71,6 +69,17 @@ public class Car implements Serializable {
         this();
         
         this.licensePlateNumber = licensePlateNumber;
+        this.status = status;
+        this.location = location;
+        this.outlet = outlet;
+        this.model = model;
+    }
+    
+    public Car(String licensePlateNumber, String colour, String status, String location, Outlet outlet, Model model) {
+        this();
+        
+        this.licensePlateNumber = licensePlateNumber;
+        this.colour = colour;
         this.status = status;
         this.location = location;
         this.outlet = outlet;
@@ -108,6 +117,14 @@ public class Car implements Serializable {
 
     public void setLicensePlateNumber(String licensePlateNumber) {
         this.licensePlateNumber = licensePlateNumber;
+    }
+    
+    public String getColour() {
+        return colour;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
     }
 
     public String getStatus() {

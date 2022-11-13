@@ -28,9 +28,15 @@ public class TransitDriverDispatchRecord implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long transitDriverDispatchRecordId;
     @Column(nullable = false)
-    private Date date;
+    private Date pickupDate;
     @Column(nullable = false)
-    private boolean isCompleted;
+    private String pickupLocation;
+    @Column(nullable = false)
+    private Date arriveDate;
+    @Column(nullable = false)
+    private String arriveLocation;
+    @Column(nullable = false)
+    private boolean isCompleted = false;
     
     // Relationships
     @ManyToOne
@@ -52,20 +58,13 @@ public class TransitDriverDispatchRecord implements Serializable {
     public TransitDriverDispatchRecord() {
     }
 
-    public TransitDriverDispatchRecord(Date date, boolean isCompleted, Car car) {
-        this.date = date;
-        this.isCompleted = isCompleted;
+    public TransitDriverDispatchRecord(Date pickupDate, String pickupLocation, Date arriveDate, String arriveLocation, Car car) {
+        this.pickupDate = pickupDate;
+        this.pickupLocation = pickupLocation;
+        this.arriveDate = arriveDate;
+        this.arriveLocation = arriveLocation;
         this.car = car;
-    }
-
-    public TransitDriverDispatchRecord(Date date, boolean isCompleted, Employee employee, Car car) {
-        this.date = date;
-        this.isCompleted = isCompleted;
-        this.employee = employee;
-        this.car = car;
-    }
-
-    
+    }    
     
     @Override
     public int hashCode() {
@@ -92,12 +91,36 @@ public class TransitDriverDispatchRecord implements Serializable {
         return "entity.TransitDriverDispatchRecord[ id=" + transitDriverDispatchRecordId + " ]";
     }
 
-    public Date getDate() {
-        return date;
+    public Date getPickupDate() {
+        return pickupDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setPickupDate(Date pickupDate) {
+        this.pickupDate = pickupDate;
+    }
+
+    public String getPickupLocation() {
+        return pickupLocation;
+    }
+
+    public void setPickupLocation(String pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+
+    public Date getArriveDate() {
+        return arriveDate;
+    }
+
+    public void setArriveDate(Date arriveDate) {
+        this.arriveDate = arriveDate;
+    }
+
+    public String getArriveLocation() {
+        return arriveLocation;
+    }
+
+    public void setArriveLocation(String arriveLocation) {
+        this.arriveLocation = arriveLocation;
     }
 
     public boolean isIsCompleted() {

@@ -14,6 +14,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -41,13 +42,13 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }   
     
     
-    // Retrieve
-    // View All TransitDriverDispatchRecords for Current Day Reservations
+    // Retrieve by Date and Outlet
     @Override
-    public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordsForCurrentDay(Date date, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException
+    public List<TransitDriverDispatchRecord> retrieveTransitDriverDispatchRecordsForCurrentDayToCurrentOutlet(Date date, Outlet outlet) throws TransitDriverDispatchRecordNotFoundException
     {
-        Query query = em.createQuery("SELECT t FROM TransitDriverDispatchRecord t WHERE t.date = :inDate AND t.car.outlet = :inOutlet");
-        query.setParameter("inDate", date).setParameter("inOutlet", outlet);
+        Query query = em.createQuery("SELECT t FROM TransitDriverDispatchRecord t WHERE t.pickupDate = :inDate AND t.arriveLocation = :inOutletName");
+        query.setParameter("inDate", date, TemporalType.DATE);
+        query.setParameter("inOutletName", outlet.getName());
         
         if(!query.getResultList().isEmpty())
         {
@@ -59,6 +60,7 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
         }
     }
     
+    // Retrieve by ID
     @Override
     public TransitDriverDispatchRecord retrieveTransitDriverDispatchRecordById(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException
     {
@@ -75,7 +77,6 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
     
     
-    // Update
     // Assign Transit Driver
     @Override
     public void assignTransitDriver(TransitDriverDispatchRecord transitDriverDispatchRecord) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException, InputDataValidationException 
@@ -109,6 +110,7 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
     
     // Update Transit As Completed
+    @Override
     public void updateTransitAsCompleted(Long transitDriverDispatchRecordId) throws TransitDriverDispatchRecordNotFoundException, UpdateTransitDriverDispatchRecordException
     {
         if(transitDriverDispatchRecordId!= null)
