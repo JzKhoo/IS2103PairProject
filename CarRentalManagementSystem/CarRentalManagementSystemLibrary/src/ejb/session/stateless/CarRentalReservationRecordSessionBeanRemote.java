@@ -12,6 +12,8 @@ import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarRentalReservationRecordNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.UpdateCarRentalReservationRecordException;
 
 /**
  *
@@ -20,13 +22,20 @@ import util.exception.CarRentalReservationRecordNotFoundException;
 @Remote
 public interface CarRentalReservationRecordSessionBeanRemote {
     
-    // Retrieve
+    // Retrieve by ID
     public CarRentalReservationRecord retrieveCarRentalReservationRecordById(Long carRentalReservationRecordId) throws CarRentalReservationRecordNotFoundException;
+    
+    // Update reservation
+    public void updateCarRentalReservationRecord(CarRentalReservationRecord carRentalReservationRecord) throws CarRentalReservationRecordNotFoundException, UpdateCarRentalReservationRecordException, InputDataValidationException;
+    
+    // Cancel reservation
+    public void cancelReservationById(Long carRentalReservationRecordId);
+    
+    // Retrieve by Customer ID
     public List<CarRentalReservationRecord> retrieveCarRentalReservationRecordByCustomerId(Long customerId);
     
     // Search Car
     public List<Car> searchCar(Date pickUpDateTime, Date returnDateTime, Outlet pickUpOutlet, Outlet returnOutlet);
     
-    // Cancel reservation
-    public void cancelReservationById(Long carRentalReservationRecordId);
+    
 }

@@ -354,8 +354,11 @@ public class MainApp
         try
         {
             CarRentalReservationRecord carRentalReservationRecord = carRentalReservationRecordSessionBeanRemote.retrieveCarRentalReservationRecordById(idInput);
-            System.out.printf("%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "ID", "Pickup Location", "Return Location", "Pickup Date", "Return Date", "Rental Fee Option", "Is Cancelled", "Car", "Customer");
-            System.out.printf("%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupLocation(), carRentalReservationRecord.getReturnLocation(), carRentalReservationRecord.getPickUpDate().toString(), carRentalReservationRecord.getReturnDate().toString(), carRentalReservationRecord.getRentalFeeOption().toString(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.getCar().getLicensePlateNumber(), carRentalReservationRecord.getCustomer().getName());
+            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", "ID", "Pickup Date", "Pickup Location", "Return Date", "Return Location", "Category Choice", "Make Choice", "Model Choice", "Rental Fee Option", "Is Cancelled", "Is Paid", "Car", "Customer");
+            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupDate().toString(),
+                    carRentalReservationRecord.getPickupLocation(), carRentalReservationRecord.getReturnDate().toString(), carRentalReservationRecord.getReturnLocation(), carRentalReservationRecord.getCategoryChoice(),
+                    carRentalReservationRecord.getMakeChoice(), carRentalReservationRecord.getModelChoice(), carRentalReservationRecord.getRentalFeeOption(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.isIsPaid(),
+                    carRentalReservationRecord.getCar().getLicensePlateNumber(), carRentalReservationRecord.getCustomer().getName());
             System.out.println("------------------------");
             System.out.println("1: Cancel Reservation");
             System.out.println("2: Back\n");
@@ -386,6 +389,45 @@ public class MainApp
         
         if(input.equals('Y'))
         {
+            int cost = carRentalReservationRecord.getPrice();
+            boolean paid = carRentalReservationRecord.isIsPaid();
+            
+            System.out.println("Select cancellation penalty scenario \n");
+            System.out.println("1: At least 14 days before pickup = no penalty");
+            System.out.println("2: Less than 14 days but at least 7 days before pickup – 20% penalty");
+            System.out.println("3: Less than 7 days but at least 3 days before pickup – 50% penalty");
+            System.out.println("4: Less than 3 days before pickup – 70% penalty");
+            int response = scanner.nextInt();
+            
+            if (response == 4) {
+                System.out.println("You will be charged for 70% of your reservation");
+                if(paid) {
+                    System.out.println(cost * 0.3 + " will be returned to your card");
+                } else {
+                    System.out.println(cost * 0.7 + " will be deducted from your card");
+                }
+            } else if (response == 3) {
+                System.out.println("You will be charged for 50% of your reservation");
+                if(paid) {
+                    System.out.println(cost * 0.5 + " will be returned to your card");
+                } else {
+                    System.out.println(cost * 0.5 + " will be deducted from your card");
+                }
+            } else if (response == 2) {
+                System.out.println("You will be charged for 20% of your reservation");
+                if(paid) {
+                    System.out.println(cost * 0.8 + " will be returned to your card");
+                } else {
+                    System.out.println(cost * 0.2 + " will be deducted from your card");
+                }
+            } else {
+                System.out.println("You will not be charged for your reservation");
+                if(paid)
+                {
+                    System.out.println(cost + " will be returned to your card");
+                }
+            }
+            
             carRentalReservationRecordSessionBeanRemote.cancelReservationById(carRentalReservationRecord.getCarRentalReservationRecordId());
         } 
         else
@@ -402,11 +444,14 @@ public class MainApp
         System.out.println("*** CaRMS Reservation System :: View All My Reservations ***\n");
         
         List<CarRentalReservationRecord> carRentalReservationRecords = carRentalReservationRecordSessionBeanRemote.retrieveCarRentalReservationRecordByCustomerId(this.currentCustomer.getCustomerId());
-        System.out.printf("%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", "ID", "Pickup Location", "Return Location", "Pickup Date", "Return Date", "Rental Fee Option", "Is Cancelled", "Car", "Customer");
+        System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", "ID", "Pickup Date", "Pickup Location", "Return Date", "Return Location", "Category Choice", "Make Choice", "Model Choice", "Rental Fee Option", "Is Cancelled", "Is Paid", "Car", "Customer");
         
         for(CarRentalReservationRecord carRentalReservationRecord:carRentalReservationRecords)
         {
-            System.out.printf("%20s%20s%20s%20s%20s%20s%20s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupLocation(), carRentalReservationRecord.getReturnLocation(), carRentalReservationRecord.getPickUpDate().toString(), carRentalReservationRecord.getReturnDate().toString(), carRentalReservationRecord.getRentalFeeOption().toString(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.getCar().getLicensePlateNumber(), carRentalReservationRecord.getCustomer().getName());
+            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupDate().toString(),
+                    carRentalReservationRecord.getPickupLocation(), carRentalReservationRecord.getReturnDate().toString(), carRentalReservationRecord.getReturnLocation(), carRentalReservationRecord.getCategoryChoice(),
+                    carRentalReservationRecord.getMakeChoice(), carRentalReservationRecord.getModelChoice(), carRentalReservationRecord.getRentalFeeOption(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.isIsPaid(),
+                    carRentalReservationRecord.getCar().getLicensePlateNumber(), carRentalReservationRecord.getCustomer().getName());
         }
         
         System.out.print("Press any key to continue...> ");

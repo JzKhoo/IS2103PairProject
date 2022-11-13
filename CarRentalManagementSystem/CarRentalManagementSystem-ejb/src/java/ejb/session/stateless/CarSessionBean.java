@@ -149,6 +149,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
                     carToUpdate.setStatus(car.getStatus());
                     carToUpdate.setLocation(car.getLocation());
                     
+                    carToUpdate.setOutlet(car.getOutlet());
+                    carToUpdate.getOutlet().getCars().remove(carToUpdate);
+                    car.getOutlet().getCars().add(car);
+                    
                 }
                 else
                 {

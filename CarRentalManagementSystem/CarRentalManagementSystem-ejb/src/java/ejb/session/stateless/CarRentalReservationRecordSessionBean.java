@@ -11,11 +11,18 @@ import entity.Outlet;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 import util.exception.CarRentalReservationRecordNotFoundException;
+import util.exception.InputDataValidationException;
+import util.exception.UpdateCarRentalReservationRecordException;
 
 /**
  *
@@ -27,8 +34,16 @@ public class CarRentalReservationRecordSessionBean implements CarRentalReservati
     @PersistenceContext
     private EntityManager em;
     
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
+    
+    public CarRentalReservationRecordSessionBean() {
+        validatorFactory = Validation.buildDefaultValidatorFactory();
+        validator = validatorFactory.getValidator();
+    }  
+    
 
-    // Retrieve
+    // Retrieve by ID
     @Override
     public CarRentalReservationRecord retrieveCarRentalReservationRecordById(Long carRentalReservationRecordId) throws CarRentalReservationRecordNotFoundException
     {
@@ -44,17 +59,39 @@ public class CarRentalReservationRecordSessionBean implements CarRentalReservati
        }
     }
     
+    // Update Reservation
     @Override
-    public List<CarRentalReservationRecord> retrieveCarRentalReservationRecordByCustomerId(Long customerId)
+    public void updateCarRentalReservationRecord(CarRentalReservationRecord carRentalReservationRecord) throws CarRentalReservationRecordNotFoundException, UpdateCarRentalReservationRecordException, InputDataValidationException
     {
-        Query query = em.createQuery("SELECT r FROM CarRentalReservationRecord r WHERE r.customer.customerId = :inCustomerId");
-        query.setParameter("inCustomerId", customerId);
+        if(carRentalReservationRecord != null && carRentalReservationRecord.getCarRentalReservationRecordId()!= null)
+        {
+            Set<ConstraintViolation<CarRentalReservationRecord>>constraintViolations = validator.validate(carRentalReservationRecord);
         
-        return query.getResultList();
+            if(constraintViolations.isEmpty())
+            {
+                CarRentalReservationRecord carRentalReservationRecordToUpdate = retrieveCarRentalReservationRecordById(carRentalReservationRecord.getCarRentalReservationRecordId());
+
+                if(carRentalReservationRecordToUpdate.getCarRentalReservationRecordId().equals(carRentalReservationRecordToUpdate.getCarRentalReservationRecordId()))
+                {
+                    carRentalReservationRecordToUpdate.setIsPaid(carRentalReservationRecord.isIsPaid());
+                }
+                else
+                {
+                    throw new UpdateCarRentalReservationRecordException("Reservation ID of reservation record to be updated does not match the existing record");
+                }
+            }
+            else
+            {
+                throw new InputDataValidationException(prepareInputDataValidationErrorsMessage(constraintViolations));
+            }
+        }
+        else
+        {
+            throw new CarRentalReservationRecordNotFoundException("Reservation ID not provided for reservation to be updated");
+        }
     }
     
-    
-    // Update 
+    // Cancel reservation 
     @Override
     public void cancelReservationById(Long carRentalReservationRecordId)
     {
@@ -68,6 +105,38 @@ public class CarRentalReservationRecordSessionBean implements CarRentalReservati
             System.out.println(ex.getMessage() + "\n");
         }
     }
+    
+    // Retrieve by Customer ID
+    @Override
+    public List<CarRentalReservationRecord> retrieveCarRentalReservationRecordByCustomerId(Long customerId)
+    {
+        Query query = em.createQuery("SELECT r FROM CarRentalReservationRecord r WHERE r.customer.customerId = :inCustomerId");
+        query.setParameter("inCustomerId", customerId);
+        
+        return query.getResultList();
+    }
+    
+    
+    private String prepareInputDataValidationErrorsMessage(Set<ConstraintViolation<CarRentalReservationRecord>>constraintViolations)
+    {
+        String msg = "Input data validation error!:";
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            msg += "\n\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage();
+        }
+        
+        return msg;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
      
     
     
@@ -117,7 +186,7 @@ public class CarRentalReservationRecordSessionBean implements CarRentalReservati
                     if(!carRentalReservationRecord.isIsCancelled())
                     {
                         // Scenario a: pickUpDateTime before reservation pickUpDateTime && returnDateTime after reservation returnDateTime
-                        if(pickUpDateTime.before(carRentalReservationRecord.getPickUpDate()) && returnDateTime.after(carRentalReservationRecord.getReturnDate())) 
+                        if(pickUpDateTime.before(carRentalReservationRecord.getPickupDate()) && returnDateTime.after(carRentalReservationRecord.getReturnDate())) 
                         {
                             filteredCars.remove(car);
                         }
@@ -127,7 +196,7 @@ public class CarRentalReservationRecordSessionBean implements CarRentalReservati
                             filteredCars.remove(car);
                         }
                         // Scenario c: returnOutlet != reservation pickUpOutlet && returnDateTime + 2hrs after reservation pickUpDateTime
-                        else if(!returnOutlet.getName().equals(carRentalReservationRecord.getPickupLocation()) && returnDateTimePlusTwoHours.after(carRentalReservationRecord.getPickUpDate()))
+                        else if(!returnOutlet.getName().equals(carRentalReservationRecord.getPickupLocation()) && returnDateTimePlusTwoHours.after(carRentalReservationRecord.getPickupDate()))
                         {
                             filteredCars.remove(car);
                         }
