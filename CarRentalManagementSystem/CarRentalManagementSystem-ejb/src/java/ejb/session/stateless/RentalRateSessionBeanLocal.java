@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategory;
 import entity.RentalRate;
 import java.util.List;
 import javax.ejb.Local;
@@ -32,11 +33,16 @@ public interface RentalRateSessionBeanLocal {
     
     // Retrieve by Name
     public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException;
+    
+    // Retrieve by Category
+    public List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory);
 
     // Update Rental Rate
     public void updateRentalRate(RentalRate rentalRate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;
     
     // Delete Rental Rate
     public void deleteRentalRate(Long rentalRateId) throws RentalRateNotFoundException, DeleteRentalRateException;
+
+    
     
 }

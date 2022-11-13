@@ -19,4 +19,7 @@ public interface CarCategorySessionBeanRemote {
     
     // Retrieve by Name
     public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException;
+    
+    // Retrieve all
+    public List<CarCategory> retrieveAllCarCategories();
 }

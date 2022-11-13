@@ -5,13 +5,16 @@
  */
 package carmsreservationclient;
 
+import ejb.session.stateless.CarCategorySessionBeanRemote;
 import ejb.session.stateless.CarRentalReservationRecordSessionBeanRemote;
 import ejb.session.stateless.CustomerSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
 import entity.Car;
+import entity.CarCategory;
 import entity.CarRentalReservationRecord;
 import entity.Customer;
 import entity.Outlet;
+import entity.RentalRate;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
@@ -25,6 +28,7 @@ import util.exception.CustomerExistException;
 import util.exception.InputDataValidationException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.OutletNotFoundException;
+import util.exception.RentalRateNotFoundException;
 import util.exception.UnknownPersistenceException;
 
 /**
@@ -36,6 +40,7 @@ public class MainApp
     private final ValidatorFactory validatorFactory;
     private final Validator validator;
     
+    private CarCategorySessionBeanRemote carCategorySessionBeanRemote;
     private CarRentalReservationRecordSessionBeanRemote carRentalReservationRecordSessionBeanRemote;
     private CustomerSessionBeanRemote customerSessionBeanRemote;
     private OutletSessionBeanRemote outletSessionBeanRemote;
@@ -50,10 +55,11 @@ public class MainApp
         validator = validatorFactory.getValidator();
     }
     
-    public MainApp(CarRentalReservationRecordSessionBeanRemote carRentalReservationRecordSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote)
+    public MainApp(CarCategorySessionBeanRemote carCategorySessionBeanRemote, CarRentalReservationRecordSessionBeanRemote carRentalReservationRecordSessionBeanRemote, CustomerSessionBeanRemote customerSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote)
     {   
         this();
         
+        this.carCategorySessionBeanRemote = carCategorySessionBeanRemote;
         this.carRentalReservationRecordSessionBeanRemote = carRentalReservationRecordSessionBeanRemote;
         this.customerSessionBeanRemote = customerSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
@@ -206,8 +212,9 @@ public class MainApp
     // Search Car
     private void doSearchCar() throws OutletNotFoundException 
     {
+        // Input fields
         Scanner scanner = new Scanner(System.in);
-        Outlet pickUpOutlet;
+        Outlet pickupOutlet;
         Outlet returnOutlet;
         
         System.out.println("*** CaRMS Reservation System :: Search Car ***\n\n");
@@ -222,7 +229,7 @@ public class MainApp
         int pickUpHour = scanner.nextInt();
         System.out.print("Enter minutes of pickup date (HH) (0-59)> ");
         int pickUpMinutes = scanner.nextInt();
-        Date pickUpDate = new Date(pickUpYear, pickUpMonth, pickUpDay, pickUpHour, pickUpMinutes);
+        Date pickupDate = new Date(pickUpYear, pickUpMonth, pickUpDay, pickUpHour, pickUpMinutes);
         
         System.out.print("Enter year of return date (YYYY> )");
         int returnYear = scanner.nextInt() - 1900;
@@ -241,7 +248,7 @@ public class MainApp
         try
         {
             System.out.print("Enter pickup Outlet Name> ");
-            pickUpOutlet = outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim());
+            pickupOutlet = outletSessionBeanRemote.retrieveOutletByName(scanner.nextLine().trim());
         }
         catch(OutletNotFoundException ex)
         {
@@ -258,24 +265,40 @@ public class MainApp
             throw new OutletNotFoundException("Search car unsuccessful!: " + ex.getMessage() + "\n");
         }
         
-        List<Car> cars = carRentalReservationRecordSessionBeanRemote.searchCar(pickUpDate, returnDate, pickUpOutlet, returnOutlet);
-        System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s%10s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet", "Rental Fee");
+        // Search for cars
+        List<Car> cars = carRentalReservationRecordSessionBeanRemote.searchCar(pickupDate, returnDate, pickupOutlet, returnOutlet);
+        System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", "Car Category", "Make", "Model", "License Plate Number", "Status", "Location", "Is Disabled", "Outlet");
         
         for(Car car:cars)
         {
-            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s%10s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+            System.out.printf("%20s%20s%20s%30s%20s%20s%20s%20s\n", car.getModel().getCarCategory().getName(), car.getModel().getMake(), car.getModel().getModel(), car.getLicensePlateNumber(), car.getStatus(), car.getLocation(), car.isIsDisabled(), car.getOutlet().getName());
+        }
+        
+        // Search for Total Rental Rates
+        List<CarCategory> carCategories = carCategorySessionBeanRemote.retrieveAllCarCategories();
+        for(CarCategory carCategory:carCategories)
+        {
+            try
+            {
+                List<RentalRate> rentalRatesByCategory = carRentalReservationRecordSessionBeanRemote.calculateTotalRentalRate(carCategory, pickupDate, returnDate);
+                int totalRentalFee = 0;
+                for(RentalRate rentalRate:rentalRatesByCategory)
+                {
+                    totalRentalFee += rentalRate.getRatePerDay();
+                }
+                
+                System.out.printf("CarCategory: %20s Total Rental Fee: %20s\n", carCategory.getName(), totalRentalFee);
+            }
+            catch(RentalRateNotFoundException ex) 
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
         }
         
         System.out.print("Press any key to continue...> ");
         scanner.nextLine();
     }
-    
-    
-    
-    
-    
-    
-    
+
     
     private void menuMain() 
     {
@@ -312,7 +335,7 @@ public class MainApp
                 }
                 else if (response == 2)
                 {
-                    break;
+                    doReserveCar();
                 }
                 else if (response == 3)
                 {
@@ -339,6 +362,94 @@ public class MainApp
         }
     }
     
+    private void doReserveCar() 
+    {
+        Scanner scanner = new Scanner(System.in);
+        CarRentalReservationRecord reservation = new CarRentalReservationRecord();
+        
+        System.out.println("*** CaRMS Reservation System :: Reserve Car ***\n\n");
+        
+        System.out.print("Enter year of pickup date (YYYY)> ");
+        int pickUpYear = scanner.nextInt() - 1900;
+        System.out.print("Enter month of pickup date (MM) (1-12)> ");
+        int pickUpMonth = scanner.nextInt() - 1;
+        System.out.print("Enter day of pickup date (DD) (1-31)> ");
+        int pickUpDay = scanner.nextInt();
+        System.out.print("Enter hour of pickup date (HH) (0-23)> ");
+        int pickUpHour = scanner.nextInt();
+        System.out.print("Enter minutes of pickup date (HH) (0-59)> ");
+        int pickUpMinutes = scanner.nextInt();
+        Date pickupDate = new Date(pickUpYear, pickUpMonth, pickUpDay, pickUpHour, pickUpMinutes);
+        reservation.setPickupDate(pickupDate);
+        
+        System.out.print("Enter year of return date (YYYY> )");
+        int returnYear = scanner.nextInt() - 1900;
+        System.out.print("Enter month of return date (MM) (1-12)> ");
+        int returnMonth = scanner.nextInt() - 1;
+        System.out.print("Enter day of return date (DD) (1-31)> ");
+        int returnDay = scanner.nextInt();
+        System.out.print("Enter hour of return date (HH) (0-23)> ");
+        int returnHour = scanner.nextInt();
+        System.out.print("Enter minutes of return date (HH) (0-59)> ");
+        int returnMinutes = scanner.nextInt();
+        Date returnDate = new Date(returnYear, returnMonth, returnDay, returnHour, returnMinutes);
+        reservation.setReturnDate(returnDate);
+        
+        scanner.nextLine();
+        
+        System.out.print("Enter pick up location> ");
+        reservation.setPickupLocation(scanner.nextLine().trim());
+        System.out.print("Enter return location> ");
+        reservation.setReturnLocation(scanner.nextLine().trim());
+        System.out.print("Enter category> ");
+        reservation.setCategoryChoice(scanner.nextLine().trim());
+        System.out.print("Enter make> ");
+        reservation.setMakeChoice(scanner.nextLine().trim());
+        System.out.print("Enter model> ");
+        reservation.setModelChoice(scanner.nextLine().trim());
+        
+        System.out.println("Select to pay now or later ('Y' or blank)> ");
+        String response = scanner.nextLine();
+        if(response.equals("Y"))
+        {
+            reservation.setIsPaid(true);
+        }
+        else
+        {
+            reservation.setIsPaid(false);
+        }
+        
+        System.out.print("Enter credit card number> ");
+        reservation.setCreditCardNumber(scanner.nextLine().trim());
+        System.out.print("Enter cvv> ");
+        reservation.setCvv(scanner.nextLine().trim());
+        reservation.setCustomer(currentCustomer);
+        
+        Set<ConstraintViolation<CarRentalReservationRecord>>constraintViolations = validator.validate(reservation);
+        
+        if(constraintViolations.isEmpty())
+        {        
+            try
+            {
+                reservation = carRentalReservationRecordSessionBeanRemote.createNewCarRentalReservationRecord(reservation);
+
+                System.out.println("New Reservation created successfully!: Reservation ID = " + reservation.getCarRentalReservationRecordId()+ "\n");
+            }
+            catch(UnknownPersistenceException ex)
+            {
+                System.out.println("An unknown error has occurred while creating the new Reservation!: " + ex.getMessage() + "\n");
+            }
+            catch(InputDataValidationException ex)
+            {
+                System.out.println(ex.getMessage() + "\n");
+            }
+        }
+        else
+        {
+            showInputDataValidationErrorsForCarRentalReservationRecord(constraintViolations);
+        }
+    }
+    
     
     // View Reservation Details
     private void doViewReservationDetails()
@@ -354,10 +465,10 @@ public class MainApp
         try
         {
             CarRentalReservationRecord carRentalReservationRecord = carRentalReservationRecordSessionBeanRemote.retrieveCarRentalReservationRecordById(idInput);
-            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", "ID", "Pickup Date", "Pickup Location", "Return Date", "Return Location", "Category Choice", "Make Choice", "Model Choice", "Rental Fee Option", "Is Cancelled", "Is Paid", "Car", "Customer");
-            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupDate().toString(),
+            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", "ID", "Pickup Date", "Pickup Location", "Return Date", "Return Location", "Category Choice", "Make Choice", "Model Choice", "Is Cancelled", "Is Paid", "Car", "Customer");
+            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupDate().toString(),
                     carRentalReservationRecord.getPickupLocation(), carRentalReservationRecord.getReturnDate().toString(), carRentalReservationRecord.getReturnLocation(), carRentalReservationRecord.getCategoryChoice(),
-                    carRentalReservationRecord.getMakeChoice(), carRentalReservationRecord.getModelChoice(), carRentalReservationRecord.getRentalFeeOption(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.isIsPaid(),
+                    carRentalReservationRecord.getMakeChoice(), carRentalReservationRecord.getModelChoice(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.isIsPaid(),
                     carRentalReservationRecord.getCar().getLicensePlateNumber(), carRentalReservationRecord.getCustomer().getName());
             System.out.println("------------------------");
             System.out.println("1: Cancel Reservation");
@@ -444,13 +555,13 @@ public class MainApp
         System.out.println("*** CaRMS Reservation System :: View All My Reservations ***\n");
         
         List<CarRentalReservationRecord> carRentalReservationRecords = carRentalReservationRecordSessionBeanRemote.retrieveCarRentalReservationRecordByCustomerId(this.currentCustomer.getCustomerId());
-        System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", "ID", "Pickup Date", "Pickup Location", "Return Date", "Return Location", "Category Choice", "Make Choice", "Model Choice", "Rental Fee Option", "Is Cancelled", "Is Paid", "Car", "Customer");
+        System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", "ID", "Pickup Date", "Pickup Location", "Return Date", "Return Location", "Category Choice", "Make Choice", "Model Choice", "Is Cancelled", "Is Paid", "Car", "Customer");
         
         for(CarRentalReservationRecord carRentalReservationRecord:carRentalReservationRecords)
         {
-            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupDate().toString(),
+            System.out.printf("%10s%20s%20s%20s%20s%20s%20s%20s%10s%10s%20s%20s\n", carRentalReservationRecord.getCarRentalReservationRecordId(), carRentalReservationRecord.getPickupDate().toString(),
                     carRentalReservationRecord.getPickupLocation(), carRentalReservationRecord.getReturnDate().toString(), carRentalReservationRecord.getReturnLocation(), carRentalReservationRecord.getCategoryChoice(),
-                    carRentalReservationRecord.getMakeChoice(), carRentalReservationRecord.getModelChoice(), carRentalReservationRecord.getRentalFeeOption(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.isIsPaid(),
+                    carRentalReservationRecord.getMakeChoice(), carRentalReservationRecord.getModelChoice(), carRentalReservationRecord.isIsCancelled(), carRentalReservationRecord.isIsPaid(),
                     carRentalReservationRecord.getCar().getLicensePlateNumber(), carRentalReservationRecord.getCustomer().getName());
         }
         
@@ -460,6 +571,18 @@ public class MainApp
     
     
     private void showInputDataValidationErrorsForCustomerEntity(Set<ConstraintViolation<Customer>>constraintViolations)
+    {
+        System.out.println("\nInput data validation error!:");
+            
+        for(ConstraintViolation constraintViolation:constraintViolations)
+        {
+            System.out.println("\t" + constraintViolation.getPropertyPath() + " - " + constraintViolation.getInvalidValue() + "; " + constraintViolation.getMessage());
+        }
+
+        System.out.println("\nPlease try again......\n");
+    }
+    
+    private void showInputDataValidationErrorsForCarRentalReservationRecord(Set<ConstraintViolation<CarRentalReservationRecord>>constraintViolations)
     {
         System.out.println("\nInput data validation error!:");
             

@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategory;
 import entity.RentalRate;
 import java.util.List;
 import javax.ejb.Remote;
@@ -32,6 +33,9 @@ public interface RentalRateSessionBeanRemote {
     
     // Retrieve by Name
     public RentalRate retrieveRentalRateByName(String name) throws RentalRateNotFoundException;
+    
+    // Retrieve by Category
+    public List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory);
 
     // Update Rental Rate
     public void updateRentalRate(RentalRate rentalRate) throws RentalRateNotFoundException, UpdateRentalRateException, InputDataValidationException;

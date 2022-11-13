@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.CarCategory;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.CarCategoryNotFoundException;
 
@@ -21,4 +22,7 @@ public interface CarCategorySessionBeanLocal {
     
     // Retrieve by Name
     public CarCategory retrieveCarCategoryByName(String name) throws CarCategoryNotFoundException;
+
+    // Retrieve all
+    public List<CarCategory> retrieveAllCarCategories();
 }

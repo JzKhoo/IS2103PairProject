@@ -53,4 +53,13 @@ public class CarCategorySessionBean implements CarCategorySessionBeanRemote, Car
             throw new CarCategoryNotFoundException("CarCategory " + name + " does not exist!");
         }
     }
+    
+    // Retrieve all
+    @Override
+    public List<CarCategory> retrieveAllCarCategories() 
+    {
+        Query query = em.createQuery("SELECT c FROM CarCategory c");
+        
+        return query.getResultList();
+    }
 }

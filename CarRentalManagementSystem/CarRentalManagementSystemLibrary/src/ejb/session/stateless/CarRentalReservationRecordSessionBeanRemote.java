@@ -6,13 +6,17 @@
 package ejb.session.stateless;
 
 import entity.Car;
+import entity.CarCategory;
 import entity.CarRentalReservationRecord;
 import entity.Outlet;
+import entity.RentalRate;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.CarRentalReservationRecordNotFoundException;
 import util.exception.InputDataValidationException;
+import util.exception.RentalRateNotFoundException;
+import util.exception.UnknownPersistenceException;
 import util.exception.UpdateCarRentalReservationRecordException;
 
 /**
@@ -35,7 +39,10 @@ public interface CarRentalReservationRecordSessionBeanRemote {
     public List<CarRentalReservationRecord> retrieveCarRentalReservationRecordByCustomerId(Long customerId);
     
     // Search Car
-    public List<Car> searchCar(Date pickUpDateTime, Date returnDateTime, Outlet pickUpOutlet, Outlet returnOutlet);
+    public List<Car> searchCar(Date pickupDate, Date returnDate, Outlet pickupOutlet, Outlet returnOutlet);
     
+    // Calculate total rental rate
+    public List<RentalRate> calculateTotalRentalRate(CarCategory carCategory, Date startDate, Date endDate) throws RentalRateNotFoundException;
     
+    public CarRentalReservationRecord createNewCarRentalReservationRecord(CarRentalReservationRecord newCarRentalReservationRecord) throws UnknownPersistenceException, InputDataValidationException;
 }

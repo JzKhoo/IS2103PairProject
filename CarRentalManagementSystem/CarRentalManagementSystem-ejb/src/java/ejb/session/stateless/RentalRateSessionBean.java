@@ -5,6 +5,7 @@
  */
 package ejb.session.stateless;
 
+import entity.CarCategory;
 import entity.CarRentalReservationRecord;
 import entity.RentalRate;
 import java.util.List;
@@ -119,6 +120,16 @@ public class RentalRateSessionBean implements RentalRateSessionBeanRemote, Renta
         {
             throw new RentalRateNotFoundException("Rental Rate " + name + " does not exist!");
         }               
+    }
+    
+    // Retrieve by Category
+    @Override
+    public List<RentalRate> retrieveRentalRateByCarCategory(CarCategory carCategory)
+    {
+        Query query = em.createQuery("SELECT r FROM RentalRate r WHERE r.carCategory = :inCarCategory");
+        query.setParameter("inCarCategory", carCategory);
+        
+        return query.getResultList();
     }
     
     

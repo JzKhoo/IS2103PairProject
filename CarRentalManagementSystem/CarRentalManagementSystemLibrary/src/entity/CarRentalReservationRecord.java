@@ -18,7 +18,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import util.enumeration.RentalFeeOption;
 
 /**
  *
@@ -47,8 +46,6 @@ public class CarRentalReservationRecord implements Serializable {
     private String makeChoice;
     private String modelChoice;
     
-    @Column(nullable = false)
-    private RentalFeeOption rentalFeeOption;
     @Column(nullable = false)
     private boolean isCancelled = false;
     @Column(nullable = false)
@@ -82,14 +79,13 @@ public class CarRentalReservationRecord implements Serializable {
         this.rentalRates = new ArrayList<>();
     }
 
-    public CarRentalReservationRecord(Date pickupDate, String pickupLocation, Date returnDate, String returnLocation, RentalFeeOption rentalFeeOption, boolean isPaid, String creditCardNumber, String cvv, Customer customer, List<RentalRate> rentalRates) {
+    public CarRentalReservationRecord(Date pickupDate, String pickupLocation, Date returnDate, String returnLocation, boolean isPaid, String creditCardNumber, String cvv, Customer customer, List<RentalRate> rentalRates) {
         this();
         
         this.pickupDate = pickupDate;
         this.pickupLocation = pickupLocation;
         this.returnDate = returnDate;
         this.returnLocation = returnLocation;
-        this.rentalFeeOption = rentalFeeOption;
         this.isPaid = isPaid;
         this.creditCardNumber = creditCardNumber;
         this.cvv = cvv;
@@ -176,14 +172,6 @@ public class CarRentalReservationRecord implements Serializable {
 
     public void setModelChoice(String modelChoice) {
         this.modelChoice = modelChoice;
-    }
-
-    public RentalFeeOption getRentalFeeOption() {
-        return rentalFeeOption;
-    }
-
-    public void setRentalFeeOption(RentalFeeOption rentalFeeOption) {
-        this.rentalFeeOption = rentalFeeOption;
     }
 
     public boolean isIsCancelled() {
