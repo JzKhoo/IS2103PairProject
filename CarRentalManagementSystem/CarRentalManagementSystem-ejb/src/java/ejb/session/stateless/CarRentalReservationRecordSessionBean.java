@@ -125,7 +125,7 @@ public class CarRentalReservationRecordSessionBean implements CarRentalReservati
             {
                 CarRentalReservationRecord carRentalReservationRecordToUpdate = retrieveCarRentalReservationRecordById(carRentalReservationRecord.getCarRentalReservationRecordId());
 
-                if(carRentalReservationRecordToUpdate.getCarRentalReservationRecordId().equals(carRentalReservationRecordToUpdate.getCarRentalReservationRecordId()))
+                if(carRentalReservationRecordToUpdate.getCarRentalReservationRecordId().equals(carRentalReservationRecord.getCarRentalReservationRecordId()))
                 {
                     carRentalReservationRecordToUpdate.setIsPaid(carRentalReservationRecord.isIsPaid());
                 }
