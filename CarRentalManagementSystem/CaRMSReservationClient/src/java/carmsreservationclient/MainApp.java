@@ -498,7 +498,7 @@ public class MainApp
         System.out.println("Confirm cancel reservation ('Y' or blank)> ");
         input = scanner.nextLine();
         
-        if(input.equals('Y'))
+        if(input.equals("Y"))
         {
             int cost = carRentalReservationRecord.getPrice();
             boolean paid = carRentalReservationRecord.isIsPaid();
