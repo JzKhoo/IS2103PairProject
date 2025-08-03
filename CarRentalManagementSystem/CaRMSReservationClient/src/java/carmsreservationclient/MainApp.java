@@ -231,7 +231,7 @@ public class MainApp
         int pickUpMinutes = scanner.nextInt();
         Date pickupDate = new Date(pickUpYear, pickUpMonth, pickUpDay, pickUpHour, pickUpMinutes);
         
-        System.out.print("Enter year of return date (YYYY> )");
+        System.out.print("Enter year of return date (YYYY)> ");
         int returnYear = scanner.nextInt() - 1900;
         System.out.print("Enter month of return date (MM) (1-12)> ");
         int returnMonth = scanner.nextInt() - 1;
