@@ -115,7 +115,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         }
         else 
         {
-            throw new CarNotFoundException("Car ID " + carId + "does not exist!");
+            throw new CarNotFoundException("Car ID " + carId + " does not exist!");
         }
     }       
             
