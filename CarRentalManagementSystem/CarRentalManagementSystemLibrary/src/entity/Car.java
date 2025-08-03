@@ -16,7 +16,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import util.enumeration.CarStatus;
 
 /**
  *
@@ -25,32 +24,32 @@ import util.enumeration.CarStatus;
 @Entity
 public class Car implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carId;
     @Column(nullable = false, unique = true)
     private String licensePlateNumber;
-    @Column(nullable = false)
     private String colour;
     @Column(nullable = false)
-    private CarStatus status;
+    private String status;
     @Column(nullable = false)
     private String location;
     @Column(nullable = false)
-    private boolean isDisabled;
+    private boolean isDisabled = false;
     
-    @ManyToOne
+    // Relationships
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Outlet outlet;
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Model model;
     @OneToMany(mappedBy = "car")
     private List<TransitDriverDispatchRecord> transitDriverDispatchRecords;
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Category category;
     @OneToMany(mappedBy = "car")
-    private List<CarRentalReservationRecord> carRentalReservationRecords;
-    
+    private List<CarRentalReservationRecord> carRentalReservationRecords; 
 
     public Long getCarId() {
         return carId;
@@ -60,24 +59,32 @@ public class Car implements Serializable {
         this.carId = carId;
     }
 
+    // Constructors
     public Car() {
-        this.transitDriverDispatchRecords = new ArrayList<TransitDriverDispatchRecord>();
-        this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
+        this.transitDriverDispatchRecords = new ArrayList<>();
+        this.carRentalReservationRecords = new ArrayList<>();
     }
 
-    public Car(String licensePlateNumber, String colour, CarStatus status, String location, boolean isDisabled, Outlet outlet, Category category) {
+    public Car(String licensePlateNumber, String status, String location, Outlet outlet, Model model) {
+        this();
+        
+        this.licensePlateNumber = licensePlateNumber;
+        this.status = status;
+        this.location = location;
+        this.outlet = outlet;
+        this.model = model;
+    }
+    
+    public Car(String licensePlateNumber, String colour, String status, String location, Outlet outlet, Model model) {
+        this();
+        
         this.licensePlateNumber = licensePlateNumber;
         this.colour = colour;
         this.status = status;
         this.location = location;
-        this.isDisabled = isDisabled;
         this.outlet = outlet;
-        this.category = category;
-        this.transitDriverDispatchRecords = new ArrayList<TransitDriverDispatchRecord>();
-        this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
+        this.model = model;
     }
-
-    
 
     @Override
     public int hashCode() {
@@ -111,7 +118,7 @@ public class Car implements Serializable {
     public void setLicensePlateNumber(String licensePlateNumber) {
         this.licensePlateNumber = licensePlateNumber;
     }
-
+    
     public String getColour() {
         return colour;
     }
@@ -120,14 +127,14 @@ public class Car implements Serializable {
         this.colour = colour;
     }
 
-    public CarStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(CarStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
-
+    
     public String getLocation() {
         return location;
     }
@@ -135,7 +142,7 @@ public class Car implements Serializable {
     public void setLocation(String location) {
         this.location = location;
     }
-
+    
     public boolean isIsDisabled() {
         return isDisabled;
     }
@@ -151,6 +158,14 @@ public class Car implements Serializable {
     public void setOutlet(Outlet outlet) {
         this.outlet = outlet;
     }
+    
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+    }
 
     public List<TransitDriverDispatchRecord> getTransitDriverDispatchRecords() {
         return transitDriverDispatchRecords;
@@ -160,14 +175,6 @@ public class Car implements Serializable {
         this.transitDriverDispatchRecords = transitDriverDispatchRecords;
     }
 
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
     public List<CarRentalReservationRecord> getCarRentalReservationRecords() {
         return carRentalReservationRecords;
     }
@@ -175,5 +182,5 @@ public class Car implements Serializable {
     public void setCarRentalReservationRecords(List<CarRentalReservationRecord> carRentalReservationRecords) {
         this.carRentalReservationRecords = carRentalReservationRecords;
     }
-    
+  
 }

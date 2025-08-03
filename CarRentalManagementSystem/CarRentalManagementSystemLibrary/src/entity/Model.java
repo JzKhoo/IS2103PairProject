@@ -6,6 +6,8 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 /**
  *
@@ -21,6 +24,7 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Model implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,12 +34,15 @@ public class Model implements Serializable {
     @Column(nullable = false)
     private String model;
     @Column(nullable = false)
-    private boolean isDisabled;
+    private boolean isDisabled = false;
     
-    @ManyToOne
+    // Relationships
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
-    private Category category;
-
+    private CarCategory carCategory;
+    @OneToMany(mappedBy = "model")
+    private List<Car> cars;
+    
     public Long getModelId() {
         return modelId;
     }
@@ -44,22 +51,25 @@ public class Model implements Serializable {
         this.modelId = modelId;
     }
 
+    // Constructors
     public Model() {
+        this.cars = new ArrayList<>();
     }
 
-    public Model(String make, String model, boolean isDisabled, Category category) {
+    public Model(String make, String model, CarCategory carCategory) {
+        this();
+        
         this.make = make;
         this.model = model;
-        this.isDisabled = isDisabled;
-        this.category = category;
+        this.carCategory = carCategory;
     }
-    
-    
 
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (modelId != null ? modelId.hashCode() : 0);
+        hash += (make != null ? make.hashCode() : 0);
+        hash += (model != null ? model.hashCode() : 0);
         return hash;
     }
 
@@ -71,6 +81,12 @@ public class Model implements Serializable {
         }
         Model other = (Model) object;
         if ((this.modelId == null && other.modelId != null) || (this.modelId != null && !this.modelId.equals(other.modelId))) {
+            return false;
+        }
+        if ((this.make == null && other.make != null) || (this.make != null && !this.make.equals(other.make))) {
+            return false;
+        }
+        if ((this.model == null && other.model != null) || (this.model != null && !this.model.equals(other.model))) {
             return false;
         }
         return true;
@@ -104,13 +120,21 @@ public class Model implements Serializable {
     public void setIsDisabled(boolean isDisabled) {
         this.isDisabled = isDisabled;
     }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
     
+    public CarCategory getCarCategory() {
+        return carCategory;
+    }
+
+    public void setCarCategory(CarCategory carCategory) {
+        this.carCategory = carCategory;
+    }
+
+    public List<Car> getCars() {
+        return cars;
+    }
+
+    public void setCars(List<Car> cars) {
+        this.cars = cars;
+    }
+
 }

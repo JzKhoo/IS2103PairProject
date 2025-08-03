@@ -6,7 +6,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -23,22 +22,24 @@ import javax.persistence.OneToMany;
 @Entity
 public class Outlet implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long outletId;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    private String name;
+    private String openingHour;
+    private String closingHour;
     private String address;
-    @Column(nullable = false)
-    private Time startTime;
-    @Column(nullable = false)
-    private Time endTime;
     
+    // Relationships
     @OneToMany(mappedBy = "outlet")
     private List<Car> cars;
     @OneToMany(mappedBy = "outlet")
     private List<Employee> employees;
 
+    
     public Long getOutletId() {
         return outletId;
     }
@@ -47,17 +48,27 @@ public class Outlet implements Serializable {
         this.outletId = outletId;
     }
 
+    // Constructors
     public Outlet() {
-        this.cars = new ArrayList<Car>();
-        this.employees = new ArrayList<Employee>();
+        this.cars = new ArrayList<>();
+        this.employees = new ArrayList<>();
     }
 
-    public Outlet(String address, Time startTime, Time endTime) {
+    public Outlet(String name, String openingHour, String closingHour) {
+        this();
+        
+        this.name = name;
+        this.openingHour = openingHour;
+        this.closingHour = closingHour;
+    }
+    
+    public Outlet(String name, String openingHour, String closingHour, String address) {
+        this();
+        
+        this.name = name;
+        this.openingHour = openingHour;
+        this.closingHour = closingHour;
         this.address = address;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.cars = new ArrayList<Car>();
-        this.employees = new ArrayList<Employee>();
     }
 
     @Override
@@ -85,6 +96,30 @@ public class Outlet implements Serializable {
         return "entity.Outlet[ id=" + outletId + " ]";
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getOpeningHour() {
+        return openingHour;
+    }
+
+    public void setOpeningHour(String openingHour) {
+        this.openingHour = openingHour;
+    }
+
+    public String getClosingHour() {
+        return closingHour;
+    }
+
+    public void setClosingHour(String closingHour) {
+        this.closingHour = closingHour;
+    }
+    
     public String getAddress() {
         return address;
     }
@@ -92,23 +127,7 @@ public class Outlet implements Serializable {
     public void setAddress(String address) {
         this.address = address;
     }
-
-    public Time getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Time startTime) {
-        this.startTime = startTime;
-    }
-
-    public Time getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Time endTime) {
-        this.endTime = endTime;
-    }
-
+    
     public List<Car> getCars() {
         return cars;
     }
@@ -124,5 +143,5 @@ public class Outlet implements Serializable {
     public void setEmployees(List<Employee> employees) {
         this.employees = employees;
     }
-    
+
 }

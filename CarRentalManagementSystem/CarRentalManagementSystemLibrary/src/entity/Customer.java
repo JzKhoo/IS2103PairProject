@@ -13,9 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 /**
  *
@@ -24,27 +22,29 @@ import javax.persistence.OneToOne;
 @Entity
 public class Customer implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long customerId;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
     private String phoneNumber;
     @Column(nullable = false)
     private String passportNumber;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false, unique = true)
+    private String cardNumber;
+    @Column(nullable = false)
+    private double balance = 0.0;
     
+    // Relationships
     @OneToMany(mappedBy = "customer")
     private List<CarRentalReservationRecord> carRentalReservationRecords;
-    @OneToOne(mappedBy = "customer")
-    @JoinColumn(nullable = false)
-    private CreditCard creditCard;
-    
 
     public Long getCustomerId() {
         return customerId;
@@ -54,20 +54,22 @@ public class Customer implements Serializable {
         this.customerId = customerId;
     }
 
+    // Constructors
     public Customer() {
-        this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
+        this.carRentalReservationRecords = new ArrayList<>();
     }
 
-    public Customer(String email, String phoneNumber, String passportNumber, String name, String password, CreditCard creditCard) {
+    public Customer(String email, String phoneNumber, String passportNumber, String name, String password, String cardNumber) {
+        this();
+        
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.passportNumber = passportNumber;
         this.name = name;
         this.password = password;
-        this.creditCard = creditCard;
-        this.carRentalReservationRecords = new ArrayList<CarRentalReservationRecord>();
+        this.cardNumber = cardNumber;
     }
-    
+
     
 
     @Override
@@ -143,12 +145,22 @@ public class Customer implements Serializable {
         this.carRentalReservationRecords = carRentalReservationRecords;
     }
 
-    public CreditCard getCreditCard() {
-        return creditCard;
+    public String getCardNumber() {
+        return cardNumber;
     }
 
-    public void setCreditCard(CreditCard creditCard) {
-        this.creditCard = creditCard;
+    public void setCardNumber(String cardNumber) {
+        this.cardNumber = cardNumber;
     }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    
     
 }

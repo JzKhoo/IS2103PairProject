@@ -3,16 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package util.enumeration;
+package ejb.session.stateless;
+
+import javax.ejb.Remote;
 
 /**
  *
  * @author khoojingzhi
  */
-public enum CategoryType {
-    STANDARD_SEDAN,
-    FAMILY_SEDAN,
-    LUXURY_SEDAN,
-    SUV,
-    MINIVAN;
+@Remote
+public interface PartnerSessionBeanRemote {
+    
 }

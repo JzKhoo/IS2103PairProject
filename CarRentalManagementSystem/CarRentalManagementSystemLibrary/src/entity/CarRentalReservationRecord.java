@@ -6,15 +6,18 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import util.enumeration.RentalFeeOption;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -23,32 +26,44 @@ import util.enumeration.RentalFeeOption;
 @Entity
 public class CarRentalReservationRecord implements Serializable {
 
+    // Attributes
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long carRentalReservationRecordId;
     @Column(nullable = false)
-    private Date date;
-    @Column(nullable = false)
-    private String categoryTypeChoice;
-    @Column(nullable = false)
-    private String makeChoice;
-    @Column(nullable = false)
-    private String modelChoice;
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date pickupDate;
     @Column(nullable = false)
     private String pickupLocation;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date returnDate;
+    @Column(nullable = false)
     private String returnLocation;
-    @Column(nullable = false)
-    private RentalFeeOption rentalFeeOption;
-    @Column(nullable = false)
-    private boolean isCancelled;
     
+    private String categoryChoice;
+    private String makeChoice;
+    private String modelChoice;
+    
+    @Column(nullable = false)
+    private boolean isCancelled = false;
+    @Column(nullable = false)
+    private boolean isPaid;
+    @Column(nullable = false)
+    private String creditCardNumber;
+    @Column(nullable = false)
+    private String cvv;
+    private int price;
+    
+    // Relationships
     @ManyToOne
     private Car car;
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Customer customer;
+    @ManyToMany(mappedBy = "carRentalReservationRecords")
+    private List<RentalRate> rentalRates;
 
     public Long getCarRentalReservationRecordId() {
         return carRentalReservationRecordId;
@@ -58,23 +73,25 @@ public class CarRentalReservationRecord implements Serializable {
         this.carRentalReservationRecordId = carRentalReservationRecordId;
     }
 
-    public CarRentalReservationRecord() {
-    }
-
-    public CarRentalReservationRecord(Date date, String categoryTypeChoice, String makeChoice, String modelChoice, String pickupLocation, String returnLocation, RentalFeeOption rentalFeeOption, boolean isCancelled, Car car, Customer customer) {
-        this.date = date;
-        this.categoryTypeChoice = categoryTypeChoice;
-        this.makeChoice = makeChoice;
-        this.modelChoice = modelChoice;
-        this.pickupLocation = pickupLocation;
-        this.returnLocation = returnLocation;
-        this.rentalFeeOption = rentalFeeOption;
-        this.isCancelled = isCancelled;
-        this.car = car;
-        this.customer = customer;
-    }
     
+    // Constructor
+    public CarRentalReservationRecord() {
+        this.rentalRates = new ArrayList<>();
+    }
 
+    public CarRentalReservationRecord(Date pickupDate, String pickupLocation, Date returnDate, String returnLocation, boolean isPaid, String creditCardNumber, String cvv, Customer customer, List<RentalRate> rentalRates) {
+        this();
+        
+        this.pickupDate = pickupDate;
+        this.pickupLocation = pickupLocation;
+        this.returnDate = returnDate;
+        this.returnLocation = returnLocation;
+        this.isPaid = isPaid;
+        this.creditCardNumber = creditCardNumber;
+        this.cvv = cvv;
+        this.customer = customer;
+        this.rentalRates = rentalRates;
+    }  
 
     @Override
     public int hashCode() {
@@ -101,20 +118,44 @@ public class CarRentalReservationRecord implements Serializable {
         return "entity.CarRentalReservationRecord[ id=" + carRentalReservationRecordId + " ]";
     }
 
-    public Date getDate() {
-        return date;
+    public Date getPickupDate() {
+        return pickupDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setPickupDate(Date pickupDate) {
+        this.pickupDate = pickupDate;
     }
 
-    public String getCategoryTypeChoice() {
-        return categoryTypeChoice;
+    public String getPickupLocation() {
+        return pickupLocation;
     }
 
-    public void setCategoryTypeChoice(String categoryTypeChoice) {
-        this.categoryTypeChoice = categoryTypeChoice;
+    public void setPickupLocation(String pickupLocation) {
+        this.pickupLocation = pickupLocation;
+    }
+
+    public Date getReturnDate() {
+        return returnDate;
+    }
+
+    public void setReturnDate(Date returnDate) {
+        this.returnDate = returnDate;
+    }
+
+    public String getReturnLocation() {
+        return returnLocation;
+    }
+
+    public void setReturnLocation(String returnLocation) {
+        this.returnLocation = returnLocation;
+    }
+
+    public String getCategoryChoice() {
+        return categoryChoice;
+    }
+
+    public void setCategoryChoice(String categoryChoice) {
+        this.categoryChoice = categoryChoice;
     }
 
     public String getMakeChoice() {
@@ -133,36 +174,44 @@ public class CarRentalReservationRecord implements Serializable {
         this.modelChoice = modelChoice;
     }
 
-    public String getPickupLocation() {
-        return pickupLocation;
-    }
-
-    public void setPickupLocation(String pickupLocation) {
-        this.pickupLocation = pickupLocation;
-    }
-
-    public String getReturnLocation() {
-        return returnLocation;
-    }
-
-    public void setReturnLocation(String returnLocation) {
-        this.returnLocation = returnLocation;
-    }
-
-    public RentalFeeOption getRentalFeeOption() {
-        return rentalFeeOption;
-    }
-
-    public void setRentalFeeOption(RentalFeeOption rentalFeeOption) {
-        this.rentalFeeOption = rentalFeeOption;
-    }
-
     public boolean isIsCancelled() {
         return isCancelled;
     }
 
     public void setIsCancelled(boolean isCancelled) {
         this.isCancelled = isCancelled;
+    }
+
+    public boolean isIsPaid() {
+        return isPaid;
+    }
+
+    public void setIsPaid(boolean isPaid) {
+        this.isPaid = isPaid;
+    }
+
+    public String getCreditCardNumber() {
+        return creditCardNumber;
+    }
+
+    public void setCreditCardNumber(String creditCardNumber) {
+        this.creditCardNumber = creditCardNumber;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public void setPrice(int price) {
+        this.price = price;
     }
 
     public Car getCar() {
@@ -180,5 +229,15 @@ public class CarRentalReservationRecord implements Serializable {
     public void setCustomer(Customer customer) {
         this.customer = customer;
     }
+
+    public List<RentalRate> getRentalRates() {
+        return rentalRates;
+    }
+
+    public void setRentalRates(List<RentalRate> rentalRates) {
+        this.rentalRates = rentalRates;
+    }
+
     
+ 
 }
